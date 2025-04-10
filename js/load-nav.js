@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <li><a href="index.html">home</a></li>
             <li><a href="#">about</a></li>
             <li><a href="projects.html">projects</a></li>
-            <li><a href="#">thoughts</a></li>
-          </ul>
+           </ul>
         </nav>
       `;
     });
