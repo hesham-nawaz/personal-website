@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning | Hesham Nawaz</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+    <script src="js/load-nav.js"></script>
+    
+    <div class="container">
+        <div class="title-card">
+            <h1>Learning Journey</h1>
+            <p>A collection of resources, courses, and materials that have shaped my knowledge and skills. Browse through different categories to explore my learning path.</p>
+        </div>
+        
+        <div class="learning-categories">
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="university">University Classes</button>
+            <button class="category-btn" data-category="courses">Online Courses</button>
+            <button class="category-btn" data-category="books">Books</button>
+            <button class="category-btn" data-category="videos">Videos</button>
+            <button class="category-btn" data-category="papers">Research Papers</button>
+            <button class="category-btn" data-category="blogs">Blog Posts</button>
+        </div>
+        
+        <div class="learning-grid">
+            <!-- University Classes -->
+            <div class="learning-item" data-category="university">
+                <div class="learning-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="learning-info">
+                    <h3>Machine Learning</h3>
+                    <p>Introduction to fundamental machine learning algorithms and their applications.</p>
+                    <div class="learning-tags">
+                        <span>MIT</span>
+                        <span>CS</span>
+                        <span>AI</span>
+                    </div>
+                    <a href="#" class="learning-link">View Notes</a>
+                </div>
+            </div>
+            
+            <div class="learning-item" data-category="university">
+                <div class="learning-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="learning-info">
+                    <h3>Advanced Algorithms</h3>
+                    <p>Deep dive into complex algorithmic structures and optimization techniques.</p>
+                    <div class="learning-tags">
+                        <span>MIT</span>
+                        <span>CS</span>
+                        <span>Algorithms</span>
+                    </div>
+                    <a href="#" class="learning-link">View Notes</a>
+                </div>
+            </div>
+            
+            <!-- Online Courses -->
+            <div class="learning-item" data-category="courses">
+                <div class="learning-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <div class="learning-info">
+                    <h3>Deep Learning Specialization</h3>
+                    <p>Comprehensive course on neural networks and deep learning architectures.</p>
+                    <div class="learning-tags">
+                        <span>Coursera</span>
+                        <span>AI</span>
+                        <span>Neural Networks</span>
+                    </div>
+                    <a href="#" class="learning-link">View Certificate</a>
+                </div>
+            </div>
+            
+            <!-- Books -->
+            <div class="learning-item" data-category="books">
+                <div class="learning-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="learning-info">
+                    <h3>Thinking, Fast and Slow</h3>
+                    <p>Exploration of the two systems that drive the way we think and make decisions.</p>
+                    <div class="learning-tags">
+                        <span>Psychology</span>
+                        <span>Decision Making</span>
+                        <span>Behavioral Economics</span>
+                    </div>
+                    <a href="#" class="learning-link">Read Summary</a>
+                </div>
+            </div>
+            
+            <!-- Videos -->
+            <div class="learning-item" data-category="videos">
+                <div class="learning-icon">
+                    <i class="fab fa-youtube"></i>
+                </div>
+                <div class="learning-info">
+                    <h3>3Blue1Brown: Neural Networks</h3>
+                    <p>Visual explanation of neural networks and the mathematics behind them.</p>
+                    <div class="learning-tags">
+                        <span>YouTube</span>
+                        <span>Math</span>
+                        <span>AI</span>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" class="learning-link">Watch Video</a>
+                </div>
+            </div>
+            
+            <!-- Research Papers -->
+            <div class="learning-item" data-category="papers">
+                <div class="learning-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="learning-info">
+                    <h3>Attention Is All You Need</h3>
+                    <p>The groundbreaking paper that introduced the Transformer architecture.</p>
+                    <div class="learning-tags">
+                        <span>NLP</span>
+                        <span>Transformers</span>
+                        <span>Deep Learning</span>
+                    </div>
+                    <a href="https://arxiv.org/abs/1706.03762" target="_blank" class="learning-link">Read Paper</a>
+                </div>
+            </div>
+            
+            <!-- Blog Posts -->
+            <div class="learning-item" data-category="blogs">
+                <div class="learning-icon">
+                    <i class="fas fa-rss"></i>
+                </div>
+                <div class="learning-info">
+                    <h3>The Unreasonable Effectiveness of Data</h3>
+                    <p>How large datasets are transforming the approach to AI problems.</p>
+                    <div class="learning-tags">
+                        <span>Google Research</span>
+                        <span>Big Data</span>
+                        <span>AI</span>
+                    </div>
+                    <a href="#" class="learning-link">Read Post</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/learning-filter.js"></script>
+</body>
+</html> 
