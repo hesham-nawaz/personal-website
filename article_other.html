@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article | Hesham Nawaz</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add the markdown loader script -->
+    <script src="js/markdown-loader.js"></script>
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+    <script src="js/load-nav.js"></script>
+    
+    <div class="container">
+        <div class="article-page">
+            <div class="article-navigation">
+                <a href="index.html" class="back-link">← Back to Home</a>
+            </div>
+            <div id="article-content" class="article-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Get the article ID from the URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleId = urlParams.get('id');
+        
+        // If there's an article ID, load the corresponding article
+        if (articleId) {
+            document.title = `${articleId.replace('-', ' ')} | Hesham Nawaz`;
+            loadMarkdownArticle(`./articles/${articleId}.md`, 'article-content');
+        } else {
+            // If no article ID is provided, show an error message
+            document.getElementById('article-content').innerHTML = '<h2>Article Not Found</h2><p>The requested article could not be found.</p>';
+        }
+    </script>
+</body>
+</html>

@@ -15,28 +15,54 @@
     <div class="container">
         <div class="title-card">
             <h1>Learning Journey</h1>
-            <p>A collection of resources, courses, and materials that have shaped my knowledge and skills. Browse through different categories to explore my learning path.</p>
+            <p>I've spent a lot of my life trying to learn things. This is my attempt at sharing both the substance of what I've learned and some of my reflections.</p>
         </div>
         
-        <div class="learning-categories">
-            <button class="category-btn active" data-category="all">All</button>
-            <button class="category-btn" data-category="university">University Classes</button>
-            <button class="category-btn" data-category="courses">Online Courses</button>
-            <button class="category-btn" data-category="books">Books</button>
-            <button class="category-btn" data-category="videos">Videos</button>
-            <button class="category-btn" data-category="papers">Research Papers</button>
-            <button class="category-btn" data-category="blogs">Blog Posts</button>
+        <div class="filter-section">
+            <div class="filter-group">
+                <h3 class="filter-title">Type</h3>
+                <div class="filter-buttons">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="university">University Classes</button>
+                    <button class="category-btn" data-category="courses">Online Courses</button>
+                    <button class="category-btn" data-category="books">Books</button>
+                    <button class="category-btn" data-category="videos">Videos</button>
+                    <button class="category-btn" data-category="papers">Research Papers</button>
+                    <button class="category-btn" data-category="blogs">Blog Posts</button>
+                </div>
+            </div>
+            
+            <div class="filter-group subject-group">
+                <h3 class="filter-title">Subject</h3>
+                <div class="filter-buttons">
+                    <button class="subject-btn active" data-subject="all">All</button>
+                    <button class="subject-btn" data-subject="ai">AI & Machine Learning</button>
+                    <button class="subject-btn" data-subject="cs">Computer Science</button>
+                    <button class="subject-btn" data-subject="math">Mathematics</button>
+                    <button class="subject-btn" data-subject="psychology">Psychology</button>
+                    <button class="subject-btn" data-subject="economics">Economics</button>
+                </div>
+                
+                <div class="sort-control">
+                    <button id="sort-toggle" class="sort-btn">
+                        <i class="fas fa-sort-amount-down"></i> Newest First
+                    </button>
+                </div>
+            </div>
         </div>
         
         <div class="learning-grid">
             <!-- University Classes -->
-            <div class="learning-item" data-category="university">
+            <div class="learning-item" data-category="university" data-subject="ai cs" data-timestamp="2023-05-15">
                 <div class="learning-icon">
                     <i class="fas fa-university"></i>
                 </div>
                 <div class="learning-info">
                     <h3>Machine Learning</h3>
                     <p>Introduction to fundamental machine learning algorithms and their applications.</p>
+                    <div class="learning-meta">
+                        <span class="learning-date">May 2023</span>
+                    </div>
                     <div class="learning-tags">
                         <span>MIT</span>
                         <span>CS</span>
@@ -46,13 +72,16 @@
                 </div>
             </div>
             
-            <div class="learning-item" data-category="university">
+            <div class="learning-item" data-category="university" data-subject="cs" data-timestamp="2022-12-10">
                 <div class="learning-icon">
                     <i class="fas fa-university"></i>
                 </div>
                 <div class="learning-info">
                     <h3>Advanced Algorithms</h3>
                     <p>Deep dive into complex algorithmic structures and optimization techniques.</p>
+                    <div class="learning-meta">
+                        <span class="learning-date">December 2022</span>
+                    </div>
                     <div class="learning-tags">
                         <span>MIT</span>
                         <span>CS</span>
@@ -63,13 +92,16 @@
             </div>
             
             <!-- Online Courses -->
-            <div class="learning-item" data-category="courses">
+            <div class="learning-item" data-category="courses" data-subject="ai" data-timestamp="2023-08-22">
                 <div class="learning-icon">
                     <i class="fas fa-laptop-code"></i>
                 </div>
                 <div class="learning-info">
                     <h3>Deep Learning Specialization</h3>
                     <p>Comprehensive course on neural networks and deep learning architectures.</p>
+                    <div class="learning-meta">
+                        <span class="learning-date">August 2023</span>
+                    </div>
                     <div class="learning-tags">
                         <span>Coursera</span>
                         <span>AI</span>
@@ -80,13 +112,16 @@
             </div>
             
             <!-- Books -->
-            <div class="learning-item" data-category="books">
+            <div class="learning-item" data-category="books" data-subject="psychology economics" data-timestamp="2022-06-05">
                 <div class="learning-icon">
                     <i class="fas fa-book"></i>
                 </div>
                 <div class="learning-info">
                     <h3>Thinking, Fast and Slow</h3>
                     <p>Exploration of the two systems that drive the way we think and make decisions.</p>
+                    <div class="learning-meta">
+                        <span class="learning-date">June 2022</span>
+                    </div>
                     <div class="learning-tags">
                         <span>Psychology</span>
                         <span>Decision Making</span>
@@ -97,13 +132,16 @@
             </div>
             
             <!-- Videos -->
-            <div class="learning-item" data-category="videos">
+            <div class="learning-item" data-category="videos" data-subject="ai math" data-timestamp="2023-02-18">
                 <div class="learning-icon">
                     <i class="fab fa-youtube"></i>
                 </div>
                 <div class="learning-info">
                     <h3>3Blue1Brown: Neural Networks</h3>
                     <p>Visual explanation of neural networks and the mathematics behind them.</p>
+                    <div class="learning-meta">
+                        <span class="learning-date">February 2023</span>
+                    </div>
                     <div class="learning-tags">
                         <span>YouTube</span>
                         <span>Math</span>
@@ -114,13 +152,16 @@
             </div>
             
             <!-- Research Papers -->
-            <div class="learning-item" data-category="papers">
+            <div class="learning-item" data-category="papers" data-subject="ai cs" data-timestamp="2021-11-30">
                 <div class="learning-icon">
                     <i class="fas fa-file-alt"></i>
                 </div>
                 <div class="learning-info">
                     <h3>Attention Is All You Need</h3>
                     <p>The groundbreaking paper that introduced the Transformer architecture.</p>
+                    <div class="learning-meta">
+                        <span class="learning-date">November 2021</span>
+                    </div>
                     <div class="learning-tags">
                         <span>NLP</span>
                         <span>Transformers</span>
@@ -131,13 +172,16 @@
             </div>
             
             <!-- Blog Posts -->
-            <div class="learning-item" data-category="blogs">
+            <div class="learning-item" data-category="blogs" data-subject="ai cs" data-timestamp="2023-01-15">
                 <div class="learning-icon">
                     <i class="fas fa-rss"></i>
                 </div>
                 <div class="learning-info">
                     <h3>The Unreasonable Effectiveness of Data</h3>
                     <p>How large datasets are transforming the approach to AI problems.</p>
+                    <div class="learning-meta">
+                        <span class="learning-date">January 2023</span>
+                    </div>
                     <div class="learning-tags">
                         <span>Google Research</span>
                         <span>Big Data</span>

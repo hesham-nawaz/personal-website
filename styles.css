@@ -602,3 +602,161 @@ p {
 .learning-item.hidden {
     display: none;
 }
+
+/* Filter controls layout */
+.filter-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.learning-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.sort-control {
+    margin-left: auto;
+    margin-top: 10px;
+}
+
+.sort-btn {
+    background-color: #f0f0f0;
+    border: 2px solid transparent;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.sort-btn.active {
+    background-color: #0066cc;
+    color: white;
+    border-color: #0055aa;
+}
+
+/* Learning meta information */
+.learning-meta {
+    margin-bottom: 10px;
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.learning-date {
+    display: inline-flex;
+    align-items: center;
+}
+
+.learning-date::before {
+    content: "\f073";
+    font-family: "Font Awesome 5 Free";
+    margin-right: 5px;
+}
+
+/* Reorganized filter section styles */
+.filter-section {
+    margin-bottom: 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-title {
+    font-size: 0.95rem;
+    margin: 0 12px 0 0;
+    color: #555;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex-grow: 1;
+}
+
+/* Subject filter group with sort button */
+.filter-group.subject-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0; /* Remove bottom margin from the last group */
+}
+
+/* Buttons styling */
+.category-btn,
+.subject-btn,
+.sort-btn {
+    background-color: #f0f0f0;
+    border: 1px solid transparent;
+    padding: 7px 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.category-btn:hover,
+.subject-btn:hover,
+.sort-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.category-btn.active,
+.subject-btn.active {
+    background-color: #0066cc;
+    color: white;
+    border-color: #0055aa;
+}
+
+/* Different color for subject buttons to distinguish them */
+.subject-btn.active {
+    background-color: #00aa66;
+    border-color: #008855;
+}
+
+/* Sort control */
+.sort-control {
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+.sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .filter-group.subject-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .sort-control {
+        margin-left: 0;
+        margin-top: 10px;
+        align-self: flex-end;
+    }
+}
