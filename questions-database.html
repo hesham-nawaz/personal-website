@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interviews | Hesham Nawaz</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+    <script src="js/load-nav.js"></script>
+    
+    <div class="container">
+        <div class="title-card">
+            <h1>Interviews Database</h1>
+            <p>A collection of interview questions and answers to help you prepare for your next interview.</p>
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-group">
+                <h3 class="filter-title">Category</h3>
+                <div class="filter-buttons">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="technical">Technical</button>
+                    <button class="category-btn" data-category="behavioral">Behavioral</button>
+                    <button class="category-btn" data-category="leadership">Leadership</button>
+                </div>
+            </div>
+            
+            <div class="filter-group subject-group">
+                <h3 class="filter-title">Topic</h3>
+                <div class="filter-buttons">
+                    <button class="subject-btn active" data-subject="all">All</button>
+                    <button class="subject-btn" data-subject="data-structures">Data Structures</button>
+                    <button class="subject-btn" data-subject="algorithms">Algorithms</button>
+                    <button class="subject-btn" data-subject="machine-learning">Machine Learning</button>
+                    <button class="subject-btn" data-subject="system-design">System Design</button>
+                </div>
+            </div>
+            
+            <div class="filter-group layout-group">
+                <h3 class="filter-title">Layout</h3>
+                <div class="filter-buttons">
+                    <button class="layout-btn active" data-columns="1">1 Column</button>
+                    <button class="layout-btn" data-columns="2">2 Columns</button>
+                    <button class="layout-btn" data-columns="3">3 Columns</button>
+                </div>
+                
+                <div class="sort-control">
+                    <button id="sort-toggle" class="sort-btn">
+                        <i class="fas fa-sort-amount-down"></i> Newest First
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="interview-grid grid-columns-1">
+            <!-- Technical Questions -->
+            <div class="interview-item" data-category="technical" data-subject="data-structures" data-timestamp="2023-05-15">
+                <div class="interview-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="interview-info">
+                    <h3>Array Rotation</h3>
+                    <p>How to rotate an array by a given number of positions.</p>
+                    <div class="interview-meta">
+                        <span class="interview-date">May 2023</span>
+                    </div>
+                    <div class="interview-tags">
+                        <span>Data Structures</span>
+                        <span>Arrays</span>
+                    </div>
+                    <a href="#" class="interview-link">View Answer</a>
+                </div>
+            </div>
+            
+            <!-- Behavioral Questions -->
+            <div class="interview-item" data-category="behavioral" data-subject="teamwork" data-timestamp="2022-12-10">
+                <div class="interview-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="interview-info">
+                    <h3>Team Conflict Resolution</h3>
+                    <p>How to handle conflicts within a team.</p>
+                    <div class="interview-meta">
+                        <span class="interview-date">December 2022</span>
+                    </div>
+                    <div class="interview-tags">
+                        <span>Teamwork</span>
+                        <span>Conflict Resolution</span>
+                    </div>
+                    <a href="#" class="interview-link">View Answer</a>
+                </div>
+            </div>
+            
+            <!-- Leadership Questions -->
+            <div class="interview-item" data-category="leadership" data-subject="vision" data-timestamp="2023-08-22">
+                <div class="interview-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="interview-info">
+                    <h3>Company Vision</h3>
+                    <p>How to articulate a company's vision and mission.</p>
+                    <div class="interview-meta">
+                        <span class="interview-date">August 2023</span>
+                    </div>
+                    <div class="interview-tags">
+                        <span>Vision</span>
+                        <span>Mission</span>
+                    </div>
+                    <a href="#" class="interview-link">View Answer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/interview-filter.js"></script>
+    <script src="js/layout-control.js"></script>
+</body>
+</html> 

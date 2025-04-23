@@ -42,7 +42,7 @@ A non-exhaustive list of things that I think fall in this category: Google Maps,
 More broadly, my interests include transit/mobility, personal finance, human connection, healthcare, climate, education, trust and safety, recruiting (helping people find jobs), productivity-enhancing tools, and more.
 
 Check out this link to see some more detailed notes on how I think about this dimension.
-# On socially valuable jobs
+<!-- On socially valuable jobs -->
 
 </details>
 
