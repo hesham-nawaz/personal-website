@@ -2,16 +2,31 @@
 
 
 :root {
-  --primary-color: #20b290; /* Light Sea Green */
+  --primary-color: #20B2AA; /* Light Sea Green */
   --primary-light: #B2DFDB; /* Lighter version for backgrounds */
   --primary-dark: #008B8B; /* Darker version for hover states */
   --sidebar-color: #20b290; /* Turquoise/Light Sea Green - for sidebar */
+  --sidebar-text: #efffd9; /* Light yellowish for sidebar text */
   --text-dark: #333333;
   --text-medium: #555555;
   --text-light: #777777;
   --white: #FFFFFF;
   --light-bg: #F5FFFA; /* Mint Cream - very light sea green tint */
+  --page-bg: #f8ffee; /* Light yellowish background for main content */
+  --card-bg: #FFFFFF; /* Background color for content cards/boxes */
   
+/* Font size multipliers - adjust these to scale all text */
+--heading-size-multiplier: 1.0; /* Default = 1.0, increase for larger headings */
+--body-size-multiplier: 1.05;    /* Default = 1.0, increase for larger body text */
+
+/* Base font sizes that will be multiplied by the multipliers */
+--base-font-size: 16px;
+--h1-size: 2.5rem;
+--h2-size: 2rem;
+--h3-size: 1.5rem;
+--h4-size: 1.25rem;
+--small-text-size: 0.875rem;
+
   /* Add font variables */
   /* For headings */
   /* --heading-font: 'Open Sans', sans-serif;  */
@@ -39,8 +54,9 @@
 
 body {
     font-family: var(--body-font);
+    font-size: calc(var(--base-font-size) * var(--body-size-multiplier));
     line-height: 1.6;
-    background-color: var(--white);
+    background-color: var(--page-bg);
 }
 
 .container {
@@ -93,7 +109,7 @@ h1 {
 }
 
 .about-me {
-    background-color: var(--white);
+    background-color: var(--card-bg);
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -169,7 +185,7 @@ p {
 }
 
 .what-brings-you-content {
-    background-color: var(--white);
+    background-color: var(--card-bg);
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -209,14 +225,14 @@ p {
     font-family: var(--heading-font);
     display: block;
     padding: 10px 30px;
-    color: var(--white);
+    color: var(--sidebar-text);
     text-decoration: none;
     font-size: 1.2rem;
     transition: color 0.3s;
 }
 
 .top-nav a:hover {
-    color: var(--light-bg);
+    color: var(--white);
 }
 
 /* Projects page styles */
@@ -253,7 +269,7 @@ p {
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background-color: var(--white);
+    background-color: var(--card-bg);
 }
 
 .project-item:hover {
@@ -569,7 +585,7 @@ p {
 }
 
 .learning-item {
-    background-color: var(--white);
+    background-color: var(--card-bg);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -958,7 +974,7 @@ p {
 
 /* Interview items */
 .interview-item {
-    background-color: var(--white);
+    background-color: var(--card-bg);
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     padding: 20px;
