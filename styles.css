@@ -6,13 +6,15 @@
   --primary-light: #B2DFDB; /* Lighter version for backgrounds */
   --primary-dark: #008B8B; /* Darker version for hover states */
   --sidebar-color: #20b290; /* Turquoise/Light Sea Green - for sidebar */
-  --sidebar-text: #efffd9; /* Light yellowish for sidebar text */
+  --sidebar-text: #FFFFFF; /* Light yellowish for sidebar text */
   --text-dark: #333333;
   --text-medium: #555555;
   --text-light: #777777;
   --white: #FFFFFF;
   --light-bg: #F5FFFA; /* Mint Cream - very light sea green tint */
-  --page-bg: #f8ffee; /* Light yellowish background for main content */
+  --page-bg: #FFFFFF; /
+  /* --page-bg: #f8ffee; */
+
   --card-bg: #FFFFFF; /* Background color for content cards/boxes */
   
 /* Font size multipliers - adjust these to scale all text */
