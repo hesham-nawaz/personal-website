@@ -1085,3 +1085,74 @@ p {
 .about-me, .what-brings-you-content, .project-item, .learning-item, .interview-item {
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
+
+/* PDF Resume Viewer */
+.resume-container {
+    width: 100%;
+    margin: 30px 0;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.resume-header {
+    padding: 15px 20px;
+    background-color: var(--primary-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resume-header h3 {
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.resume-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.resume-actions a {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.resume-actions a:hover {
+    background-color: var(--primary-dark);
+}
+
+.resume-actions a i {
+    margin-right: 5px;
+}
+
+.pdf-viewer {
+    width: 100%;
+    height: 800px; /* Adjust height as needed */
+    border: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pdf-viewer {
+        height: 500px;
+    }
+    
+    .resume-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .resume-actions {
+        margin-top: 10px;
+    }
+}
