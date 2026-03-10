@@ -193,6 +193,7 @@ p {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     text-align: center;
     margin-top: 20px;
+    margin-bottom: 30px;
 }
 
 .what-brings-you-content ul {
@@ -1084,6 +1085,12 @@ p {
 /* Optional: Add a subtle border for additional definition */
 .about-me, .what-brings-you-content, .project-item, .learning-item, .interview-item {
     border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Spacing for Other Resources section */
+.additional-links {
+    margin-top: 0;
+    padding-top: 4px;
 }
 
 /* PDF Resume Viewer */
