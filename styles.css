@@ -1163,3 +1163,104 @@ p {
         margin-top: 10px;
     }
 }
+
+/* Screenings page styles */
+.screenings-section {
+    width: 100%;
+}
+
+.screenings-summary {
+    color: var(--text-medium);
+    margin-bottom: 30px;
+    font-size: 1.05rem;
+}
+
+.screenings-updated {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+
+.day-group {
+    margin-bottom: 35px;
+}
+
+.day-header {
+    color: var(--text-dark);
+    font-family: var(--heading-font);
+    font-size: 1.35rem;
+    font-weight: 600;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.screening-card {
+    background-color: var(--card-bg);
+    border: 1px solid #e8e8e8;
+    border-left: 3px solid var(--primary-light);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    transition: border-left-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.screening-card:hover {
+    border-left-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.screening-card.double-feature {
+    border-left-color: var(--primary-color);
+}
+
+.screening-title {
+    font-weight: 600;
+    font-size: 1.08rem;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.screening-title a {
+    color: var(--primary-dark);
+    text-decoration: none;
+}
+
+.screening-title a:hover {
+    text-decoration: underline;
+}
+
+.screening-title .unmatched {
+    opacity: 0.6;
+    font-weight: 400;
+}
+
+.screening-meta {
+    color: var(--text-medium);
+    font-size: 0.92rem;
+    margin-bottom: 4px;
+}
+
+.screening-times {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.screening-notes {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    background-color: var(--primary-light);
+    color: var(--text-dark);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.screenings-empty {
+    color: var(--text-light);
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
+}
