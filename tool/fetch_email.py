@@ -110,7 +110,11 @@ def fetch(output_path: Path, print_week_label: bool) -> None:
     if not user or not pw:
         print("ERROR: GMAIL_USER and GMAIL_APP_PASSWORD env vars required", file=sys.stderr)
         sys.exit(2)
-    pw = pw.replace(" ", "")  # Google sometimes shows the password with spaces
+    # Google shows the password as "xxxx xxxx xxxx xxxx"; copy/paste sometimes
+    # turns those visual gaps into non-breaking spaces (\xa0) which IMAP can't
+    # encode. str.split() (no args) splits on ANY whitespace including NBSP,
+    # so this strips them all.
+    pw = "".join(pw.split())
 
     try:
         M = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT)
