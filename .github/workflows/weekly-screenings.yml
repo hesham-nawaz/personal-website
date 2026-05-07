@@ -1,0 +1,84 @@
+name: Weekly Screenings
+
+# Updates screenings.html with the matches between the most recent Revival Hub
+# LA newsletter and Hesham's Letterboxd watchlist, then commits to main so
+# Cloudflare Pages re-deploys.
+#
+# Auth: Gmail App Password (set as repo secret GMAIL_APP_PASSWORD).
+
+on:
+  schedule:
+    # Mondays at 21:00 UTC (= 14:00 PDT / 13:00 PST). The newsletter typically
+    # arrives Monday morning Pacific so an early-afternoon run catches it.
+    # GitHub cron is UTC-only and ignores DST; the 1-hour drift in winter is
+    # acceptable since the email is usually in by then either way.
+    - cron: "0 21 * * 1"
+  workflow_dispatch:  # also lets you run it manually from the Actions tab
+
+permissions:
+  contents: write  # needed to commit and push the updated screenings.html
+
+concurrency:
+  group: weekly-screenings
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Pipeline has zero third-party deps (stdlib only) — no install step.
+
+      - name: Fetch latest Revival Hub email via IMAP
+        id: fetch
+        env:
+          GMAIL_USER: heshamnawaz2000@gmail.com
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          mkdir -p reports
+          # fetch_email.py prints the week label (YYYY-MM-DD Sunday) on stdout
+          # and a status line on stderr; capture the label.
+          WEEK_LABEL=$(python tool/fetch_email.py \
+            --output "reports/.inbox-LATEST.txt" \
+            --print-week-label)
+          echo "week_label=$WEEK_LABEL" >> "$GITHUB_OUTPUT"
+          # Rename the inbox file to use the week label.
+          mv reports/.inbox-LATEST.txt "reports/.inbox-${WEEK_LABEL}.txt"
+          echo "year=${WEEK_LABEL:0:4}" >> "$GITHUB_OUTPUT"
+
+      - name: Run matcher and splice screenings.html
+        env:
+          WEEK_LABEL: ${{ steps.fetch.outputs.week_label }}
+          YEAR: ${{ steps.fetch.outputs.year }}
+        run: |
+          UPDATED=$(date -u +%F)
+          cd tool && python main.py \
+            "../reports/.inbox-${WEEK_LABEL}.txt" \
+            "../reports/${WEEK_LABEL}.html" \
+            --watchlist "../data/watchlist.csv" \
+            --year "$YEAR" \
+            --site-page "../screenings.html" \
+            --updated "$UPDATED"
+
+      - name: Commit and push if screenings.html changed
+        env:
+          WEEK_LABEL: ${{ steps.fetch.outputs.week_label }}
+        run: |
+          git config user.name  "screenings-bot"
+          git config user.email "screenings-bot@users.noreply.github.com"
+          git add screenings.html
+          if git diff --cached --quiet; then
+            echo "No changes to screenings.html — nothing to commit."
+            exit 0
+          fi
+          git commit -m "Update weekly screenings (week of ${WEEK_LABEL})"
+          git push
