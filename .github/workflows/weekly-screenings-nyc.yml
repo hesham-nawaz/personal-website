@@ -1,0 +1,60 @@
+name: Weekly Screenings (NYC)
+
+# Updates screenings-nyc.html with the matches between repertory.nyc's public
+# JSON feed (aggregating Film Forum, Metrograph, IFC, BAM, Anthology, MoMA,
+# MoMI, Quad, Roxy, Nitehawk, and more) and Hesham's Letterboxd watchlist,
+# then commits to main so Cloudflare Pages re-deploys.
+#
+# No auth needed — repertory.nyc/api/screenings is a public JSON feed.
+
+on:
+  schedule:
+    # Mondays at 21:00 UTC (= 14:00 PDT / 13:00 PST). Matches the LA workflow
+    # cadence. GitHub cron is UTC-only and ignores DST; the 1-hour winter
+    # drift is acceptable since we're re-computing the whole week's data.
+    - cron: "0 21 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-screenings-nyc
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Stdlib only — no install step needed.
+
+      - name: Fetch, match, and splice screenings-nyc.html
+        run: |
+          UPDATED=$(TZ=America/New_York date +%F)
+          cd tool && python main_nyc.py \
+            --watchlist "../data/watchlist.csv" \
+            --site-page "../screenings-nyc.html" \
+            --updated "$UPDATED"
+
+      - name: Commit and push if screenings-nyc.html changed
+        run: |
+          git config user.name  "screenings-bot"
+          git config user.email "screenings-bot@users.noreply.github.com"
+          git add screenings-nyc.html
+          if git diff --cached --quiet; then
+            echo "No changes to screenings-nyc.html — nothing to commit."
+            exit 0
+          fi
+          WEEK_LABEL=$(TZ=America/New_York date +%F)
+          git commit -m "Update NYC weekly screenings (week of ${WEEK_LABEL})"
+          git push
