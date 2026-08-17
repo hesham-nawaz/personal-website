@@ -26,9 +26,21 @@ USER_AGENT = "hesham-nawaz-personal-website/1.0 (+https://hesham-nawaz.com)"
 DEFAULT_TIMEOUT = 30  # seconds
 
 
-def fetch_raw(url: str = API_URL, timeout: int = DEFAULT_TIMEOUT) -> list[dict]:
-    """GET the JSON feed. Returns the list of screening dicts as-is."""
-    req = urllib.request.Request(url, headers={
+def fetch_raw(url: str = API_URL, timeout: int = DEFAULT_TIMEOUT,
+              query_date: date | None = None) -> list[dict]:
+    """GET the JSON feed. Returns the list of screening dicts as-is.
+
+    IMPORTANT: The bare `/api/screenings` endpoint returns a fixed/stale
+    window of data (observed: only the first few days of May 2026 come back
+    regardless of when you call it). To get current data you MUST pass
+    `?date=YYYY-MM-DD` — that returns everything scheduled for that specific
+    day. We iterate one call per day of the week in fetch_screenings_for_week.
+    """
+    full = url
+    if query_date is not None:
+        sep = "&" if "?" in url else "?"
+        full = f"{url}{sep}date={query_date.isoformat()}"
+    req = urllib.request.Request(full, headers={
         "Accept": "application/json",
         "User-Agent": USER_AGENT,
     })
@@ -176,28 +188,44 @@ def _time_sort_key(t: str) -> tuple[int, int]:
 
 def fetch_screenings_for_week(reference: date | None = None,
                               url: str = API_URL) -> list[Screening]:
-    """Fetch all screenings, filter to the Mon-Sun week containing `reference`,
+    """Fetch all screenings for the Mon-Sun week containing `reference`,
     convert to Screening objects, and merge same-day same-film-same-theater
     entries by concatenating their times.
 
-    Defaults to today's calendar week.
+    Defaults to today's calendar week. Makes one API call per day (7 total)
+    because the bare API endpoint returns a stale/fixed window; only
+    `?date=YYYY-MM-DD` returns current data.
     """
     monday, sunday = _week_bounds(reference)
-    raw = fetch_raw(url)
     screenings: list[Screening] = []
-    for entry in raw:
-        date_str = entry.get("date")
-        if not date_str:
-            continue
+    day = monday
+    while day <= sunday:
         try:
-            d = datetime.strptime(date_str, "%Y-%m-%d").date()
-        except ValueError:
+            raw = fetch_raw(url, query_date=day)
+        except Exception as e:
+            # Log and skip; a single-day failure shouldn't kill the whole week.
+            import sys
+            print(f"[nyc_repertory] WARNING: fetch failed for {day}: {e}",
+                  file=sys.stderr)
+            day += timedelta(days=1)
             continue
-        if not (monday <= d <= sunday):
-            continue
-        s = _entry_to_screening(entry)
-        if s is not None:
-            screenings.append(s)
+        for entry in raw:
+            date_str = entry.get("date")
+            if not date_str:
+                continue
+            # Trust the query date over the entry date to catch any mislabels
+            # (defensive: if the API ever mixes days, we still bin correctly).
+            try:
+                entry_d = datetime.strptime(date_str, "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            if entry_d != day:
+                # Some endpoints return a small window; only keep the exact day.
+                continue
+            s = _entry_to_screening(entry)
+            if s is not None:
+                screenings.append(s)
+        day += timedelta(days=1)
     return _merge_showtimes(screenings)
 
 
