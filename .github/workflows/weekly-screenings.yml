@@ -8,11 +8,14 @@ name: Weekly Screenings
 
 on:
   schedule:
-    # Mondays at 21:00 UTC (= 14:00 PDT / 13:00 PST). The newsletter typically
-    # arrives Monday morning Pacific so an early-afternoon run catches it.
-    # GitHub cron is UTC-only and ignores DST; the 1-hour drift in winter is
-    # acceptable since the email is usually in by then either way.
-    - cron: "0 21 * * 1"
+    # Mondays at 17:30 UTC (= 10:30 AM PDT / 1:30 PM EDT). The Revival Hub LA
+    # newsletter arrives Monday morning Pacific (observed: ~16:30 UTC), so
+    # this gives ~1 hour of buffer. Running earlier risks the IMAP fetcher
+    # picking up last week's email and silently republishing stale data.
+    # GitHub cron is UTC-only and ignores DST; the 1-hour drift in winter
+    # (17:30 UTC = 9:30 AM PST) still safely follows the send time.
+    # :30 minute mark also dodges top-of-hour GitHub Actions load.
+    - cron: "30 17 * * 1"
   workflow_dispatch:  # also lets you run it manually from the Actions tab
 
 permissions:

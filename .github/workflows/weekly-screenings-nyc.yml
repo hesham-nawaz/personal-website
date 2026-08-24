@@ -9,10 +9,11 @@ name: Weekly Screenings (NYC)
 
 on:
   schedule:
-    # Mondays at 21:00 UTC (= 14:00 PDT / 13:00 PST). Matches the LA workflow
-    # cadence. GitHub cron is UTC-only and ignores DST; the 1-hour winter
-    # drift is acceptable since we're re-computing the whole week's data.
-    - cron: "0 21 * * 1"
+    # Mondays at 12:00 UTC (= 8:00 AM EDT / 7:00 AM EST / 5:00 AM PDT).
+    # repertory.nyc updates daily with no known cutoff, so we can run early
+    # to have this week's page ready by NYC breakfast time. No email
+    # dependency means no risk of catching last week's data by accident.
+    - cron: "0 12 * * 1"
   workflow_dispatch:
 
 permissions:
