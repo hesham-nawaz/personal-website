@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Understanding Transformers from First Principles</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #1D4ED8; --blue-mid: #3B82F6; --blue-light: #DBEAFE; --blue-pale: #EFF6FF;
+      --rust: #B45309; --rust-light: #FEF3C7; --rust-pale: #FFFBEB;
+      --red: #DC2626; --red-light: #FEF2F2;
+      --green: #15803D; --green-light: #F0FDF4;
+      --text: #18181B; --text-muted: #52525B; --text-light: #A1A1AA;
+      --bg: #FEFEFE; --bg-subtle: #F4F4F5; --border: #E4E4E7; --max-w: 720px;
+    }
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 18px; line-height: 1.75;
+      color: var(--text); background: var(--bg); padding: 0 24px 80px;
+    }
+    .wrap { max-width: var(--max-w); margin: 0 auto; }
+
+    /* ══════════════════════════════════════════
+       DOCUMENT STYLES (unchanged from original)
+    ══════════════════════════════════════════ */
+    .doc-header { border-bottom: 2px solid var(--text); padding: 48px 0 32px; margin-bottom: 40px; }
+    .doc-header h1 {
+      font-family: system-ui, -apple-system, sans-serif; font-size: 2.2rem;
+      font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 14px;
+    }
+    .doc-header .subtitle { font-size: 1.05rem; color: var(--text-muted); font-style: italic; }
+    .doc-header .running-example {
+      margin-top: 24px; display: inline-flex; align-items: center; gap: 12px;
+      background: var(--bg-subtle); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 18px;
+      font-family: system-ui, sans-serif; font-size: 0.88rem;
+    }
+    .token-en { background: var(--blue-light); color: var(--blue); border-radius: 4px; padding: 2px 8px; font-weight: 600; }
+    .token-es { background: var(--rust-light); color: var(--rust); border-radius: 4px; padding: 2px 8px; font-weight: 600; }
+    .arrow-label { color: var(--text-light); font-size: 1.2rem; }
+    .how-to-read {
+      background: var(--bg-subtle); border-left: 3px solid var(--text-light); border-radius: 0 8px 8px 0;
+      padding: 16px 22px; margin: 36px 0; font-family: system-ui, sans-serif;
+      font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;
+    }
+    .how-to-read strong { color: var(--text); }
+    .part { margin-top: 60px; }
+    .part-label {
+      font-family: system-ui, sans-serif; font-size: 0.76rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); margin-bottom: 6px;
+    }
+    .part h2 {
+      font-family: system-ui, sans-serif; font-size: 1.85rem; font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 24px;
+      padding-bottom: 14px; border-bottom: 1px solid var(--border);
+    }
+    .part h3 {
+      font-family: system-ui, sans-serif; font-size: 1.12rem; font-weight: 600;
+      margin: 34px 0 12px; color: var(--text);
+    }
+    p { margin-bottom: 18px; }
+    p:last-child { margin-bottom: 0; }
+    .box {
+      border-radius: 8px; padding: 18px 22px; margin: 26px 0;
+      font-family: system-ui, sans-serif; font-size: 0.91rem; line-height: 1.65;
+    }
+    .box-label { font-size: 0.73rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+    .box.math { background: var(--blue-pale); border-left: 3px solid var(--blue); }
+    .box.math .box-label { color: var(--blue); }
+    .box.failure { background: var(--red-light); border-left: 3px solid var(--red); }
+    .box.failure .box-label { color: var(--red); }
+    .box.note { background: var(--rust-pale); border-left: 3px solid var(--rust); }
+    .box.note .box-label { color: var(--rust); }
+    .trace-wrap { overflow-x: auto; margin: 22px 0; }
+    .trace { border-collapse: collapse; font-family: 'SF Mono','Fira Code',monospace; font-size: 0.84rem; width: 100%; }
+    .trace th { background: var(--bg-subtle); border: 1px solid var(--border); padding: 7px 13px; font-weight: 600; text-align: center; color: var(--text-muted); font-size: 0.76rem; letter-spacing: 0.04em; }
+    .trace td { border: 1px solid var(--border); padding: 7px 13px; text-align: center; }
+    .trace .row-label { text-align: left; font-weight: 500; background: var(--bg-subtle); font-family: system-ui, sans-serif; }
+    .trace .highlight { background: var(--blue-light); color: var(--blue); font-weight: 600; }
+    .trace .result-row td { border-top: 2px solid var(--border); font-weight: 600; }
+    .panel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 26px 0; }
+    @media (max-width: 560px) { .panel-row { grid-template-columns: 1fr; } }
+    .panel { border-radius: 10px; padding: 18px; font-family: system-ui, sans-serif; font-size: 0.88rem; line-height: 1.6; }
+    .panel.training { background: var(--green-light); border: 1px solid #BBF7D0; }
+    .panel.inference { background: var(--rust-pale); border: 1px solid #FDE68A; }
+    .panel h4 { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+    .panel.training h4 { color: var(--green); }
+    .panel.inference h4 { color: var(--rust); }
+    .panel .sentence { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+    .panel .unknown { opacity: 0.4; border: 1.5px dashed currentColor; border-radius: 4px; padding: 2px 8px; font-size: 0.85rem; }
+    .bridge {
+      margin-top: 44px; padding: 22px; background: var(--bg-subtle);
+      border-radius: 10px; font-family: system-ui, sans-serif; font-size: 0.93rem; line-height: 1.6;
+      border: 1px solid var(--border);
+    }
+    .bridge .bridge-label { font-size: 0.73rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-bottom: 6px; }
+    .failure-list { list-style: none; margin: 18px 0; }
+    .failure-list li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; margin-bottom: 20px; }
+    .failure-num { width: 28px; height: 28px; border-radius: 50%; background: var(--red); color: white; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; margin-top: 3px; }
+    code { font-family: 'SF Mono','Fira Code',monospace; font-size: 0.83em; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
+    .embed-table-wrap { overflow-x: auto; margin: 22px 0; }
+    .embed-table { border-collapse: collapse; font-family: system-ui, sans-serif; font-size: 0.87rem; width: 100%; }
+    .embed-table th { border: 1px solid var(--border); padding: 8px 15px; background: var(--bg-subtle); text-align: center; color: var(--text-muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.05em; }
+    .embed-table td { border: 1px solid var(--border); padding: 9px 15px; text-align: center; font-family: 'SF Mono','Fira Code',monospace; font-size: 0.83rem; }
+    .embed-table .token-cell { text-align: left; font-family: system-ui, sans-serif; font-weight: 600; font-size: 0.88rem; }
+    .embed-table .token-cell span { background: var(--blue-light); color: var(--blue); border-radius: 4px; padding: 2px 8px; }
+    .toc { margin: 36px 0; padding: 22px 26px; border: 1px solid var(--border); border-radius: 10px; font-family: system-ui, sans-serif; font-size: 0.88rem; }
+    .toc h3 { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 5px; line-height: 1.4; }
+    .toc .toc-current { font-weight: 700; color: var(--blue); }
+    .toc .toc-future { color: var(--text-muted); }
+    .toc .toc-label { font-size: 0.76rem; color: var(--text-light); margin-left: 5px; }
+
+    /* ── MVP progression strip ── */
+    .mvp-strip {
+      display: grid; grid-template-columns: 1fr 2fr; gap: 16px;
+      background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 18px; margin-bottom: 30px;
+      font-family: system-ui, sans-serif; font-size: 0.84rem;
+    }
+    @media (max-width: 560px) { .mvp-strip { grid-template-columns: 1fr; } }
+    .mvp-col-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--text-light); margin-bottom: 8px;
+    }
+    .mvp-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 20px;
+      padding: 2px 10px; margin: 2px 4px 2px 0; font-size: 0.78rem;
+      color: var(--text-muted); font-family: system-ui, sans-serif;
+    }
+    .mvp-pill.mvp-on {
+      background: var(--blue-light); border-color: var(--blue);
+      color: var(--blue); font-weight: 600;
+    }
+    /* ── Site nav (mirrors styles.css .top-nav) ── */
+    .top-nav {
+      width: 200px; position: fixed; height: 100%; left: 0; top: 0;
+      background-color: #20b290; padding: 30px 0;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.05); z-index: 50;
+    }
+    .top-nav ul { list-style: none; padding: 0; margin: 0; }
+    .top-nav li { margin-bottom: 30px; }
+    .top-nav a {
+      font-family: 'Nunito', sans-serif; display: block;
+      padding: 10px 30px; color: #FFFFFF; text-decoration: none;
+      font-size: 1.2rem; transition: color 0.3s;
+    }
+    .top-nav a:hover { color: #F0FDF4; }
+    body { padding-left: 224px; }
+    @media (max-width: 768px) {
+      .top-nav { width: auto; height: auto; position: relative; padding: 15px 0; margin: 0 -24px; }
+      .top-nav ul { display: flex; justify-content: center; flex-wrap: wrap; }
+      .top-nav li { margin: 0 15px 10px; }
+      body { padding-left: 24px; }
+    }
+
+    /* ── Work-in-progress banner ── */
+    .wip-banner {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--rust-pale); border: 1px solid #FDE68A;
+      border-left: 3px solid var(--rust); border-radius: 0 10px 10px 0;
+      padding: 16px 20px; margin: 36px 0 0;
+      font-family: system-ui, sans-serif; font-size: 0.88rem; line-height: 1.6;
+      color: var(--text-muted);
+    }
+    .wip-banner .wip-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--rust); margin-bottom: 5px;
+    }
+    .wip-banner strong { color: var(--text); font-weight: 600; }
+    /* ── Keep wide display equations from pushing the page sideways on phones ── */
+    mjx-container[display="true"] {
+      overflow-x: auto; overflow-y: hidden; max-width: 100%; padding-bottom: 2px;
+    }
+
+    .toc .toc-wip {
+      font-family: system-ui, sans-serif; font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-light);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 1px 8px; margin-left: 8px; white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<script src="js/load-nav.js"></script>
+
+<div class="wrap">
+
+  <!-- DOCUMENT HEADER -->
+  <header class="doc-header" id="doc-title">
+    <h1>Understanding Transformers<br>from First Principles</h1>
+    <p class="subtitle">A ground-up construction, one piece at a time</p>
+    <div class="running-example">
+      <span>Our running example:</span>
+      <span class="token-en">the black cat sleeps</span>
+      <span class="arrow-label">→</span>
+      <span class="token-es">el gato negro duerme</span>
+    </div>
+  </header>
+
+  <!-- WORK IN PROGRESS -->
+  <div class="wip-banner">
+    <div>
+      <div class="wip-label">Work in progress</div>
+      This document is being written in order, and it currently runs through
+      <strong>MVP 2: Learned Projections (Q, K, V)</strong>. Everything up to that point is
+      complete and self-contained — you can read it end to end and come away understanding
+      how self-attention works and why each piece of it is there. The remaining stages —
+      <strong>MVP 3 through MVP 7</strong>, and the closing section on training and inference —
+      are listed below so you can see where the construction is headed, but they have not been
+      written yet.
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li class="toc-current">Orientation <span class="toc-label">— what problem are we solving?</span></li>
+      <li class="toc-current">The Baseline: Bag of Embeddings <span class="toc-label">— the simplest possible start</span></li>
+      <li class="toc-current">MVP 1: Single-Head Self-Attention</li>
+      <li class="toc-current">MVP 2: Learned Projections (Q, K, V)</li>
+      <li class="toc-future">MVP 3: Positional Encoding<span class="toc-wip">in progress</span></li>
+      <li class="toc-future">MVP 4: Feed-Forward Network<span class="toc-wip">in progress</span></li>
+      <li class="toc-future">MVP 5: Residual Connections &amp; Layer Norm<span class="toc-wip">in progress</span></li>
+      <li class="toc-future">MVP 6: Multi-Head Attention<span class="toc-wip">in progress</span></li>
+      <li class="toc-future">MVP 7: Stacked Layers — the Full Architecture<span class="toc-wip">in progress</span></li>
+      <li class="toc-future">Training and Inference in Full<span class="toc-wip">in progress</span></li>
+    </ol>
+  </div>
+
+  <!-- PART 0 -->
+  <section class="part" id="part-0">
+    <div class="part-label">Part 0</div>
+    <h2>Orientation</h2>
+
+    <p>The task this document builds around is translation: given the English sentence
+    <strong>"the black cat sleeps,"</strong> produce its Spanish equivalent,
+    <strong>"el gato negro duerme."</strong> We use translation as our running lens
+    throughout because it exercises every part of the architecture naturally — encoder,
+    decoder, and the connection between them. The ideas generalize well beyond it.</p>
+
+    <p>Notice something immediately: the word order is not the same. In English,
+    the adjective comes before the noun — <em>black cat</em>. In Spanish, it
+    comes after — <em>gato negro</em>. A system that simply translates word by word,
+    left to right, will get this wrong. A good translation model needs to understand
+    the structure of the whole source sentence before it can produce the target.
+    That structural understanding is exactly what the transformer is built to provide.</p>
+
+    <h3 id="p0-background">Transformers in context</h3>
+
+    <p>The transformer was introduced in 2017 in a paper titled "Attention Is All You
+    Need" (Vaswani et al.) and rapidly became the dominant architecture for language tasks.
+    Before it, the standard approach was recurrent neural networks — architectures that
+    processed text one word at a time, left to right, passing a hidden state forward at
+    each step. The transformer replaced that sequential processing with a fully
+    parallel mechanism called <em>attention</em>, which lets every token in a sequence
+    directly interact with every other token in a single step. This made training
+    dramatically faster and gave models a much easier time capturing relationships
+    between distant words.</p>
+
+    <p>Today, virtually every large language model you interact with — GPT-4, Claude,
+    Gemini, LLaMA, and others — is a transformer or a close descendant of one. The
+    architecture has also spread well beyond text: transformers are now used in image
+    recognition (Vision Transformers), protein structure prediction (AlphaFold), audio
+    generation, and more. Learning how a transformer works is, in large part, learning
+    the foundation of modern AI.</p>
+
+    <h3 id="p0-how-to">How this document works</h3>
+
+    <p>Rather than presenting the full transformer architecture and then explaining
+    what each piece does, we build it up from scratch — one component at a time.
+    Each version of the model will have multiple shortcomings. Rather than fixing them
+    all at once, we identify the most important one, add the minimal change needed to
+    address it, and move on. The next version then fixes the next most significant
+    remaining problem, and so on. Every addition is motivated by one concrete,
+    demonstrable failure in the version before it.</p>
+
+    <p>This progression has eight stages, called MVPs (minimum viable products).
+    Every section follows the same structure:</p>
+
+    <ul style="margin: 0 0 18px 24px; line-height: 2.1;">
+      <li>What does this version look like?</li>
+      <li>What can it do, illustrated with real numbers from our running example?</li>
+      <li>Where does it fail, concretely?</li>
+      <li>What is the minimal change that fixes that failure?</li>
+    </ul>
+
+    <div class="how-to-read">
+      <strong>On the math.</strong> Every section contains mathematical notation
+      in clearly marked callout boxes. The math makes the ideas precise, but you
+      do not need it to follow the argument. If you are comfortable with it, the
+      boxes add rigor; if not, skip them — the surrounding text carries the full
+      explanation on its own.
+    </div>
+
+    <div class="box math">
+      <div class="box-label">Optional: the math</div>
+      Math callout boxes look like this throughout the document. They are always
+      self-contained and always skippable.
+    </div>
+
+    <h3 id="p0-train-inf">Training and inference — an early distinction</h3>
+
+    <p>Before we build anything, there is one distinction worth establishing now,
+    because it runs through every section: the difference between
+    <strong>training</strong> and <strong>inference</strong>.
+    <strong>Training</strong> is the process of adjusting a model's parameters —
+    its internal numerical weights — so that it gets progressively better at its
+    task, given a large set of labeled examples. In our case those examples are
+    paired English and Spanish sentences; the model sees both sides, measures how
+    wrong its predictions are, and updates its weights accordingly.
+    <strong>Inference</strong> is the process of passing a new input through a
+    trained, fixed model to produce the desired output. The model's parameters
+    do not change during inference — only the input changes.</p>
+
+    <div class="panel-row">
+      <div class="panel training">
+        <h4>Training</h4>
+        <p>We have a large dataset of paired sentences — English alongside correct
+        Spanish translations. The model sees both sides, makes a prediction, measures
+        how wrong it is against the known answer, and adjusts its internal numbers to
+        do better next time. This happens millions of times.</p>
+        <div class="sentence">
+          <span class="token-en">the black cat sleeps</span>
+          <span style="color:var(--green);font-weight:600;">→</span>
+          <span class="token-es">el gato negro duerme</span>
+        </div>
+        <p style="margin-top:8px;font-size:0.83rem;color:var(--text-muted);">Both sides known. Error measured. Weights updated.</p>
+      </div>
+      <div class="panel inference">
+        <h4>Inference</h4>
+        <p>We have only the source sentence. The model must produce the translation
+        from scratch, with no reference answer to compare against. There is no error
+        signal, no weight update — just a forward pass through the learned model.</p>
+        <div class="sentence">
+          <span class="token-en">the black cat sleeps</span>
+          <span style="color:var(--rust);font-weight:600;">→</span>
+          <span class="unknown token-es">???</span>
+        </div>
+        <p style="margin-top:8px;font-size:0.83rem;color:var(--text-muted);">Source only known. Target must be generated.</p>
+      </div>
+    </div>
+
+    <p>The mechanical consequences of this distinction — especially in how the
+    decoder behaves differently in each mode — are one of the most important and
+    least-explained aspects of the transformer. We will return to it with full
+    technical detail in Part 4, when the decoder is introduced.</p>
+  </section>
+
+  <!-- PART 1 -->
+  <section class="part" id="part-1">
+    <div class="part-label">Part 1 — The Baseline</div>
+    <h2>Bag of Embeddings</h2>
+
+    <p>Before we build the transformer, we need to answer a more basic question:
+    how do you feed a sentence into a neural network at all? Networks operate on
+    numbers. Strings of text are not numbers. The answer is
+    <strong>embeddings</strong> — and they are the foundation everything else
+    is built on.</p>
+
+    <h3 id="p1-step1">Step 1: Turning words into vectors</h3>
+
+    <p>An embedding is simply a list of numbers — a vector — assigned to each word
+    in the vocabulary. We maintain a large table, one row per vocabulary word, where
+    each row is that word's vector. Looking up a word's embedding means finding its
+    row in that table.</p>
+
+    <p>These vectors are <em>learned</em>: they start as random numbers and are
+    updated during training until words with similar meanings end up with similar
+    vectors. "Cat" and "kitten" end up nearby; "cat" and "airplane" end up far apart.
+    But at the very start of training, every word has a random vector.</p>
+
+    <p>In this document we use 3-dimensional embeddings to keep the numbers readable.
+    Real models use 512 or more dimensions. Here is what the embeddings for our four
+    source tokens might look like early in training:</p>
+
+    <div class="embed-table-wrap">
+      <table class="embed-table">
+        <thead>
+          <tr><th style="text-align:left">Token</th><th>dimension 0</th><th>dimension 1</th><th>dimension 2</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="token-cell"><span>the</span></td><td>0.10</td><td>0.30</td><td>−0.20</td></tr>
+          <tr><td class="token-cell"><span>black</span></td><td>0.80</td><td>−0.40</td><td>0.60</td></tr>
+          <tr><td class="token-cell"><span>cat</span></td><td>0.50</td><td>0.90</td><td>0.10</td></tr>
+          <tr><td class="token-cell"><span>sleeps</span></td><td>−0.30</td><td>0.20</td><td>0.70</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box math">
+      <div class="box-label">Optional: the math</div>
+      The embedding table is a matrix \( E \in \mathbb{R}^{V \times d} \), where \(V\)
+      is the vocabulary size and \(d\) is the embedding dimension. Looking up word \(x_i\)
+      is written \( e_i = E[x_i] \) — "take row \(x_i\) of \(E\)." The entire table is a
+      learnable parameter, updated by gradient descent during training.
+    </div>
+
+    <h3 id="p1-step2">Step 2: Collapsing the sequence into a single vector</h3>
+
+    <p>We now have four vectors — one per token. But to produce an output we need a
+    single fixed-size vector. Predicting the next word means scoring every word in the
+    Spanish vocabulary and picking the most likely one — a form of
+    <em>classification</em> over V classes, one per vocabulary word. A variable-length
+    sequence of token vectors cannot be fed directly into that scoring layer; it needs
+    one fixed-size vector. The simplest possible answer: <strong>average them</strong>.
+    Add up all four embedding vectors and divide by four.</p>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead>
+          <tr><th style="text-align:left">Token</th><th>dim 0</th><th>dim 1</th><th>dim 2</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-label">the</td><td>0.10</td><td>0.30</td><td>−0.20</td></tr>
+          <tr><td class="row-label">black</td><td>0.80</td><td>−0.40</td><td>0.60</td></tr>
+          <tr><td class="row-label">cat</td><td>0.50</td><td>0.90</td><td>0.10</td></tr>
+          <tr><td class="row-label">sleeps</td><td>−0.30</td><td>0.20</td><td>0.70</td></tr>
+          <tr class="result-row">
+            <td class="row-label" style="color:var(--blue);font-weight:700;">average →</td>
+            <td class="highlight">0.28</td><td class="highlight">0.25</td><td class="highlight">0.30</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>This averaged vector — the <strong>context vector</strong> — is then passed
+    through two operations to produce a prediction. First, a <strong>linear
+    projection</strong>: a learned matrix \(W\) maps the context vector from the
+    embedding space (\(\mathbb{R}^3\) in our example, or \(\mathbb{R}^d\) in general)
+    into the vocabulary space (\(\mathbb{R}^V\), where \(V\) is the number of words
+    in the Spanish vocabulary — potentially tens of thousands). "Linear" here means
+    the transformation is a matrix multiplication with no nonlinear activation; 
+    "projection" means we are mapping between two different vector spaces. The result
+    is a \(V\)-dimensional vector of raw scores, one per Spanish word: a higher score
+    means the model thinks that word is more likely given this context. Second,
+    a <strong>softmax</strong> converts those raw scores into a proper probability
+    distribution summing to 1. The word with the highest probability is the model's
+    prediction for the first Spanish token.</p>
+
+    <div class="box math">
+      <div class="box-label">Optional: the math</div>
+      <p style="margin-bottom:10px">The context vector is the elementwise average of the \(n\) token embeddings:</p>
+      \[ c = \frac{1}{n} \sum_{i=1}^{n} e_i \]
+      <p style="margin:10px 0">The prediction is produced by a linear projection followed by softmax:</p>
+      \[ p(y) = \text{softmax}(W c + b) \]
+      <p style="margin-top:10px">where \( W \in \mathbb{R}^{V \times d} \) is a weight matrix and \( b \in \mathbb{R}^{V} \) is
+      a bias vector — both are learnable parameters updated during training. Row \(i\) of \(W\) is a
+      learned \(d\)-dimensional vector associated with vocabulary word \(i\); the dot product
+      of row \(i\) with \(c\) scores how well the context matches that word. Softmax then
+      converts the full vector of \(V\) raw scores into probabilities:</p>
+      \[ \text{softmax}(z)_i = \frac{e^{z_i}}{\sum_{j=1}^{V} e^{z_j}} \]
+    </div>
+
+    <h3 id="p1-train-inf">Training and inference at this stage</h3>
+
+    <div class="panel-row">
+      <div class="panel training">
+        <h4>During training</h4>
+        <p>We have the paired example. We compute context vector
+        <code>[0.28, 0.25, 0.30]</code>, pass it through the linear layer, and get a
+        probability over all Spanish vocabulary words. We compare against the known
+        first word — <strong>el</strong> — measure the error, and backpropagate. The
+        embedding table and linear weights are both updated. Repeat for millions of
+        sentence pairs.</p>
+      </div>
+      <div class="panel inference">
+        <h4>During inference</h4>
+        <p>We have only <strong>"the black cat sleeps."</strong> We compute the same
+        context vector <code>[0.28, 0.25, 0.30]</code> and pass it through the same
+        linear layer — but now there is no known answer. We take the
+        highest-probability Spanish word as our prediction. There is no weight update;
+        everything is frozen.</p>
+      </div>
+    </div>
+
+    <h3 id="p1-failures">Three things that are wrong with this</h3>
+
+    <p>Averaging embeddings is a functional starting point — the model can technically
+    learn something — but it has three fundamental problems. Each one will be fixed
+    by a specific, identifiable change in the sections that follow.</p>
+
+    <ul class="failure-list">
+      <li>
+        <div class="failure-num">1</div>
+        <div>
+          <strong>Uniform weighting.</strong> Every word contributes exactly \(1/n\)
+          to the average. When deciding how to translate "sleeps," the word "sleeps"
+          contributes as much as the article "the." The model has no way to focus its
+          attention on what matters. Fixed in <strong>Part 2</strong> with
+          self-attention, which replaces the fixed average with a learned,
+          content-dependent weighting.
+        </div>
+      </li>
+      <li>
+        <div class="failure-num">2</div>
+        <div>
+          <strong>Permutation invariance.</strong> The average of four vectors does not
+          depend on the order in which you add them. "The black cat sleeps" and
+          "sleeps cat black the" produce the <em>identical</em> context vector —
+          and therefore the identical prediction. Word order is completely invisible.
+          <div class="trace-wrap" style="margin-top:12px;">
+            <table class="trace">
+              <thead><tr><th style="text-align:left">Sentence</th><th>dim 0</th><th>dim 1</th><th>dim 2</th></tr></thead>
+              <tbody>
+                <tr><td class="row-label">the black cat sleeps</td><td>0.28</td><td>0.25</td><td>0.30</td></tr>
+                <tr><td class="row-label">sleeps cat black the</td><td>0.28</td><td>0.25</td><td>0.30</td></tr>
+              </tbody>
+            </table>
+          </div>
+          Fixed in <strong>Part 5</strong> with positional encoding.
+        </div>
+      </li>
+      <li>
+        <div class="failure-num">3</div>
+        <div>
+          <strong>Dilution with length.</strong> As the sentence gets longer, each
+          token's contribution shrinks. A critical word in a 50-word sentence
+          contributes only 1/50th of the context vector. This is resolved by the same
+          fix as failure 1: attention weights are not constrained to be equal, so an
+          important word can receive a large weight regardless of sequence length.
+        </div>
+      </li>
+    </ul>
+
+    <div class="box failure">
+      <div class="box-label">Root cause</div>
+      All three failures trace back to the same underlying problem: there is no
+      mechanism for words to interact with each other. Each embedding is looked up
+      independently and blended with equal weight. The embedding for "black" has no
+      way to influence the representation of "cat." A model that cannot let words
+      influence each other cannot understand the structure of the sentence — it sees
+      only a bag of words, not a sequence.
+    </div>
+
+    <div class="bridge">
+      <div class="bridge-label">Coming up in Part 2</div>
+      The fix is <strong>self-attention</strong>: instead of averaging with equal
+      weight, each token computes a score against every other token, uses those
+      scores to weight the blend, and produces a new representation that has been
+      <em>contextualized</em> by what is around it.
+    </div>
+  </section>
+
+  <!-- PART 2 -->
+  <section class="part" id="part-2">
+    <div class="part-label">Part 2 — MVP 1</div>
+    <h2>Single-Head Self-Attention</h2>
+
+    <div class="mvp-strip">
+      <div class="mvp-col">
+        <div class="mvp-col-label">Added this section</div>
+        <span class="mvp-pill mvp-on">✓ Self-attention</span>
+      </div>
+      <div class="mvp-col">
+        <div class="mvp-col-label">Still to come</div>
+        <span class="mvp-pill">1/√d scaling</span>
+        <span class="mvp-pill">Q, K, V projections</span>
+        <span class="mvp-pill">Positional encoding</span>
+        <span class="mvp-pill">Feed-forward network</span>
+        <span class="mvp-pill">Residual connections</span>
+        <span class="mvp-pill">Multi-head attention</span>
+        <span class="mvp-pill">Stacked layers</span>
+      </div>
+    </div>
+
+    <p>In Part 1 we identified the root problem: averaging treats every word as equally
+    relevant. Self-attention replaces that flat average with a <em>learned,
+    content-dependent</em> weighting. Each token looks at every other token, scores
+    how relevant it is, and builds a new representation by blending the ones that
+    matter most to it.</p>
+
+    <h3 id="p2-mechanism">The mechanism</h3>
+
+    <p>Self-attention happens in three steps, applied simultaneously to every token.</p>
+
+    <p><strong>Step 1: Score every other token.</strong> For token <em>i</em>, compute a
+    dot product against every token <em>j</em> in the sequence — including itself. The dot
+    product measures similarity: a high score means the two tokens are pointing in a
+    similar direction in embedding space, and therefore that <em>j</em> is likely relevant
+    to updating <em>i</em>'s representation.</p>
+
+    <p><strong>Step 2: Normalize into a probability distribution.</strong> Pass all scores
+    for token <em>i</em> through softmax. This converts the raw scores into
+    <em>attention weights</em> that sum to 1. A high weight on token <em>j</em> means
+    token <em>i</em> will draw heavily from token <em>j</em>'s embedding in the next step.</p>
+
+    <p><strong>Step 3: Take the weighted sum.</strong> Compute a weighted sum of every
+    token's embedding, weighted by the attention weights from step 2. The result,
+    <em>z<sub>i</sub></em>, is token <em>i</em>'s new <strong>contextualized
+    representation</strong> — it has been updated to reflect the content of the tokens
+    around it, weighted by relevance.</p>
+
+    <div class="box math">
+      <div class="box-label">Optional: the math</div>
+      <p style="margin-bottom:10px">For each token \(i\), compute raw scores against all other positions \(j\):</p>
+      \[ \text{score}_{ij} = e_i \cdot e_j \]
+      <p style="margin:10px 0">Normalize into attention weights via softmax (over all \(j\) for fixed \(i\)):</p>
+      \[ \alpha_{ij} = \text{softmax}_j(\text{score}_{ij}) = \frac{e^{e_i \cdot e_j}}{\sum_{k} e^{e_i \cdot e_k}} \]
+      <p style="margin:10px 0">Compute the contextualized representation as a weighted sum of all embeddings:</p>
+      \[ z_i = \sum_j \alpha_{ij}\, e_j \]
+      <p style="margin-top:10px">Note that \(j\) ranges over every position including \(i\) itself — a token is always
+      a candidate to attend to itself. Also note that \(\alpha_{ij} \neq \alpha_{ji}\) in general:
+      how much token <em>i</em> attends to token <em>j</em> is not the same as how much
+      <em>j</em> attends to <em>i</em>.</p>
+    </div>
+
+    <h3 id="p2-trace">Traced through "the black cat sleeps"</h3>
+
+    <p>We use the same four embeddings from Part 1. The attention computation produces a
+    4×4 score matrix — one row per query token, one column per key token — then softmax
+    weights, then the final contextualized vectors.</p>
+
+    <p><strong>Step 1: Score matrix</strong> (each cell is the dot product of the row
+    token's embedding with the column token's embedding):</p>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead><tr><th></th><th>the</th><th>black</th><th>cat</th><th>sleeps</th></tr></thead>
+        <tbody>
+          <tr><td class="row-label">the</td><td>+0.14</td><td>−0.16</td><td class="highlight">+0.30</td><td>−0.11</td></tr>
+          <tr><td class="row-label">black</td><td>−0.16</td><td class="highlight">+1.16</td><td>+0.10</td><td>+0.10</td></tr>
+          <tr><td class="row-label">cat</td><td>+0.30</td><td>+0.10</td><td class="highlight">+1.07</td><td>+0.10</td></tr>
+          <tr><td class="row-label">sleeps</td><td>−0.11</td><td>+0.10</td><td>+0.10</td><td class="highlight">+0.62</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The diagonal (highlighted) shows each token's self-similarity — how strongly it
+    matches itself. "black" and "cat" have the highest self-scores because their embeddings
+    have the largest magnitudes. "the", a low-information function word, has the smallest
+    self-score.</p>
+
+    <p><strong>Step 2: Attention weights</strong> (softmax applied row by row; each row
+    sums to 1; bolder cell = highest weight in that row):</p>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead><tr><th></th><th>the</th><th>black</th><th>cat</th><th>sleeps</th></tr></thead>
+        <tbody>
+          <tr><td class="row-label">the</td><td>0.27</td><td>0.20</td><td class="highlight">0.32</td><td>0.21</td></tr>
+          <tr><td class="row-label">black</td><td>0.14</td><td class="highlight">0.51</td><td>0.18</td><td>0.18</td></tr>
+          <tr><td class="row-label">cat</td><td>0.21</td><td>0.17</td><td class="highlight">0.45</td><td>0.17</td></tr>
+          <tr><td class="row-label">sleeps</td><td>0.18</td><td>0.22</td><td>0.22</td><td class="highlight">0.37</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>A few things to notice. "black" attends most to itself (0.51) — its high
+    self-score is so dominant that it draws more than half the weight. "sleeps" also
+    attends most to itself (0.37), but much less exclusively — the remaining weight is
+    spread across the other three tokens. "the" is the most distributed: it attends
+    most to "cat" (0.32), slightly more than to itself (0.27). This is the content-dependent
+    weighting that was impossible in Part 1 — no two rows look the same.</p>
+
+    <p><strong>Step 3: Contextualized representations</strong> (weighted sum of embeddings
+    using the weights above; compare original vs. updated):</p>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead>
+          <tr><th></th><th colspan="3" style="border-bottom:1px solid var(--border)">original embedding</th><th style="width:20px;background:white;border:none"></th><th colspan="3" style="border-bottom:1px solid var(--blue)">after attention  z</th></tr>
+          <tr><th></th><th>d0</th><th>d1</th><th>d2</th><th style="background:white;border:none"></th><th>d0</th><th>d1</th><th>d2</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-label">the</td><td>+0.10</td><td>+0.30</td><td>−0.20</td><td style="background:white;border:none">→</td><td class="highlight">+0.28</td><td class="highlight">+0.33</td><td class="highlight">+0.25</td></tr>
+          <tr><td class="row-label">black</td><td>+0.80</td><td>−0.40</td><td>+0.60</td><td style="background:white;border:none">→</td><td class="highlight">+0.46</td><td class="highlight">+0.03</td><td class="highlight">+0.42</td></tr>
+          <tr><td class="row-label">cat</td><td>+0.50</td><td>+0.90</td><td>+0.10</td><td style="background:white;border:none">→</td><td class="highlight">+0.33</td><td class="highlight">+0.43</td><td class="highlight">+0.23</td></tr>
+          <tr><td class="row-label">sleeps</td><td>−0.30</td><td>+0.20</td><td>+0.70</td><td style="background:white;border:none">→</td><td class="highlight">+0.20</td><td class="highlight">+0.24</td><td class="highlight">+0.38</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Every token's representation has moved. "the" moved the most dramatically: it started at
+    [+0.10, +0.30, −0.20] and landed at [+0.28, +0.33, +0.25] — the −0.20 in dimension 2 has
+    flipped positive, pulled by the strong positive values of "cat" and "sleeps" in that
+    dimension. "black", which attends mostly to itself, moved the least: its representation
+    stayed close to its original, diluted only slightly by the other tokens.</p>
+
+    <p>This is the core of what contextualization means: each token's final representation
+    is no longer just its own embedding — it is a blend of the whole sequence, weighted by
+    how relevant each token decided the others were to it.</p>
+
+    <h3 id="p2-limit">What this version still cannot do</h3>
+
+    <p>Self-attention fixes failure 1 from Part 1 (uniform weighting) and failure 3
+    (dilution). But failure 2 — permutation invariance — is still present. Consider a
+    longer example:</p>
+
+    <div class="box note">
+      <div class="box-label">The permutation problem</div>
+      "Time flies like an arrow. Fruit flies like a banana."
+      <br><br>
+      There are two instances of "flies" in this sentence — one a verb ("time flies"),
+      one a noun ("fruit flies"). A reader has no trouble distinguishing them because of
+      the words around each instance. But in this MVP, both instances of "flies" have the
+      same embedding, and without any position information, they also attend over exactly
+      the same set of keys with exactly the same weights. The result:
+      <strong>\(z_{\text{flies}_1} = z_{\text{flies}_2}\)</strong> — identical contextualized
+      representations, despite the words meaning different things in each context.
+    </div>
+
+    <p>The reason is structural, not incidental: without positional encoding, "flies" in
+    position 1 uses the same query embedding as "flies" in position 6, and both compute
+    dot products against the same global set of key embeddings, weighted the same way.
+    Position simply does not exist as information anywhere in the computation. This will
+    not be fixed until Part 5, when we add sinusoidal positional encodings that inject
+    position information directly into the embeddings before attention runs.</p>
+
+    <h3 id="p2-train-inf">Training and inference at this stage</h3>
+
+    <p>The encoder has a clean property worth naming now because it contrasts sharply
+    with the decoder: it behaves identically at training time and inference time.
+    The source sentence is always fully known in both cases — whether you are training
+    on a labeled translation pair or translating a new sentence from scratch. So the
+    encoder always runs exactly once, in a single forward pass over all source tokens
+    in parallel, with no sequential dependency.</p>
+
+    <div class="panel-row">
+      <div class="panel training">
+        <h4>Training — encoder</h4>
+        <p>Source sentence is known. All four tokens are embedded and processed in
+        parallel. The 4×4 attention matrix is computed in one matrix multiplication;
+        all four <em>z</em> vectors are produced simultaneously. No sequential
+        steps — this is what makes the transformer trainable at scale.</p>
+      </div>
+      <div class="panel inference">
+        <h4>Inference — encoder</h4>
+        <p>Exactly the same computation. Source sentence is still fully known.
+        The encoder produces <em>z</em><sub>1</sub>…<em>z</em><sub>4</sub> in
+        one forward pass, identically to training. The interesting train/inference
+        asymmetry lives entirely in the decoder — which we will introduce in Part 4.</p>
+      </div>
+    </div>
+
+    <div class="bridge">
+      <div class="bridge-label">Coming up in Part 3</div>
+      Self-attention as described here forces every token to use the same embedding
+      vector for three conceptually distinct jobs: forming a <em>query</em> ("what am I
+      looking for?"), offering a <em>key</em> ("what do I advertise to others?"), and
+      providing a <em>value</em> ("what do I actually contribute if attended to?").
+      Collapsing three roles into one vector means the model has no freedom to
+      optimize them independently — it cannot learn to ask one kind of question while
+      offering a different kind of information. Part 3 fixes this by introducing three
+      separate learned projections, one per role.
+    </div>
+  </section>
+
+  <!-- PART 3 -->
+  <section class="part" id="part-3">
+    <div class="part-label">Part 3 — MVP 2</div>
+    <h2>Learned Projections &amp; Scaling</h2>
+
+    <div class="mvp-strip">
+      <div class="mvp-col">
+        <div class="mvp-col-label">Added this section</div>
+        <span class="mvp-pill mvp-on">✓ Q, K, V projections</span>
+        <span class="mvp-pill mvp-on">✓ 1/√d scaling</span>
+      </div>
+      <div class="mvp-col">
+        <div class="mvp-col-label">Still to come</div>
+        <span class="mvp-pill">Positional encoding</span>
+        <span class="mvp-pill">Feed-forward network</span>
+        <span class="mvp-pill">Residual connections</span>
+        <span class="mvp-pill">Multi-head attention</span>
+        <span class="mvp-pill">Stacked layers</span>
+      </div>
+    </div>
+
+    <p>In Part 2, every token played three roles simultaneously using the same single
+    vector: it queried ("what am I looking for?"), it offered itself as a key ("what
+    do I advertise to others' queries?"), and it provided a value ("what do I actually
+    contribute if someone attends to me?"). Using one vector for all three means the
+    model cannot optimize them independently. A word cannot learn to ask a different kind
+    of question than it answers.</p>
+
+    <p>The fix is one of the cleanest ideas in the transformer: give each role its own
+    <strong>learned linear projection</strong>. Instead of one embedding per token, we
+    maintain three separate weight matrices — \(W_Q\), \(W_K\), and \(W_V\) — each of
+    which transforms the embedding into a specialized representation for its role.</p>
+
+    <h3 id="p3-roles">Three roles, three matrices</h3>
+
+    <p>The three projections work as follows for each token \(i\):</p>
+
+    <ul style="margin: 0 0 20px 24px; line-height: 2.1;">
+      <li><strong>Query:</strong> \(q_i = W_Q\, e_i\) — "given what I am, what pattern
+      of information am I looking for in the sequence?"</li>
+      <li><strong>Key:</strong> \(k_i = W_K\, e_i\) — "given what I am, what do I
+      advertise to other tokens' queries, to help them find me?"</li>
+      <li><strong>Value:</strong> \(v_i = W_V\, e_i\) — "if another token decides to
+      attend to me, what do I actually hand over?"</li>
+    </ul>
+
+    <p>The attention score between token \(i\) and token \(j\) is now the dot product
+    of \(i\)'s query with \(j\)'s key, divided by \(\sqrt{d}\):</p>
+
+    <div class="box math">
+      <div class="box-label">Optional: the math</div>
+      <p style="margin-bottom:10px">The three projections for token \(i\):</p>
+      \[ q_i = W_Q e_i, \qquad k_j = W_K e_j, \qquad v_j = W_V e_j \]
+      <p style="margin:10px 0">Scaled dot-product attention:</p>
+      \[ \alpha_{ij} = \text{softmax}_j\!\left(\frac{q_i \cdot k_j}{\sqrt{d}}\right),
+         \qquad z_i = \sum_j \alpha_{ij}\, v_j \]
+      <p style="margin-top:12px"><strong>Why divide by \(\sqrt{d}\)?</strong> If the
+      components of \(q_i\) and \(k_j\) each have variance \(\sigma^2\), the dot product
+      \(q_i \cdot k_j = \sum_{m=1}^{d} q_{im} k_{jm}\) has variance \(d\sigma^4\) —
+      it grows with \(d\). As \(d\) increases, the scores become so large that softmax
+      saturates: one score dominates, the weights collapse toward a one-hot vector, and
+      gradients vanish. Dividing by \(\sqrt{d}\) normalises the variance back to
+      \(\sigma^4\), independent of dimension size.</p>
+      <p style="margin-top:10px">Note also that the output \(z_i\) is now a weighted
+      sum of <em>value vectors</em> \(v_j\), not of the original embeddings \(e_j\).
+      The value projection separates "what information I use to decide who to attend to"
+      (keys and queries) from "what information I actually receive from attending" (values).</p>
+    </div>
+
+    <h3 id="p3-trace">Traced through "the black cat sleeps"</h3>
+
+    <p>We apply three simple projection matrices to our four token embeddings. Each
+    produces a different view of the same underlying embedding — the same sentence,
+    seen through three different lenses:</p>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead>
+          <tr>
+            <th></th>
+            <th colspan="3" style="border-bottom:1px solid var(--border)">query  q = W<sub>Q</sub>e</th>
+            <th style="background:white;border:none;width:10px"></th>
+            <th colspan="3" style="border-bottom:1px solid var(--border)">key  k = W<sub>K</sub>e</th>
+            <th style="background:white;border:none;width:10px"></th>
+            <th colspan="3" style="border-bottom:1px solid var(--border)">value  v = W<sub>V</sub>e</th>
+          </tr>
+          <tr>
+            <th></th><th>d0</th><th>d1</th><th>d2</th>
+            <th style="background:white;border:none"></th>
+            <th>d0</th><th>d1</th><th>d2</th>
+            <th style="background:white;border:none"></th>
+            <th>d0</th><th>d1</th><th>d2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">the</td>
+            <td>+0.10</td><td>−0.20</td><td>+0.30</td>
+            <td style="background:white;border:none"></td>
+            <td>+0.30</td><td>+0.10</td><td>−0.20</td>
+            <td style="background:white;border:none"></td>
+            <td>+0.10</td><td>+0.30</td><td>+0.20</td>
+          </tr>
+          <tr>
+            <td class="row-label">black</td>
+            <td>+0.80</td><td>+0.60</td><td>−0.40</td>
+            <td style="background:white;border:none"></td>
+            <td>−0.40</td><td>+0.80</td><td>+0.60</td>
+            <td style="background:white;border:none"></td>
+            <td>+0.80</td><td>−0.40</td><td>−0.60</td>
+          </tr>
+          <tr>
+            <td class="row-label">cat</td>
+            <td>+0.50</td><td>+0.10</td><td>+0.90</td>
+            <td style="background:white;border:none"></td>
+            <td>+0.90</td><td>+0.50</td><td>+0.10</td>
+            <td style="background:white;border:none"></td>
+            <td>+0.50</td><td>+0.90</td><td>−0.10</td>
+          </tr>
+          <tr>
+            <td class="row-label">sleeps</td>
+            <td>−0.30</td><td>+0.70</td><td>+0.20</td>
+            <td style="background:white;border:none"></td>
+            <td>+0.20</td><td>−0.30</td><td>+0.70</td>
+            <td style="background:white;border:none"></td>
+            <td>−0.30</td><td>+0.20</td><td>−0.70</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Each token now has three distinct representations, none of which is simply its
+    original embedding. The query, key, and value for "black" are all different from
+    each other — and different from "black"'s original embedding [+0.80, −0.40, +0.60].
+    Each projection has rotated and rescaled the information in a different direction,
+    giving the model three separate handles to tune independently during training.</p>
+
+    <h3 id="p3-attn-change">How the attention pattern changes</h3>
+
+    <p>The most striking effect of projections is visible in the attention weights.
+    Compare the two patterns directly:</p>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead>
+          <tr><th></th><th colspan="4" style="border-bottom:1px solid var(--border)">Part 2 — no projections (e·e)</th></tr>
+          <tr><th></th><th>the</th><th>black</th><th>cat</th><th>sleeps</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-label">the</td><td>0.27</td><td>0.20</td><td class="highlight">0.32</td><td>0.21</td></tr>
+          <tr><td class="row-label">black</td><td>0.14</td><td class="highlight">0.51</td><td>0.18</td><td>0.18</td></tr>
+          <tr><td class="row-label">cat</td><td>0.21</td><td>0.17</td><td class="highlight">0.45</td><td>0.17</td></tr>
+          <tr><td class="row-label">sleeps</td><td>0.18</td><td>0.22</td><td>0.22</td><td class="highlight">0.37</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead>
+          <tr><th></th><th colspan="4" style="border-bottom:1px solid var(--blue)">Part 3 — with projections (q·k / √d)</th></tr>
+          <tr><th></th><th>the</th><th>black</th><th>cat</th><th>sleeps</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-label">the</td><td>0.23</td><td>0.24</td><td>0.24</td><td class="highlight">0.28</td></tr>
+          <tr><td class="row-label">black</td><td>0.26</td><td>0.20</td><td class="highlight">0.37</td><td>0.18</td></tr>
+          <tr><td class="row-label">cat</td><td>0.19</td><td>0.25</td><td>0.27</td><td class="highlight">0.29</td></tr>
+          <tr><td class="row-label">sleeps</td><td>0.21</td><td class="highlight">0.35</td><td>0.23</td><td>0.20</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The change for "black" is the most telling. In Part 2, "black" attended to itself
+    with weight 0.51 — more than half its attention was self-directed, because its
+    embedding was the most similar to itself. In Part 3, "black" now attends most to
+    "cat" (0.37), with its self-attention reduced to 0.20. The projections have broken
+    the self-similarity dominance, allowing the attention pattern to express relationships
+    that the raw embedding geometry could not.</p>
+
+    <p>Similarly, "sleeps" now attends most to "black" (0.35) rather than to itself (0.20).
+    Whether these particular patterns are semantically meaningful is beside the point —
+    the weights here are random and untrained. The key insight is structural: the model
+    now <em>has the capacity</em> to learn patterns like these through training, which
+    it did not have before.</p>
+
+    <p>Finally, the output \(z_i\) is now a weighted sum of <em>value vectors</em>, not
+    the original embeddings. The z vectors for Part 3 look nothing like the original
+    embeddings — the value projection has transformed the information space entirely:</p>
+
+    <div class="trace-wrap">
+      <table class="trace">
+        <thead>
+          <tr><th></th><th>d0</th><th>d1</th><th>d2</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-label">z_the</td><td class="highlight">+0.25</td><td class="highlight">+0.25</td><td class="highlight">−0.32</td></tr>
+          <tr><td class="row-label">z_black</td><td class="highlight">+0.32</td><td class="highlight">+0.36</td><td class="highlight">−0.23</td></tr>
+          <tr><td class="row-label">z_cat</td><td class="highlight">+0.27</td><td class="highlight">+0.26</td><td class="highlight">−0.34</td></tr>
+          <tr><td class="row-label">z_sleeps</td><td class="highlight">+0.36</td><td class="highlight">+0.17</td><td class="highlight">−0.33</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bridge">
+      <div class="bridge-label">Coming up in Part 4</div>
+      We have now fixed both the uniform-weighting problem (Part 2) and given the model
+      the expressive power to learn arbitrary attention patterns (Part 3). But one of the
+      original three failures remains untouched: the model is still completely blind to
+      word order. "The black cat sleeps" and "sleeps cat black the" still produce the same
+      output. Part 4 adds <strong>positional encoding</strong> — the only mechanism in the
+      entire architecture that injects position information into the computation.
+    </div>
+  </section>
+
+</div><!-- /wrap -->
+
+
+</body>
+</html>
