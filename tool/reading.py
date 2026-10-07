@@ -43,6 +43,7 @@ import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -61,7 +62,7 @@ TABS = [
 ]
 
 TAGS_SHEET_ID = "1SdU8kIUH_GjB6xETjkL2gycRju665JJRZiiag0ax7V4"
-TAGS_SHEET_GIDS = {"tags": "0", "definitions": "1"}
+TAGS_SHEET_TABS = {"tags": "Tags", "definitions": "Tag definitions"}
 
 READING_SHEET_ID = "1l1c__X_FdnW8i28yu3s7XoVcGAqCQt9RtOIzM2_q75U"
 READING_SHEET_TAB = "Blogposts and Papers"
@@ -117,15 +118,64 @@ def fetch_tab_zip(tab_id: str) -> bytes:
     return fetch(f"https://docs.google.com/document/d/{DOC_ID}/export?format=zip&tab={tab_id}", "zip")
 
 
-def fetch_sheet_csv(sheet_id: str, gid: str) -> str:
-    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
-    return fetch(url, "text/csv").decode("utf-8")
+def fetch_sheet_tabs(sheet_id: str) -> dict[str, str]:
+    """Every tab of a sheet as CSV text, keyed by tab name.
+
+    Exported as .xlsx so tabs can be found by name (the CSV export wants a
+    numeric tab id) and values come through exactly as typed.
+    """
+    data = fetch(f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx", "spreadsheetml")
+    out = {}
+    for name, rows in read_xlsx(data).items():
+        buf = io.StringIO()
+        csv.writer(buf, lineterminator="\n").writerows(rows)
+        out[name] = buf.getvalue()
+    return out
 
 
-def fetch_reading_sheet_csv() -> str:
-    url = (f"https://docs.google.com/spreadsheets/d/{READING_SHEET_ID}/gviz/tq?tqx=out:csv"
-           f"&sheet={urllib.parse.quote(READING_SHEET_TAB)}")
-    return fetch(url, "text/csv").decode("utf-8")
+XLSX_NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
+           "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+           "rel": "http://schemas.openxmlformats.org/package/2006/relationships"}
+
+
+def read_xlsx(data: bytes) -> dict[str, list[list[str]]]:
+    m, ns = "{%s}" % XLSX_NS["m"], XLSX_NS
+
+    def col_index(ref: str) -> int:
+        n = 0
+        for ch in re.match(r"[A-Z]+", ref).group(0):
+            n = n * 26 + ord(ch) - 64
+        return n - 1
+
+    tabs: dict[str, list[list[str]]] = {}
+    with zipfile.ZipFile(io.BytesIO(data)) as z:
+        shared = []
+        if "xl/sharedStrings.xml" in z.namelist():
+            for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall("m:si", ns):
+                shared.append("".join(t.text or "" for t in si.iter(m + "t")))
+        rels = {r.get("Id"): r.get("Target")
+                for r in ET.fromstring(z.read("xl/_rels/workbook.xml.rels")).findall("rel:Relationship", ns)}
+        for sheet in ET.fromstring(z.read("xl/workbook.xml")).find("m:sheets", ns):
+            target = rels[sheet.get("{%s}id" % ns["r"])]
+            path = target.lstrip("/") if target.startswith("/") else f"xl/{target}"
+            rows = []
+            for row in ET.fromstring(z.read(path)).iter(m + "row"):
+                cells = {}
+                for c in row.findall("m:c", ns):
+                    kind = c.get("t")
+                    if kind == "s":
+                        value = shared[int(c.findtext("m:v", "0", ns))]
+                    elif kind == "inlineStr":
+                        value = "".join(t.text or "" for t in c.iter(m + "t"))
+                    else:
+                        value = c.findtext("m:v", "", ns)
+                        if re.fullmatch(r"-?\d+\.0", value):
+                            value = value[:-2]
+                    cells[col_index(c.get("r"))] = value
+                if any(v.strip() for v in cells.values()):
+                    rows.append([cells.get(i, "") for i in range(max(cells) + 1)])
+            tabs[sheet.get("name")] = rows
+    return tabs
 
 
 # --------------------------------------------------------------------------
@@ -687,17 +737,20 @@ def run(page_path: Path, img_dir: Path, data_dir: Path, offline: bool = False,
     tags_csv = defs_csv = reading_csv = None
     if not offline:
         try:
-            tags_csv = fetch_sheet_csv(TAGS_SHEET_ID, TAGS_SHEET_GIDS["tags"])
-            defs_csv = fetch_sheet_csv(TAGS_SHEET_ID, TAGS_SHEET_GIDS["definitions"])
+            tabs = fetch_sheet_tabs(TAGS_SHEET_ID)
+            missing = [t for t in TAGS_SHEET_TABS.values() if t not in tabs]
+            if missing:
+                raise RuntimeError(f"tags sheet has no tab named {missing}")
+            tags_csv, defs_csv = tabs[TAGS_SHEET_TABS["tags"]], tabs[TAGS_SHEET_TABS["definitions"]]
             for path, text in ((tags_snapshot, tags_csv), (defs_snapshot, defs_csv)):
-                if write_if_changed(path, text.replace("\r\n", "\n").rstrip("\n") + "\n"):
+                if write_if_changed(path, text):
                     print(f"Updated snapshot {path.name}")
-        except RuntimeError as e:
+        except (RuntimeError, zipfile.BadZipFile, ET.ParseError, KeyError) as e:
             print(f"WARNING: tags sheet unavailable, using snapshot: {e}", file=sys.stderr)
             tags_csv = defs_csv = None
         try:
-            reading_csv = fetch_reading_sheet_csv()
-        except RuntimeError as e:
+            reading_csv = fetch_sheet_tabs(READING_SHEET_ID).get(READING_SHEET_TAB)
+        except (RuntimeError, zipfile.BadZipFile, ET.ParseError, KeyError) as e:
             print(f"WARNING: Professional Reading sheet unavailable: {e}", file=sys.stderr)
     tags_csv = tags_csv or tags_snapshot.read_text(encoding="utf-8")
     defs = load_definitions(defs_csv or defs_snapshot.read_text(encoding="utf-8"))
