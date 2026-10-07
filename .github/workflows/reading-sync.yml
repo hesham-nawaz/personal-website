@@ -1,0 +1,59 @@
+name: Reading Sync
+
+# Rebuilds reading.html from the "Blogpost/Paper Review" Google Doc and the
+# "Reading Page Tags" sheet, then commits to main so Cloudflare Pages
+# re-deploys. Commits only when the rendered content changed.
+#
+# No auth needed — the Doc and both sheets are link-viewable, so their
+# export URLs work anonymously.
+#
+# Manual sync: Actions tab → Reading Sync → Run workflow, or
+#   gh workflow run reading-sync.yml -R hesham-nawaz/personal-website
+
+on:
+  schedule:
+    # Daily at 11:00 UTC (= 7:00 AM EDT / 6:00 AM EST).
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reading-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Stdlib only — no install step needed.
+
+      - name: Fetch the Doc and tags, and splice reading.html
+        run: |
+          cd tool && python reading.py \
+            --page ../reading.html \
+            --img-dir ../reading/img \
+            --data-dir ../data
+
+      - name: Commit and push if anything changed
+        run: |
+          git config user.name  "reading-bot"
+          git config user.email "reading-bot@users.noreply.github.com"
+          git add reading.html reading/img data/reading-tags.csv data/reading-tag-definitions.csv
+          if git diff --cached --quiet; then
+            echo "No changes — nothing to commit."
+            exit 0
+          fi
+          git commit -m "Sync reading page ($(TZ=America/New_York date +%F))"
+          git push

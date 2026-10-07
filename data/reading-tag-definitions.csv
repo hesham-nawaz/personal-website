@@ -1,0 +1,24 @@
+Tag,Group,Definition
+Search,Topic,Retrieval and ranking for user queries.
+Query Understanding,Topic,"Working out what a search query means: intent, categories, rewrites and expansion."
+RecSys,Topic,Recommendations and personalization.
+Classification,Topic,"Assigning labels or categories to items such as content, emails, transactions or listings."
+Information Extraction,Topic,"Pulling structured fields out of documents, invoices, catalogs or contracts."
+Trust & Safety,Topic,"Content moderation, scams and platform abuse."
+Security,Topic,"Email security, phishing and cyberattack detection."
+Customer Support,Topic,Conversational agents for support teams and contact centers.
+Voice,Topic,"Speech: transcription, voice agents and their latency."
+ML,Technique,"Trains or fine-tunes its own models, rather than only prompting off-the-shelf LLMs."
+Classical ML,Technique,"Gradient-boosted trees, logistic regression and hand-built tabular features."
+Deep Learning,Technique,"Neural networks the team trains itself, including transformers such as BERT."
+Embeddings,Technique,"Vector representations used for retrieval, similarity or as model features."
+Fine-tuning,Technique,"Adapting a pretrained model to the task, including distilling it into a smaller one."
+LLMs,Technique,"Builds on large language models through prompting, fine-tuning or orchestration."
+Agents,Technique,"LLM systems that plan and call tools over several steps, including multi-agent setups."
+RAG,Technique,Retrieving context to ground an LLM's answer.
+Evals,Technique,"Measuring quality: offline evaluation, benchmarks, test suites and A/B tests."
+LLM-as-a-Judge,Technique,"Using an LLM to grade outputs, and checking whether that judge can be trusted."
+Calibration,Technique,Turning model scores into probabilities or confidence you can act on.
+Human-in-the-Loop,Technique,Human review or labeling built into the system.
+Computer Vision,Technique,Models that work on images or video.
+ML Infra,Technique,"Pipelines, serving, latency and platform work around models."
