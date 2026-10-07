@@ -1323,8 +1323,128 @@ p {
     flex: 0 1 210px;
 }
 
+.reading-company-picker {
+    position: relative;
+}
+
+.reading-company-btn {
+    width: 100%;
+    font: inherit;
+    font-size: 0.95rem;
+    text-align: left;
+    color: var(--text-dark);
+    background-color: var(--white);
+    border: 1px solid #d6d6d6;
+    border-radius: 6px;
+    padding: 8px 32px 8px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+.reading-company-btn::after {
+    content: "";
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid var(--text-medium);
+    border-bottom: 1.5px solid var(--text-medium);
+    transform: translateY(-70%) rotate(45deg);
+}
+
+.reading-company-btn[aria-expanded="true"]::after {
+    transform: translateY(-30%) rotate(-135deg);
+}
+
+.reading-company-btn.has-selection {
+    border-color: var(--primary-color);
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+.reading-company-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 20;
+    width: 280px;
+    max-width: calc(100vw - 48px);
+    background-color: var(--white);
+    border: 1px solid #d6d6d6;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    padding: 6px 0;
+}
+
+.reading-company-menu[hidden] {
+    display: none;
+}
+
+.reading-company-menu-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 14px 8px;
+    border-bottom: 1px solid #eee;
+    font-family: var(--heading-font);
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+.reading-company-options {
+    max-height: 320px;
+    overflow-y: auto;
+    padding-top: 4px;
+}
+
+.reading-company-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+.reading-company-option:hover {
+    background-color: #f2faf9;
+}
+
+.reading-company-option input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.reading-company-name {
+    flex: 1;
+}
+
+.reading-company-option .reading-chip-count {
+    margin-left: 0;
+}
+
+.reading-company-option.is-disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.reading-company-option.is-disabled input {
+    cursor: default;
+}
+
 .reading-search input:focus,
 .reading-select select:focus,
+.reading-company-btn:focus-visible,
+.reading-company-option input:focus-visible,
 .reading-controls button:focus-visible,
 .reading-entry button:focus-visible,
 .reading-entry summary:focus-visible {

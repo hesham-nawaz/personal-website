@@ -1,13 +1,16 @@
 // Search and filters for reading.html. The entries are rendered into the page
 // by tool/reading.py; this script only shows, hides and reorders them, and
 // keeps the filters in the URL so a filtered view can be shared as a link.
+//
+// Filter rules: choices within one control widen the results (any of the
+// selected companies; any of the selected tags in a row), and the controls
+// narrow each other (companies AND topics AND techniques AND type AND search).
 document.addEventListener('DOMContentLoaded', function () {
     const list = document.querySelector('.reading-list');
     if (!list) return;
 
     const $ = (id) => document.getElementById(id);
     const searchInput = $('reading-q');
-    const companySelect = $('reading-company');
     const sortSelect = $('reading-sort');
     const tagGroupsEl = $('reading-tag-groups');
     const countEl = $('reading-count');
@@ -15,11 +18,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const expandBtn = $('reading-expand');
     const emptyEl = $('reading-empty');
     const typeButtons = Array.from(document.querySelectorAll('.reading-type-btn'));
+    const picker = $('reading-company-picker');
+    const pickerBtn = $('reading-company-btn');
+    const pickerMenu = $('reading-company-menu');
 
     let defs = {};
     try {
         defs = JSON.parse($('reading-tag-defs').textContent);
     } catch (e) { /* tags still work, just without groups or definitions */ }
+    const groupOf = (tag) => (defs[tag] && defs[tag].group) || 'Other';
 
     const entries = Array.from(list.querySelectorAll('.reading-entry')).map((el) => ({
         el,
@@ -32,23 +39,29 @@ document.addEventListener('DOMContentLoaded', function () {
         text: el.textContent.toLowerCase().replace(/\s+/g, ' '),
     }));
 
-    const state = { q: '', company: '', tags: [], type: '', sort: 'reviewed' };
+    const state = { q: '', companies: [], tags: [], type: '', sort: 'reviewed' };
 
     // ---- Build the controls from the entries -------------------------------
 
-    const companyCounts = countBy(entries.map((e) => e.company).filter(Boolean));
-    Object.keys(companyCounts).sort((a, b) => a.localeCompare(b)).forEach((c) => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = `${c} (${companyCounts[c]})`;
-        companySelect.appendChild(opt);
+    const companies = Array.from(new Set(entries.map((e) => e.company).filter(Boolean)))
+        .sort((a, b) => a.localeCompare(b));
+    const companyBoxes = {};
+    companies.forEach((c) => {
+        const row = document.createElement('label');
+        row.className = 'reading-company-option';
+        row.innerHTML = '<input type="checkbox"><span class="reading-company-name"></span><span class="reading-chip-count"></span>';
+        const box = row.querySelector('input');
+        box.value = c;
+        row.querySelector('.reading-company-name').textContent = c;
+        box.addEventListener('change', () => toggleCompany(c));
+        companyBoxes[c] = row;
+        $('reading-company-options').appendChild(row);
     });
 
     const allTags = new Set(entries.flatMap((e) => e.tags));
     const groups = {};
     Object.keys(defs).forEach((tag) => {
-        if (!allTags.has(tag)) return;
-        (groups[defs[tag].group] = groups[defs[tag].group] || []).push(tag);
+        if (allTags.has(tag)) (groups[groupOf(tag)] = groups[groupOf(tag)] || []).push(tag);
     });
     const undefinedTags = Array.from(allTags).filter((t) => !defs[t]).sort();
     if (undefinedTags.length) groups.Other = (groups.Other || []).concat(undefinedTags);
@@ -101,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function readUrl() {
         const p = new URLSearchParams(location.search);
         state.q = p.get('q') || '';
-        state.company = companyCounts[p.get('company')] ? p.get('company') : '';
+        state.companies = (p.get('company') || '').split(',').filter((c) => companies.includes(c));
         state.tags = (p.get('tags') || '').split(',').filter((t) => allTags.has(t));
         state.type = p.get('type') || '';
         state.sort = ['reviewed', 'published', 'company'].includes(p.get('sort')) ? p.get('sort') : 'reviewed';
@@ -110,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function writeUrl() {
         const p = new URLSearchParams();
         if (state.q) p.set('q', state.q);
-        if (state.company) p.set('company', state.company);
+        if (state.companies.length) p.set('company', state.companies.join(','));
         if (state.tags.length) p.set('tags', state.tags.join(','));
         if (state.type) p.set('type', state.type);
         if (state.sort !== 'reviewed') p.set('sort', state.sort);
@@ -121,10 +134,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ---- Filtering ---------------------------------------------------------
 
+    function selectedByGroup() {
+        const out = {};
+        state.tags.forEach((t) => { (out[groupOf(t)] = out[groupOf(t)] || []).push(t); });
+        return out;
+    }
+
+    // `skip` leaves one control out, which is how each control's counts are
+    // computed: "how many reviews have this, given everything else you chose".
     function matches(e, skip) {
-        if (skip !== 'company' && state.company && e.company !== state.company) return false;
+        if (skip !== 'company' && state.companies.length && !state.companies.includes(e.company)) return false;
         if (skip !== 'type' && state.type && e.type !== state.type) return false;
-        if (skip !== 'tags' && !state.tags.every((t) => e.tags.includes(t))) return false;
+        const byGroup = selectedByGroup();
+        for (const group in byGroup) {
+            if (group !== skip && !byGroup[group].some((t) => e.tags.includes(t))) return false;
+        }
         if (state.q) {
             const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
             if (!words.every((w) => e.text.includes(w))) return false;
@@ -146,29 +170,48 @@ document.addEventListener('DOMContentLoaded', function () {
             list.appendChild(e.el);
         });
 
-        // Tag counts answer "how many would I see if I added this tag?"
-        const tagPool = entries.filter((e) => matches(e, 'tags'));
-        Object.entries(tagButtons).forEach(([tag, btn]) => {
-            const active = state.tags.includes(tag);
-            const n = tagPool.filter((e) => e.tags.includes(tag) && state.tags.every((t) => e.tags.includes(t))).length;
-            btn.setAttribute('aria-pressed', String(active));
-            btn.lastChild.textContent = n;
-            btn.disabled = !active && n === 0;
+        Object.keys(groups).forEach((group) => {
+            const pool = entries.filter((e) => matches(e, group));
+            groups[group].forEach((tag) => {
+                const btn = tagButtons[tag];
+                const active = state.tags.includes(tag);
+                const n = pool.filter((e) => e.tags.includes(tag)).length;
+                btn.setAttribute('aria-pressed', String(active));
+                btn.lastChild.textContent = n;
+                btn.disabled = !active && n === 0;
+            });
         });
+
+        const companyPool = entries.filter((e) => matches(e, 'company'));
+        companies.forEach((c) => {
+            const row = companyBoxes[c];
+            const box = row.firstChild;
+            const n = companyPool.filter((e) => e.company === c).length;
+            box.checked = state.companies.includes(c);
+            box.disabled = !box.checked && n === 0;
+            row.classList.toggle('is-disabled', box.disabled);
+            row.lastChild.textContent = n;
+        });
+        $('reading-company-label').textContent =
+            state.companies.length === 0 ? 'All companies'
+                : state.companies.length === 1 ? state.companies[0]
+                    : `${state.companies.length} companies`;
+        pickerBtn.classList.toggle('has-selection', state.companies.length > 0);
+        $('reading-company-clear').hidden = !state.companies.length;
+
         $('reading-tag-active').textContent = state.tags.length ? `(${state.tags.length} selected)` : '';
         list.querySelectorAll('.reading-tag').forEach((btn) => {
             btn.classList.toggle('is-active', state.tags.includes(btn.dataset.tag));
         });
         list.querySelectorAll('.reading-company').forEach((btn) => {
-            btn.classList.toggle('is-active', btn.dataset.company === state.company);
+            btn.classList.toggle('is-active', state.companies.includes(btn.dataset.company));
         });
 
         searchInput.value = state.q;
-        companySelect.value = state.company;
         sortSelect.value = state.sort;
         typeButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === state.type)));
 
-        const filtered = state.q || state.company || state.tags.length || state.type;
+        const filtered = state.q || state.companies.length || state.tags.length || state.type;
         countEl.textContent = filtered
             ? `Showing ${visible.length} of ${entries.length} reviews`
             : `${entries.length} reviews`;
@@ -177,15 +220,48 @@ document.addEventListener('DOMContentLoaded', function () {
         writeUrl();
     }
 
+    const toggle = (arr, x) => (arr.includes(x) ? arr.filter((y) => y !== x) : arr.concat(x));
+
     function toggleTag(tag) {
-        state.tags = state.tags.includes(tag) ? state.tags.filter((t) => t !== tag) : state.tags.concat(tag);
+        state.tags = toggle(state.tags, tag);
+        render();
+    }
+
+    function toggleCompany(company) {
+        state.companies = toggle(state.companies, company);
         render();
     }
 
     function clearFilters() {
-        Object.assign(state, { q: '', company: '', tags: [], type: '' });
+        Object.assign(state, { q: '', companies: [], tags: [], type: '' });
         render();
     }
+
+    // ---- Company menu ------------------------------------------------------
+
+    function setMenu(open) {
+        pickerMenu.hidden = !open;
+        pickerBtn.setAttribute('aria-expanded', String(open));
+        if (!open) return;
+        // Keep the menu on screen: slide it left if it would run off the edge.
+        pickerMenu.style.left = '0px';
+        const overflow = pickerMenu.getBoundingClientRect().right - (document.documentElement.clientWidth - 12);
+        if (overflow > 0) pickerMenu.style.left = `${-overflow}px`;
+    }
+    pickerBtn.addEventListener('click', () => setMenu(pickerMenu.hidden));
+    $('reading-company-clear').addEventListener('click', () => { state.companies = []; render(); });
+    document.addEventListener('click', (ev) => {
+        if (!pickerMenu.hidden && !picker.contains(ev.target)) setMenu(false);
+    });
+    picker.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape' && !pickerMenu.hidden) {
+            setMenu(false);
+            pickerBtn.focus();
+        }
+    });
+    picker.addEventListener('focusout', (ev) => {
+        if (ev.relatedTarget && !picker.contains(ev.relatedTarget)) setMenu(false);
+    });
 
     // ---- Events ------------------------------------------------------------
 
@@ -194,7 +270,6 @@ document.addEventListener('DOMContentLoaded', function () {
         clearTimeout(searchTimer);
         searchTimer = setTimeout(() => { state.q = searchInput.value.trim(); render(); }, 120);
     });
-    companySelect.addEventListener('change', () => { state.company = companySelect.value; render(); });
     sortSelect.addEventListener('change', () => { state.sort = sortSelect.value; render(); });
     typeButtons.forEach((b) => b.addEventListener('click', () => { state.type = b.dataset.type; render(); }));
     clearBtn.addEventListener('click', clearFilters);
@@ -204,10 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const tagBtn = ev.target.closest('.reading-tag');
         if (tagBtn) { toggleTag(tagBtn.dataset.tag); return; }
         const coBtn = ev.target.closest('.reading-company');
-        if (coBtn) {
-            state.company = state.company === coBtn.dataset.company ? '' : coBtn.dataset.company;
-            render();
-        }
+        if (coBtn) toggleCompany(coBtn.dataset.company);
     });
 
     expandBtn.addEventListener('click', () => {
@@ -233,8 +305,4 @@ document.addEventListener('DOMContentLoaded', function () {
     readUrl();
     render();
     openFromHash();
-
-    function countBy(items) {
-        return items.reduce((acc, x) => { acc[x] = (acc[x] || 0) + 1; return acc; }, {});
-    }
 });
