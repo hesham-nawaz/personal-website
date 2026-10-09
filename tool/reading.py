@@ -31,6 +31,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import collections
 import csv
 import hashlib
 import html
@@ -45,6 +46,7 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
+import zlib
 from dataclasses import dataclass, field
 from datetime import datetime
 from html.parser import HTMLParser
@@ -125,8 +127,10 @@ def fetch_tab_zip(tab_id: str) -> bytes:
 # Each company's icon is fetched once from its own site and committed under
 # reading/logos/, so the page never calls a third-party logo service. The
 # company → domain map lives in data/reading-companies.csv; a new company
-# gets a row guessed from its review's link, and a "Logo URL" in that file
-# overrides whatever the site publishes. Delete a logo file to refetch it.
+# gets a row guessed from its review's link. A "Logo URL" in that file
+# overrides whatever the site publishes, and "none" means no logo (the card
+# shows the company's initial). Only roughly square icons are used. Delete a
+# logo file to refetch it.
 
 # Hosts that publish other people's posts, so their icon isn't the company's.
 SHARED_HOSTS = {"medium.com", "arxiv.org", "linkedin.com", "github.com", "github.io", "substack.com",
@@ -152,16 +156,156 @@ def get_once(url: str) -> tuple[bytes, str, str]:
         return resp.read(), resp.headers.get("Content-Type", ""), resp.geturl()
 
 
-def icon_width(data: bytes, ext: str) -> int:
-    """Pixel width of a PNG or the largest ICO frame; SVGs scale freely."""
-    if ext == "svg":
-        return 1024
-    if data[:8] == b"\x89PNG\r\n\x1a\n":
-        return int.from_bytes(data[16:20], "big")
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+
+
+def image_size(data: bytes, ext: str) -> tuple[int, int] | None:
+    """(width, height) of a PNG, the largest ICO frame, or an SVG's viewBox."""
+    if data[:8] == PNG_SIGNATURE:
+        return int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")
     if ext == "ico" and len(data) >= 22:
-        count = int.from_bytes(data[4:6], "little")
-        return max((data[6 + 16 * i] or 256 for i in range(count) if 6 + 16 * i < len(data)), default=0)
-    return 64
+        frames = [(data[6 + 16 * i] or 256, data[7 + 16 * i] or 256)
+                  for i in range(int.from_bytes(data[4:6], "little")) if 8 + 16 * i <= len(data)]
+        return max(frames, default=None)
+    if ext == "svg":
+        head = data[:4000].decode("utf-8", "replace")
+        box = re.search(r'viewBox=["\']\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)', head)
+        if box:
+            return round(float(box.group(1))), round(float(box.group(2)))
+        w = re.search(r'<svg\b[^>]*\bwidth=["\']([\d.]+)', head)
+        h = re.search(r'<svg\b[^>]*\bheight=["\']([\d.]+)', head)
+        return (round(float(w.group(1))), round(float(h.group(1)))) if w and h else None
+    return None
+
+
+def png_pixels(data: bytes) -> tuple[int, int, list[list[tuple[int, int, int, int]]]] | None:
+    """Decode an 8-bit, non-interlaced PNG to rows of RGBA pixels, or None
+    for layouts this doesn't handle (the logo is then judged by size alone)."""
+    pos, ihdr, idat, plte, trns = 8, b"", b"", b"", b""
+    while pos + 8 <= len(data):
+        n, kind = int.from_bytes(data[pos:pos + 4], "big"), data[pos + 4:pos + 8]
+        body = data[pos + 8:pos + 8 + n]
+        if kind == b"IHDR":
+            ihdr = body
+        elif kind == b"IDAT":
+            idat += body
+        elif kind == b"PLTE":
+            plte = body
+        elif kind == b"tRNS":
+            trns = body
+        elif kind == b"IEND":
+            break
+        pos += 12 + n
+    if len(ihdr) < 13 or ihdr[8] != 8 or ihdr[12] != 0:
+        return None
+    w, h, color = int.from_bytes(ihdr[0:4], "big"), int.from_bytes(ihdr[4:8], "big"), ihdr[9]
+    bpp = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(color)
+    if not bpp or (color == 3 and not plte):
+        return None
+    try:
+        raw = zlib.decompress(idat)
+    except zlib.error:
+        return None
+    stride, prev, rows = w * bpp, bytearray(w * bpp), []
+    for y in range(h):
+        start = y * (stride + 1)
+        kind, row = raw[start], bytearray(raw[start + 1:start + 1 + stride])
+        for i in range(stride):  # undo PNG's per-row filter
+            a = row[i - bpp] if i >= bpp else 0
+            b, c = prev[i], (prev[i - bpp] if i >= bpp else 0)
+            if kind == 1:
+                row[i] = (row[i] + a) & 255
+            elif kind == 2:
+                row[i] = (row[i] + b) & 255
+            elif kind == 3:
+                row[i] = (row[i] + (a + b) // 2) & 255
+            elif kind == 4:
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                row[i] = (row[i] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
+        prev = row
+        if color == 6:
+            rows.append([tuple(row[i:i + 4]) for i in range(0, stride, 4)])
+        elif color == 2:
+            rows.append([(*row[i:i + 3], 255) for i in range(0, stride, 3)])
+        elif color == 4:
+            rows.append([(row[i], row[i], row[i], row[i + 1]) for i in range(0, stride, 2)])
+        elif color == 0:
+            rows.append([(v, v, v, 255) for v in row])
+        else:
+            rows.append([(*plte[3 * v:3 * v + 3], trns[v] if v < len(trns) else 255) for v in row])
+    return w, h, rows
+
+
+def ico_png_frame(data: bytes) -> bytes | None:
+    """The largest frame of an ICO, if that frame is stored as a PNG."""
+    best = None
+    for i in range(int.from_bytes(data[4:6], "little")):
+        e = 6 + 16 * i
+        if e + 16 > len(data):
+            break
+        width = data[e] or 256
+        size, offset = int.from_bytes(data[e + 8:e + 12], "little"), int.from_bytes(data[e + 12:e + 16], "little")
+        if best is None or width > best[0]:
+            best = (width, data[offset:offset + size])
+    return best[1] if best and best[1][:8] == PNG_SIGNATURE else None
+
+
+def logo_problem(data: bytes, ext: str, check_content: bool = True) -> str:
+    """Why a logo wouldn't fit a small square on the page, or "" if it's fine.
+
+    The canvas must be about square. Then, reading the pixels where possible:
+    a colored tile (rounded square or circle) is fine as long as its mark sits
+    inside it rather than running off the edge (a cropped wordmark does);
+    otherwise the visible shape must itself be roughly square (a wordmark on a
+    clear or white background isn't).
+    """
+    size = image_size(data, ext)
+    if not size or not size[1] or not 0.8 <= size[0] / size[1] <= 1.25:
+        return f"canvas isn't square ({size})"
+    if not check_content:
+        return ""
+    png = data if ext == "png" else ico_png_frame(data) if ext == "ico" else None
+    px = png_pixels(png) if png else None
+    if not px:
+        return ""
+    w, h, rows = px
+
+    def box(hit) -> tuple[int, int, int, int] | None:
+        xs, ys = [], []
+        for y, row in enumerate(rows):
+            on = [x for x, p in enumerate(row) if hit(p)]
+            if on:
+                xs += [on[0], on[-1]]
+                ys.append(y)
+        return (min(xs), min(ys), max(xs), max(ys)) if xs else None
+
+    shape = box(lambda p: p[3] > 24)
+    if not shape:
+        return "blank"
+    x0, y0, x1, y1 = shape
+    opaque = [p for row in rows[y0:y1 + 1] for p in row[x0:x1 + 1] if p[3] > 24]
+    # A tile (rounded square, circle) fills most of its box; a mark on a clear
+    # background, like a grid of dots, doesn't.
+    if len(opaque) >= 0.75 * (x1 - x0 + 1) * (y1 - y0 + 1):
+        bucket = lambda p: (p[0] // 32, p[1] // 32, p[2] // 32)
+        counts = collections.Counter(map(bucket, opaque))
+        common = counts.most_common(1)[0][0]
+        same = [p for p in opaque if bucket(p) == common]
+        bg = [sum(p[i] for p in same) / len(same) for i in range(3)]
+        mark = box(lambda p: p[3] > 24 and sum(abs(p[i] - bg[i]) for i in range(3)) > 60)
+        if min(bg) < 225:  # a colored tile is the visible square; its mark must sit inside it
+            if not mark:
+                return ""
+            margin = max(1, (x1 - x0) // 64)
+            if mark[0] - x0 < margin or mark[1] - y0 < margin or x1 - mark[2] < margin or y1 - mark[3] < margin:
+                return "the mark runs off the edge of its tile (cut off)"
+            return ""
+        if not mark:  # a plain white square
+            return "blank"
+        x0, y0, x1, y1 = mark  # a white tile blends into the page; what shows is the mark
+    ratio = (x1 - x0 + 1) / (y1 - y0 + 1)
+    return "" if 0.4 <= ratio <= 2.5 else f"the visible shape isn't square (width/height {ratio:.1f})"
 
 
 def logo_candidates(domain: str) -> list[str]:
@@ -180,23 +324,28 @@ def logo_candidates(domain: str) -> list[str]:
     return list(dict.fromkeys(urls))
 
 
-def fetch_logo(domain: str, override: str = "") -> tuple[bytes, str] | None:
-    """The sharpest icon among the site's declared icons and the usual fallbacks."""
-    best = None
+def fetch_logo(domain: str, override: str = "") -> tuple[tuple[bytes, str] | None, bool]:
+    """The sharpest icon that fits a square, from the site's declared icons and
+    the usual fallbacks. Returns (icon or None, whether icons were found but
+    none fit), so a temporary network failure isn't mistaken for "no logo"."""
+    fetched = []
     for url in [override] if override else logo_candidates(domain):
         try:
             data, ctype, _ = get_once(url)
         except (urllib.error.URLError, TimeoutError, ValueError, OSError):
             continue
         ext = IMAGE_EXTS.get(ctype.split(";")[0].strip().lower())
-        if not ext or len(data) < 100:
-            continue
-        width = icon_width(data, ext)
-        if best is None or width > best[0]:
-            best = (width, data, ext)
-        if width >= 128:
-            break
-    return (best[1], best[2]) if best else None
+        if ext and len(data) >= 100:
+            readable = ext == "png" or (ext == "ico" and ico_png_frame(data) is not None)
+            fetched.append((data, ext, logo_problem(data, ext), readable))
+    # If the site's artwork failed a pixel check, an SVG or old-style ICO of the
+    # same artwork can't be trusted either, since those can't be checked.
+    artwork_failed = any(problem and readable and "canvas" not in problem
+                         for _, _, problem, readable in fetched)
+    usable = [(d, e) for d, e, problem, readable in fetched if not problem and (readable or not artwork_failed)]
+    if not usable:
+        return None, bool(fetched)
+    return max(usable, key=lambda c: 1024 if c[1] == "svg" else image_size(c[0], c[1])[0]), False
 
 
 def fetch_sheet_tabs(sheet_id: str) -> dict[str, str]:
@@ -747,26 +896,41 @@ def assign_logos(entries: list[Entry], companies_csv: Path, logo_dir: Path, rel_
     logo_dir.mkdir(parents=True, exist_ok=True)
     files = {p.stem: p for p in logo_dir.iterdir() if p.is_file()}
 
-    added = False
+    changed = False
     for company in sorted({e.company for e in entries if e.company}):
         row = known.get(company)
         if row is None:
             domain = next((d for e in entries if e.company == company and e.url
                            for d in [site_domain(e.url)] if d), "")
             row = known[company] = {"Company": company, "Domain": domain, "Logo URL": ""}
-            added = True
+            changed = True
             print(f"New company {company!r}: guessed domain {domain or '(none)'}; "
                   f"check data/{companies_csv.name}")
         key = slugify(company)
         domain, override = (row.get("Domain") or "").strip(), (row.get("Logo URL") or "").strip()
-        if key not in files and fetch_missing and (domain or override):
-            got = fetch_logo(domain, override)
+        if override.lower() == "none":  # no logo that fits: the card shows the initial
+            if key in files:
+                files.pop(key).unlink()
+            continue
+        if key in files:
+            problem = logo_problem(files[key].read_bytes(), files[key].suffix[1:])
+            if problem:
+                print(f"WARNING: removed {files[key].name}: {problem}", file=sys.stderr)
+                files.pop(key).unlink()
+                row["Logo URL"], changed = "none", True
+                continue
+        elif fetch_missing and (domain or override):
+            got, none_fit = fetch_logo(domain, override)
             if got:
                 files[key] = logo_dir / f"{key}.{got[1]}"
                 files[key].write_bytes(got[0])
                 print(f"Fetched logo for {company}")
+            elif none_fit:
+                print(f"WARNING: no logo for {company} fits a square; it shows its initial "
+                      f"(set a Logo URL in data/{companies_csv.name} to override)", file=sys.stderr)
+                row["Logo URL"], changed = "none", True
             else:
-                print(f"WARNING: no logo found for {company} ({domain or override})", file=sys.stderr)
+                print(f"WARNING: couldn't reach {domain or override} for {company}'s logo", file=sys.stderr)
         if key in files:
             # The content hash in the URL busts caches when a logo is replaced.
             version = hashlib.sha256(files[key].read_bytes()).hexdigest()[:8]
@@ -774,7 +938,7 @@ def assign_logos(entries: list[Entry], companies_csv: Path, logo_dir: Path, rel_
                 if e.company == company:
                     e.logo = f"{rel_dir}/{files[key].name}?v={version}"
 
-    if added:
+    if changed:
         buf = io.StringIO()
         writer = csv.DictWriter(buf, fieldnames=fields, extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
@@ -837,6 +1001,17 @@ def splice(page: str, fragment: str) -> str:
     if start < 0 or end < start:
         raise RuntimeError("reading page is missing the READING:START/END markers")
     return page[:start] + fragment + page[end + len(END_MARKER):]
+
+
+def stamp_assets(page: str, root: Path) -> str:
+    """Version the page's stylesheet and script links by their content, so a
+    browser can't pair a new page with a cached old styles.css."""
+    def stamp(m: re.Match) -> str:
+        path = root / m.group(2)
+        if not path.exists():
+            return m.group(0)
+        return f'{m.group(1)}="{m.group(2)}?v={hashlib.sha256(path.read_bytes()).hexdigest()[:8]}"'
+    return re.sub(r'\b(href|src)="(styles\.css|js/reading\.js)(?:\?v=[0-9a-f]+)?"', stamp, page)
 
 
 def content_hash_of(text: str) -> str | None:
@@ -921,11 +1096,15 @@ def run(page_path: Path, img_dir: Path, data_dir: Path, offline: bool = False,
 
     # 4. Render, and only touch the page when the content changed. Images no
     #    longer referenced by the page are deleted.
-    page = page_path.read_text(encoding="utf-8")
+    original = page_path.read_text(encoding="utf-8")
+    page = stamp_assets(original, page_path.parent)
     updated = datetime.now(ZoneInfo("America/New_York")).strftime("%B %-d, %Y")
     fragment = render_fragment(entries, defs, updated)
     used_images = {n for n in image_files if n in fragment}
     if content_hash_of(fragment) == content_hash_of(page):
+        if page != original:
+            page_path.write_text(page, encoding="utf-8")
+            print("Updated stylesheet/script versions.")
         print(f"No content changes ({len(entries)} reviews).")
         return 0
 
