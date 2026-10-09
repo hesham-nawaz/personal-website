@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const box = row.querySelector('input');
         box.value = c;
         row.querySelector('.reading-company-name').textContent = c;
+        // Reuse the logo the cards already show for this company.
+        const logo = list.querySelector(`.reading-company[data-company="${CSS.escape(c)}"] .reading-logo`);
+        if (logo) row.insertBefore(logo.cloneNode(true), row.querySelector('.reading-company-name'));
         box.addEventListener('change', () => toggleCompany(c));
         companyBoxes[c] = row;
         $('reading-company-options').appendChild(row);

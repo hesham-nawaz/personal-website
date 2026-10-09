@@ -118,6 +118,87 @@ def fetch_tab_zip(tab_id: str) -> bytes:
     return fetch(f"https://docs.google.com/document/d/{DOC_ID}/export?format=zip&tab={tab_id}", "zip")
 
 
+# --------------------------------------------------------------------------
+# Company logos
+# --------------------------------------------------------------------------
+#
+# Each company's icon is fetched once from its own site and committed under
+# reading/logos/, so the page never calls a third-party logo service. The
+# company → domain map lives in data/reading-companies.csv; a new company
+# gets a row guessed from its review's link, and a "Logo URL" in that file
+# overrides whatever the site publishes. Delete a logo file to refetch it.
+
+# Hosts that publish other people's posts, so their icon isn't the company's.
+SHARED_HOSTS = {"medium.com", "arxiv.org", "linkedin.com", "github.com", "github.io", "substack.com",
+                "youtube.com", "youtu.be", "amazonaws.com", "google.com", "notion.site", "x.com",
+                "twitter.com", "openreview.net", "aclanthology.org", "acm.org", "sciencedirect.com",
+                "researchgate.net", "huggingface.co"}
+BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+              "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+IMAGE_EXTS = {"image/png": "png", "image/svg+xml": "svg", "image/x-icon": "ico",
+              "image/vnd.microsoft.icon": "ico", "image/jpeg": "jpg", "image/webp": "webp"}
+
+
+def site_domain(url: str) -> str:
+    """'https://build.forus.com/post' → 'forus.com'; '' for shared hosts."""
+    parts = (urllib.parse.urlparse(url).hostname or "").lower().split(".")
+    domain = ".".join(parts[-2:]) if len(parts) >= 2 else ""
+    return "" if domain in SHARED_HOSTS else domain
+
+
+def get_once(url: str) -> tuple[bytes, str, str]:
+    req = urllib.request.Request(url, headers={"User-Agent": BROWSER_UA})
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        return resp.read(), resp.headers.get("Content-Type", ""), resp.geturl()
+
+
+def icon_width(data: bytes, ext: str) -> int:
+    """Pixel width of a PNG or the largest ICO frame; SVGs scale freely."""
+    if ext == "svg":
+        return 1024
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return int.from_bytes(data[16:20], "big")
+    if ext == "ico" and len(data) >= 22:
+        count = int.from_bytes(data[4:6], "little")
+        return max((data[6 + 16 * i] or 256 for i in range(count) if 6 + 16 * i < len(data)), default=0)
+    return 64
+
+
+def logo_candidates(domain: str) -> list[str]:
+    urls = []
+    try:
+        page, _, final = get_once(f"https://{domain}/")
+        for tag in re.findall(r"<link\b[^>]*>", page.decode("utf-8", "replace"), re.I):
+            rel = re.search(r'\brel=["\']?([^"\'>]+)', tag, re.I)
+            href = re.search(r'\bhref=["\']?([^"\'\s>]+)', tag, re.I)
+            if rel and href and "icon" in rel.group(1).lower() and "mask" not in rel.group(1).lower():
+                urls.append(urllib.parse.urljoin(final, html.unescape(href.group(1))))
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+        pass
+    urls += [f"https://{domain}/apple-touch-icon.png", f"https://{domain}/favicon.ico",
+             f"https://www.google.com/s2/favicons?domain={domain}&sz=128"]
+    return list(dict.fromkeys(urls))
+
+
+def fetch_logo(domain: str, override: str = "") -> tuple[bytes, str] | None:
+    """The sharpest icon among the site's declared icons and the usual fallbacks."""
+    best = None
+    for url in [override] if override else logo_candidates(domain):
+        try:
+            data, ctype, _ = get_once(url)
+        except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+            continue
+        ext = IMAGE_EXTS.get(ctype.split(";")[0].strip().lower())
+        if not ext or len(data) < 100:
+            continue
+        width = icon_width(data, ext)
+        if best is None or width > best[0]:
+            best = (width, data, ext)
+        if width >= 128:
+            break
+    return (best[1], best[2]) if best else None
+
+
 def fetch_sheet_tabs(sheet_id: str) -> dict[str, str]:
     """Every tab of a sheet as CSV text, keyed by tab name.
 
@@ -452,6 +533,7 @@ class Entry:
     year: str = ""
     type: str = ""
     slug: str = ""
+    logo: str = ""
 
 
 def norm_title(s: str) -> str:
@@ -656,6 +738,50 @@ def apply_metadata(entries: list[Entry], tags_csv: str, reading_csv: str | None,
     return warnings
 
 
+def assign_logos(entries: list[Entry], companies_csv: Path, logo_dir: Path, rel_dir: str,
+                 fetch_missing: bool) -> None:
+    """Point each entry at its company's logo, fetching any that are missing."""
+    fields = ["Company", "Domain", "Logo URL"]
+    rows = list(csv.DictReader(io.StringIO(companies_csv.read_text(encoding="utf-8")))) if companies_csv.exists() else []
+    known = {(r.get("Company") or "").strip(): r for r in rows if (r.get("Company") or "").strip()}
+    logo_dir.mkdir(parents=True, exist_ok=True)
+    files = {p.stem: p for p in logo_dir.iterdir() if p.is_file()}
+
+    added = False
+    for company in sorted({e.company for e in entries if e.company}):
+        row = known.get(company)
+        if row is None:
+            domain = next((d for e in entries if e.company == company and e.url
+                           for d in [site_domain(e.url)] if d), "")
+            row = known[company] = {"Company": company, "Domain": domain, "Logo URL": ""}
+            added = True
+            print(f"New company {company!r}: guessed domain {domain or '(none)'}; "
+                  f"check data/{companies_csv.name}")
+        key = slugify(company)
+        domain, override = (row.get("Domain") or "").strip(), (row.get("Logo URL") or "").strip()
+        if key not in files and fetch_missing and (domain or override):
+            got = fetch_logo(domain, override)
+            if got:
+                files[key] = logo_dir / f"{key}.{got[1]}"
+                files[key].write_bytes(got[0])
+                print(f"Fetched logo for {company}")
+            else:
+                print(f"WARNING: no logo found for {company} ({domain or override})", file=sys.stderr)
+        if key in files:
+            # The content hash in the URL busts caches when a logo is replaced.
+            version = hashlib.sha256(files[key].read_bytes()).hexdigest()[:8]
+            for e in entries:
+                if e.company == company:
+                    e.logo = f"{rel_dir}/{files[key].name}?v={version}"
+
+    if added:
+        buf = io.StringIO()
+        writer = csv.DictWriter(buf, fieldnames=fields, extrasaction="ignore", lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(sorted(known.values(), key=lambda r: r["Company"].lower()))
+        companies_csv.write_text(buf.getvalue(), encoding="utf-8")
+
+
 # --------------------------------------------------------------------------
 # Rendering the page fragment
 # --------------------------------------------------------------------------
@@ -665,7 +791,12 @@ def esc(s: str) -> str:
 
 
 def render_entry(e: Entry, order: int) -> str:
-    meta = [f'<button type="button" class="reading-company" data-company="{esc(e.company)}">{esc(e.company)}</button>'] if e.company else []
+    if e.logo:
+        mark = f'<img class="reading-logo" src="{esc(e.logo)}" alt="" width="22" height="22" decoding="async">'
+    else:
+        mark = f'<span class="reading-logo reading-logo-letter" aria-hidden="true">{esc(e.company[:1])}</span>'
+    meta = [f'<button type="button" class="reading-company" data-company="{esc(e.company)}">{mark}'
+            f'<span class="reading-company-text">{esc(e.company)}</span></button>'] if e.company else []
     meta += [esc(x) for x in (e.year, e.type) if x]
     if e.url:
         meta.append(f'<a class="reading-original" href="{esc(e.url)}" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a>')
@@ -725,7 +856,7 @@ def write_if_changed(path: Path, text: str) -> bool:
 
 
 def run(page_path: Path, img_dir: Path, data_dir: Path, offline: bool = False,
-        doc_zips: list[Path] | None = None) -> int:
+        doc_zips: list[Path] | None = None, logo_dir: Path | None = None) -> int:
     tags_snapshot = data_dir / "reading-tags.csv"
     defs_snapshot = data_dir / "reading-tag-definitions.csv"
 
@@ -784,6 +915,9 @@ def run(page_path: Path, img_dir: Path, data_dir: Path, offline: bool = False,
 
     for w in apply_metadata(entries, tags_csv, reading_csv, defs):
         print(f"WARNING: {w}", file=sys.stderr)
+    logo_dir = logo_dir or img_dir.parent / "logos"
+    assign_logos(entries, data_dir / "reading-companies.csv", logo_dir,
+                 logo_dir.relative_to(page_path.parent).as_posix(), fetch_missing=not offline)
 
     # 4. Render, and only touch the page when the content changed. Images no
     #    longer referenced by the page are deleted.
@@ -814,9 +948,11 @@ def main() -> None:
     ap.add_argument("--data-dir", required=True, type=Path, help="Where the tag CSV snapshots live.")
     ap.add_argument("--offline", action="store_true", help="Use the CSV snapshots instead of fetching sheets.")
     ap.add_argument("--doc-zip", nargs="*", type=Path, help="Local zip exports to use instead of the Doc.")
+    ap.add_argument("--logo-dir", type=Path, help="Where company logos live (default: <img-dir>/../logos).")
     args = ap.parse_args()
     sys.exit(run(args.page.resolve(), args.img_dir.resolve(), args.data_dir.resolve(),
-                 offline=args.offline, doc_zips=args.doc_zip))
+                 offline=args.offline, doc_zips=args.doc_zip,
+                 logo_dir=args.logo_dir.resolve() if args.logo_dir else None))
 
 
 if __name__ == "__main__":

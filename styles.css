@@ -1602,25 +1602,59 @@ p {
 }
 
 .reading-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 6px;
+    row-gap: 2px;
     font-size: 0.88rem;
     color: var(--text-light);
-    margin-bottom: 2px;
+    margin-bottom: 6px;
 }
 
 .reading-company {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 2px;
     font: inherit;
-    font-weight: 600;
-    color: var(--text-medium);
+    font-family: var(--heading-font);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
 }
 
-.reading-company:hover,
-.reading-company.is-active {
+.reading-company:hover .reading-company-text,
+.reading-company.is-active .reading-company-text {
     color: var(--primary-dark);
     text-decoration: underline;
+}
+
+.reading-logo {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    object-fit: contain;
+}
+
+.reading-logo-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.8rem;
+}
+
+.reading-company-option .reading-logo {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
 }
 
 .reading-original {
