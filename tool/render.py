@@ -1,7 +1,9 @@
 """Render a list of matched screenings as a single-file HTML report."""
 from __future__ import annotations
 
+import hashlib
 import html
+import re
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -372,8 +374,24 @@ def splice_into_site_page(page_path: str | Path, fragment: str) -> Path:
         + SITE_FRAGMENT_END
         + post
     )
+    new_page = _stamp_stylesheet(new_page, p.parent)
     p.write_text(new_page, encoding="utf-8")
     return p
+
+
+def _stamp_stylesheet(page: str, site_root: Path) -> str:
+    """Point the page's styles.css link at a content version (styles.css?v=<hash>).
+
+    The site serves styles.css with a 4-hour browser cache, so without this a
+    returning visitor can get freshly generated markup paired with a stale
+    stylesheet that lacks its classes. Same scheme tool/reading.py uses for
+    reading.html."""
+    css = site_root / "styles.css"
+    if not css.exists():
+        return page
+    version = hashlib.sha256(css.read_bytes()).hexdigest()[:8]
+    return re.sub(r'\bhref="styles\.css(?:\?v=[0-9a-f]+)?"',
+                  f'href="styles.css?v={version}"', page)
 
 
 def write_site_page(matches: list[MatchedScreening],
