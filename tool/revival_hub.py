@@ -89,6 +89,10 @@ class Screening:
     notes: str | None = None
     presenter: str | None = None
     raw: str = ""          # original joined line, for debugging
+    # Optional, aligned with `times`: a ticket link for each showtime.
+    ticket_urls: list[str | None] = field(default_factory=list)
+    # Optional special-event text ("Q&A with the director", "Live score by ...").
+    event: str | None = None
 
 
 # ---- PDF / text extraction -------------------------------------------------

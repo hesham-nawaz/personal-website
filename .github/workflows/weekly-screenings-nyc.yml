@@ -1,8 +1,10 @@
-name: Weekly Screenings (NYC)
+name: Daily Screenings (NYC)
 
-# Updates screenings-nyc.html with the matches between repertory.nyc's public
-# JSON feed and Hesham's Letterboxd watchlist, then commits to main so
-# Cloudflare Pages re-deploys.
+# Every morning: stores every screening repertory.nyc lists from today on in
+# data/nyc-screenings/ (one JSON Lines file per month), matches them against
+# Hesham's Letterboxd watchlist, and rebuilds screenings-nyc.html with this
+# week (today through Sunday) plus a picker for later weeks. Commits to main
+# so Cloudflare Pages re-deploys.
 #
 # As of Oct 2026 the feed covers 11 venues: Film Forum, Film at Lincoln
 # Center, IFC Center, Metrograph, Quad, BAM Rose Cinemas, Anthology Film
@@ -15,11 +17,9 @@ name: Weekly Screenings (NYC)
 
 on:
   schedule:
-    # Mondays at 12:00 UTC (= 8:00 AM EDT / 7:00 AM EST / 5:00 AM PDT).
-    # repertory.nyc updates daily with no known cutoff, so we can run early
-    # to have this week's page ready by NYC breakfast time. No email
-    # dependency means no risk of catching last week's data by accident.
-    - cron: "0 12 * * 1"
+    # Daily at 10:17 UTC (6:17 AM EDT / 5:17 AM EST), so the page has today
+    # by breakfast. Off the hour to avoid the top-of-hour Actions backlog.
+    - cron: "17 10 * * *"
   workflow_dispatch:
 
 permissions:
@@ -32,7 +32,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Check out repo
@@ -56,25 +56,30 @@ jobs:
             --user hnawaz \
             --out "../data/watchlist.csv"
 
-      - name: Fetch, match, and splice screenings-nyc.html
+      # Fetches today through the feed's horizon into data/nyc-screenings/,
+      # then rebuilds the page. If the feed is down, the store and page are
+      # left as they were and this step fails.
+      - name: Store screenings and rebuild screenings-nyc.html
         run: |
-          UPDATED=$(TZ=America/New_York date +%F)
+          TODAY=$(TZ=America/New_York date +%F)
           cd tool && python main_nyc.py \
             --watchlist "../data/watchlist.csv" \
+            --store "../data/nyc-screenings" \
             --site-page "../screenings-nyc.html" \
-            --updated "$UPDATED"
+            --reference-date "$TODAY" \
+            --updated "$TODAY"
 
       - name: Commit and push if anything changed
         run: |
           git config user.name  "screenings-bot"
           git config user.email "screenings-bot@users.noreply.github.com"
-          git add screenings-nyc.html data/watchlist.csv
+          git add screenings-nyc.html data/watchlist.csv data/nyc-screenings
           if git diff --cached --quiet; then
-            echo "No changes to screenings-nyc.html or the watchlist — nothing to commit."
+            echo "Nothing changed — nothing to commit."
             exit 0
           fi
-          WEEK_LABEL=$(TZ=America/New_York date +%F)
-          git commit -m "Update NYC weekly screenings (week of ${WEEK_LABEL})"
+          TODAY=$(TZ=America/New_York date +%F)
+          git commit -m "Update NYC screenings (${TODAY})"
           # main may have moved since checkout (another workflow or a manual
           # commit, or a "Re-run jobs" of an old run); replay this commit on
           # top of it rather than failing the push.

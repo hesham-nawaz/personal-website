@@ -15,6 +15,7 @@ revival_hub.py, so match.py and render.py work unchanged.
 from __future__ import annotations
 
 import json
+import re
 import urllib.request
 from datetime import date, datetime, timedelta
 from typing import Iterable
@@ -89,30 +90,63 @@ def fetch_day(day: date, url: str = API_URL) -> list[dict]:
     return list(rows.values())
 
 
-def _special_event_label(special) -> str | None:
+def event_label(special) -> str | None:
     """special_event is null, a string, or an object like
-    {"event_type": "q_and_a", "description": "...", "guests": [...]}.
-    Turn it into short readable text instead of a raw dict dump."""
+    {"event_type": "q_and_a", "description": "Q&A with ...", "guests": [...]}.
+    The venue's description is the useful part (event_type is often wrong:
+    live scores and introductions get filed as "q_and_a"), so show that, and
+    fall back to a label for the type."""
     if not special:
         return None
     if isinstance(special, str):
         return special.strip() or None
     if isinstance(special, dict):
-        names = {"q_and_a": "Q&A", "intro": "Intro", "introduction": "Intro",
-                 "discussion": "Discussion", "conversation": "Conversation",
+        desc = (special.get("description") or "").strip()
+        desc = re.sub(r"\s*Read More\s*›?\s*$", "", desc).strip()
+        if desc:
+            return desc
+        names = {"q_and_a": "Q&A", "introduction": "Introduction", "intro": "Introduction",
+                 "filmmaker_in_person": "Filmmaker in person",
                  "live_performance": "Live performance", "panel": "Panel"}
         etype = special.get("event_type") or ""
+        if etype == "other":
+            return None
         label = names.get(etype, etype.replace("_", " ").strip().capitalize())
         guests = [g if isinstance(g, str) else (g.get("name") if isinstance(g, dict) else None)
                   for g in (special.get("guests") or [])]
         guests = [g for g in guests if g]
         if label and guests:
             label = f"{label} with {', '.join(guests)}"
-        desc = (special.get("description") or "").strip()
-        if not label and desc:
-            label = desc if len(desc) <= 120 else desc[:117].rstrip() + "..."
         return label or None
     return str(special)
+
+
+# The feed's "format" field mixes projection formats with stray venue text
+# (ticket prices, "first come first serve" notices). Only real formats that
+# set a screening apart are shown; plain digital projection (DCP) is the norm
+# and is hidden.
+_FORMAT_NAMES = [
+    (r"^(\d{2})\s*mm\b", lambda m: f"{m.group(1)}mm"),
+    (r"^4k\s+restoration$", lambda m: "4K restoration"),
+    (r"^4k(\s+dcp)?$", lambda m: "4K"),
+    (r"^3d(\s+dcp)?$", lambda m: "3D"),
+    (r"^(imax.*|vhs|nitrate.*|.*restoration)$", lambda m: m.group(0)[:1].upper() + m.group(0)[1:]),
+]
+
+
+def format_tag(raw) -> str | None:
+    """Display tag for a format value, or None if it should not be shown."""
+    if not raw:
+        return None
+    t = str(raw).strip()
+    low = t.lower()
+    if len(t) > 30 or low in ("dcp", "digital", "dcp digital", "digital projection"):
+        return None
+    for pat, name in _FORMAT_NAMES:
+        m = re.match(pat, low)
+        if m:
+            return name(m)
+    return None
 
 
 def _time_24_to_12(hhmm: str) -> str:
@@ -170,15 +204,12 @@ def _entry_to_screening(entry: dict) -> Screening | None:
         # split conservatively so render.py's "Dir./Dirs." label works.
         directors = [d.strip() for d in director.split(",") if d.strip()]
 
-    # Compose notes from format + special_event when present.
-    note_bits: list[str] = []
-    fmt = entry.get("format")
-    if fmt:
-        note_bits.append(str(fmt))
-    special = _special_event_label(entry.get("special_event"))
-    if special:
-        note_bits.append(special)
-    notes = " • ".join(note_bits) if note_bits else None
+    # Notes carry only display-worthy format tags (no plain DCP); special
+    # events go in their own field.
+    tag = format_tag(entry.get("format"))
+    special = entry.get("special_event")
+    event = special if (isinstance(special, str) or special is None) else event_label(special)
+    ticket = (entry.get("ticket_url") or "").strip() or None
 
     return Screening(
         day=d,
@@ -187,10 +218,29 @@ def _entry_to_screening(entry: dict) -> Screening | None:
         films=[Film(title=title, year=year)],
         directors=directors,
         theater=(entry.get("theater_name") or "").strip(),
-        notes=notes,
+        notes=tag,
         presenter=None,
         raw=json.dumps(entry, ensure_ascii=False),
+        ticket_urls=[ticket],
+        event=event,
     )
+
+
+def screening_from_record(rec: dict) -> Screening | None:
+    """Screening from a stored record (see nyc_store.py)."""
+    entry = {
+        "film_title": rec.get("title"), "film_year": rec.get("year"),
+        "film_director": rec.get("director"), "theater_name": rec.get("theater"),
+        "date": rec.get("date"), "time": rec.get("time"),
+        "format": rec.get("format"), "special_event": rec.get("event"),
+        "ticket_url": rec.get("ticket_url"), "id": rec.get("id"),
+    }
+    return _entry_to_screening(entry)
+
+
+def screenings_from_records(records: list[dict]) -> list[Screening]:
+    out = [s for s in (screening_from_record(r) for r in records) if s is not None]
+    return _merge_showtimes(out)
 
 
 def _merge_showtimes(screenings: list[Screening]) -> list[Screening]:
@@ -204,6 +254,7 @@ def _merge_showtimes(screenings: list[Screening]) -> list[Screening]:
             tuple((f.title.lower(), f.year) for f in s.films),
             s.theater.lower(),
             (s.notes or "").lower(),
+            (s.event or "").lower(),
         )
 
     from collections import defaultdict
@@ -217,11 +268,14 @@ def _merge_showtimes(screenings: list[Screening]) -> list[Screening]:
         # Preserve original chronological order within the day
         items_sorted = sorted(items, key=lambda s: _time_sort_key(s.times[0]))
         combined_times: list[str] = []
+        combined_urls: list[str | None] = []
         seen_times: set[str] = set()
         for it in items_sorted:
-            for t in it.times:
+            urls = list(it.ticket_urls) + [None] * (len(it.times) - len(it.ticket_urls))
+            for t, u in zip(it.times, urls):
                 if t not in seen_times:
                     combined_times.append(t)
+                    combined_urls.append(u)
                     seen_times.add(t)
         merged.append(Screening(
             day=base.day,
@@ -233,6 +287,8 @@ def _merge_showtimes(screenings: list[Screening]) -> list[Screening]:
             notes=base.notes,
             presenter=base.presenter,
             raw=base.raw,
+            ticket_urls=combined_urls,
+            event=base.event,
         ))
     return merged
 

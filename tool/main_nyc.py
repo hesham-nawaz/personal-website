@@ -1,103 +1,119 @@
-"""End-to-end runner for the NYC pipeline.
+"""End-to-end runner for the NYC screenings page.
 
-Fetches this week's repertory screenings from https://repertory.nyc/api/screenings,
-matches against Hesham's Letterboxd watchlist, splices results into a site
-page (screenings-nyc.html), and optionally writes a standalone HTML report.
-
-Much simpler than main.py (LA) — no email, no file inputs, no IMAP.
-Just:  HTTP → JSON → match → HTML → splice.
+Each (daily) run:
+  1. refreshes the screenings store, data/nyc-screenings/, from
+     https://repertory.nyc/api/screenings for today through the feed's horizon
+     (see nyc_store.py);
+  2. matches every screening still listed from today on against Hesham's
+     Letterboxd watchlist;
+  3. renders "This Week in NYC" (today through Sunday) plus each later week
+     that has listings, and splices it into the site page (screenings-nyc.html).
 
 Usage:
-    python main_nyc.py --site-page screenings-nyc.html --updated 2026-05-04
-    python main_nyc.py --site-page ../screenings-nyc.html --report ../reports/nyc-2026-05-04.html
+    python main_nyc.py --site-page ../screenings-nyc.html --updated 2026-10-10
+    python main_nyc.py --site-page ../screenings-nyc.html --no-fetch      # rebuild from the store
+    python main_nyc.py --site-page ../screenings-nyc.html --reference-date 2026-10-12
 """
 from __future__ import annotations
 
 import argparse
-from datetime import date
+import sys
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from watchlist import load_watchlist
-from nyc_repertory import fetch_screenings_for_week, _week_bounds
 from match import match_screenings
-from render import write_report, write_site_page
+from nyc_repertory import screenings_from_records
+from nyc_store import listed_records, refresh
+from render import SiteWeek, write_report, write_site_page
+from watchlist import load_watchlist
+
+ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_WATCHLIST = str(ROOT / "data" / "watchlist.csv")
+DEFAULT_STORE = str(ROOT / "data" / "nyc-screenings")
+
+# Google Maps searches by venue name find the venue's own listing. The borough
+# keeps a search from landing on a same-named place elsewhere.
+_BROOKLYN = {"bam rose cinemas", "nitehawk cinema williamsburg", "nitehawk cinema prospect park"}
 
 
-DEFAULT_WATCHLIST = str(Path(__file__).resolve().parent.parent / "data" / "watchlist.csv")
+def map_query(venue: str) -> str:
+    borough = "Brooklyn, NY" if venue.strip().lower() in _BROOKLYN else "New York, NY"
+    return f"{venue}, {borough}"
 
 
-def run(watchlist_path: str = DEFAULT_WATCHLIST,
-        site_page: str | None = None,
-        report_path: str | None = None,
-        updated_iso: str | None = None,
-        reference_date: date | None = None) -> dict:
-    screenings = fetch_screenings_for_week(reference=reference_date)
-    monday, sunday = _week_bounds(reference_date)
+def build_weeks(matches, listed_days: list[date], today: date) -> list[SiteWeek]:
+    """This week (today through Sunday) and each following Monday-Sunday week
+    through the last week with a watchlist match (always at least this week
+    and next, so the picker has somewhere to go). Empty weeks in between stay,
+    labelled as having no matches yet."""
+    sunday = today + timedelta(days=6 - today.weekday())
+    last = max(listed_days) if listed_days else sunday
+    weeks = []
+    start, end, is_current = today, sunday, True
+    while start <= max(last, sunday):
+        weeks.append(SiteWeek(
+            start=start, end=end, is_current=is_current,
+            matches=[m for m in matches if start <= m.screening.day <= end]))
+        start, end, is_current = end + timedelta(days=1), end + timedelta(days=7), False
+    while len(weeks) > 2 and not weeks[-1].matches:
+        weeks.pop()
+    return weeks
 
+
+def run(site_page: str, watchlist_path: str = DEFAULT_WATCHLIST, store: str = DEFAULT_STORE,
+        updated_iso: str | None = None, today: date | None = None,
+        fetch: bool = True, report_path: str | None = None) -> dict:
+    today = today or date.today()
+    store_dir = Path(store)
+    summary = refresh(store_dir, today=today) if fetch else {}
+
+    records = listed_records(store_dir, today)
+    screenings = screenings_from_records(records)
     wl = load_watchlist(watchlist_path)
     matches = match_screenings(screenings, wl)
+    weeks = build_weeks(matches, sorted({s.day for s in screenings}), today)
 
-    # Week label like "May 4 – May 10, 2026" (matches LA report style).
-    week_label = f"{monday.strftime('%b %-d')} – {sunday.strftime('%b %-d, %Y')}"
-
-    report_out = None
+    write_site_page(matches, site_page, updated_iso=updated_iso,
+                    weeks=weeks, map_query=map_query)
     if report_path:
-        report_out = write_report(matches, report_path, week_label=week_label)
-
-    site_out = None
-    if site_page:
-        site_out = write_site_page(matches, site_page,
-                                   week_label=week_label,
-                                   updated_iso=updated_iso)
-
+        write_report(weeks[0].matches, report_path)
     return {
-        "week_monday": monday.isoformat(),
-        "week_sunday": sunday.isoformat(),
-        "week_label": week_label,
-        "screenings_fetched": len(screenings),
-        "screenings_matched": len(matches),
+        **summary,
+        "screenings_listed": sum(len(s.times) for s in screenings),
+        "matched_this_week": sum(len(m.screening.times) for m in weeks[0].matches),
+        "matched_total": sum(len(m.screening.times) for m in matches),
+        "weeks": len(weeks),
         "watchlist_entries": len(wl.entries),
-        "report_path": str(report_out) if report_out else None,
-        "site_page_path": str(site_out) if site_out else None,
     }
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser(description="Match repertory.nyc screenings against Letterboxd watchlist.")
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Build the NYC screenings page from repertory.nyc and a Letterboxd watchlist.")
+    ap.add_argument("--site-page", required=True, help="Page to splice into (screenings-nyc.html)")
     ap.add_argument("--watchlist", default=DEFAULT_WATCHLIST, help="Letterboxd watchlist CSV")
-    ap.add_argument("--site-page", default=None,
-                    help="Path to a site page (e.g. screenings-nyc.html) to splice updated content into.")
-    ap.add_argument("--report", default=None,
-                    help="Optional path to write a standalone HTML report to.")
-    ap.add_argument("--updated", default=None,
-                    help="Optional 'last updated' date for the site page (e.g. 2026-05-04).")
-    ap.add_argument("--reference-date", default=None,
-                    help="Override the reference date (YYYY-MM-DD). Defaults to today.")
+    ap.add_argument("--store", default=DEFAULT_STORE, help="Directory of stored screenings")
+    ap.add_argument("--updated", default=None, help="'Last updated' date shown on the page")
+    ap.add_argument("--reference-date", default=None, help="Treat this date (YYYY-MM-DD) as today")
+    ap.add_argument("--no-fetch", action="store_true", help="Rebuild from the store without fetching")
+    ap.add_argument("--report", default=None, help="Optional standalone HTML report of this week")
     args = ap.parse_args()
 
-    ref = None
-    if args.reference_date:
-        from datetime import datetime as _dt
-        ref = _dt.strptime(args.reference_date, "%Y-%m-%d").date()
-
-    summary = run(
-        watchlist_path=args.watchlist,
-        site_page=args.site_page,
-        report_path=args.report,
-        updated_iso=args.updated,
-        reference_date=ref,
-    )
-    print(
-        f"Week {summary['week_label']}: "
-        f"fetched {summary['screenings_fetched']} screenings, "
-        f"matched {summary['screenings_matched']} against "
-        f"{summary['watchlist_entries']}-entry watchlist."
-    )
-    if summary["report_path"]:
-        print(f"Report: {summary['report_path']}")
-    if summary["site_page_path"]:
-        print(f"Site page: {summary['site_page_path']}")
+    today = datetime.strptime(args.reference_date, "%Y-%m-%d").date() if args.reference_date else None
+    try:
+        s = run(args.site_page, args.watchlist, args.store, args.updated, today,
+                fetch=not args.no_fetch, report_path=args.report)
+    except RuntimeError as e:
+        print(f"[main_nyc] {e}; page left unchanged", file=sys.stderr)
+        return 1
+    if "days_checked" in s:
+        print(f"Store: checked {s['days_checked']} days through {s['through']} "
+              f"({s['days_failed']} failed); {s['added']} new, {s['updated']} changed, "
+              f"{s['removed']} removed, {s['restored']} back.")
+    print(f"Listed from today: {s['screenings_listed']} showtimes; matched {s['matched_total']} "
+          f"({s['matched_this_week']} this week) against {s['watchlist_entries']}-entry watchlist; "
+          f"{s['weeks']} weeks on the page.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

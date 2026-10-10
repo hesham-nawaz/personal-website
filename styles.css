@@ -1178,7 +1178,92 @@ p {
 .screenings-updated {
     color: var(--text-light);
     font-size: 0.9rem;
-    margin-top: 6px;
+    margin: 0 0 16px;
+}
+
+/* Week picker + Day/Movie switch, then a one-line hint about the links */
+.screenings-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 28px;
+    margin: 0 0 12px;
+}
+
+.screenings-controls[hidden],
+.screenings-week[hidden],
+.day-group[hidden],
+.screening-card[hidden],
+.screening-venue[hidden] {
+    display: none;
+}
+
+.week-picker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.week-step {
+    font: inherit;
+    font-size: 1.3rem;
+    line-height: 1;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+    background: var(--card-bg);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.week-step:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.week-step:hover:not(:disabled) {
+    background: var(--light-bg);
+}
+
+.week-select {
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    background: var(--card-bg);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    padding: 5px 10px;
+    min-width: 0;
+    max-width: 100%;
+    cursor: pointer;
+}
+
+.week-step:focus-visible,
+.week-select:focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+}
+
+.screenings-hint {
+    color: var(--text-light);
+    font-size: 0.88rem;
+    margin: 0 0 26px;
+}
+
+.screenings-hint i {
+    color: var(--primary-dark);
+    margin-right: 3px;
+}
+
+.hint-sep {
+    margin: 0 8px;
 }
 
 .day-group {
@@ -1286,6 +1371,21 @@ p {
     font-size: 0.95rem;
 }
 
+a.venue-map {
+    text-decoration: none;
+}
+
+a.venue-map i {
+    color: var(--primary-dark);
+    font-size: 0.85em;
+    margin-right: 6px;
+}
+
+a.venue-map:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
 .venue-showings {
     display: flex;
     flex-wrap: wrap;
@@ -1295,9 +1395,58 @@ p {
 }
 
 .venue-times {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
     font-variant-numeric: tabular-nums;
     color: var(--text-dark);
-    font-size: 0.95rem;
+    font-size: 0.92rem;
+}
+
+/* Each showtime is a button-like link to that screening's tickets. */
+.showtime {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid var(--primary-light);
+    border-radius: 999px;
+    line-height: 1.5;
+    color: var(--text-dark);
+    white-space: nowrap;
+}
+
+a.showtime {
+    text-decoration: none;
+    border-color: var(--primary-color);
+    color: var(--primary-dark);
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+a.showtime:hover,
+a.showtime:focus-visible {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+a.showtime:focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+}
+
+.showtime.no-link {
+    border-color: transparent;
+    padding-left: 0;
+}
+
+/* Special events (Q&As, introductions, live scores) get their own line. */
+.screening-event {
+    flex-basis: 100%;
+    font-size: 0.86rem;
+    color: var(--text-medium);
+}
+
+.screening-event i {
+    color: var(--primary-dark);
+    margin-right: 6px;
 }
 
 .screening-tag {
@@ -1322,10 +1471,8 @@ p {
     display: flex;
     align-items: center;
     gap: 0;
-    margin: 0 0 28px;
 }
 
-.screenings-view-toggle[hidden],
 .screenings-view[hidden] {
     display: none;
 }
@@ -1393,6 +1540,15 @@ p {
     .screening-venue {
         grid-template-columns: 1fr;
         row-gap: 2px;
+    }
+
+    .week-picker {
+        flex: 1 1 100%;
+    }
+
+    .week-select {
+        flex: 1 1 auto;
+        width: 0;
     }
 
     /* date and venue share a line; times wrap underneath */
