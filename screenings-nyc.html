@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>This Week's Screenings (NYC) | Hesham Nawaz</title>
-    <link rel="stylesheet" href="styles.css?v=0842a42c">
+    <link rel="stylesheet" href="styles.css?v=226943a0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -29,34 +29,120 @@
 <section class="screenings-section">
   <p class="screenings-updated">Last updated 2026-10-10</p>
   <div class="screenings-controls" hidden>
-    <div class="week-picker">
-      <button type="button" class="week-step" data-step="-1" aria-label="Previous week"><span aria-hidden="true">‹</span></button>
-      <label class="visually-hidden" for="week-select">Week</label>
-      <select id="week-select" class="week-select">
-        <option value="2026-10-10">This week · Oct 10 – 11</option>
-        <option value="2026-10-12">Week of Oct 12 – 18</option>
-        <option value="2026-10-19">Week of Oct 19 – 25</option>
-        <option value="2026-10-26">Week of Oct 26 – Nov 1</option>
-        <option value="2026-11-02">Week of Nov 2 – 8</option>
-        <option value="2026-11-09">Week of Nov 9 – 15</option>
-        <option value="2026-11-16">Week of Nov 16 – 22 (no matches yet)</option>
-        <option value="2026-11-23">Week of Nov 23 – 29 (no matches yet)</option>
-        <option value="2026-11-30">Week of Nov 30 – Dec 6 (no matches yet)</option>
-        <option value="2026-12-07">Week of Dec 7 – 13</option>
-      </select>
-      <button type="button" class="week-step" data-step="1" aria-label="Next week"><span aria-hidden="true">›</span></button>
+    <div class="date-strip">
+      <button type="button" class="strip-scroll" data-dir="-1" aria-label="Earlier dates"><span aria-hidden="true">‹</span></button>
+      <div class="strip-track" role="group" aria-label="Choose dates">
+        <div class="strip-week" data-week="2026-10-10">
+          <button type="button" class="strip-week-label" data-week="2026-10-10" aria-pressed="false" aria-label="This week: 19 films"><span class="strip-week-name">This week</span><span class="strip-count">19 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-10" data-week="2026-10-10" aria-pressed="false" aria-label="Saturday, October 10: 15 films"><span class="strip-dow">Today</span><span class="strip-num">10</span><span class="strip-month">Oct</span><span class="strip-count">15 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-11" data-week="2026-10-10" aria-pressed="false" aria-label="Sunday, October 11: 13 films"><span class="strip-dow">Sun</span><span class="strip-num">11</span><span class="strip-month"></span><span class="strip-count">13 films</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-10-12">
+          <button type="button" class="strip-week-label" data-week="2026-10-12" aria-pressed="false" aria-label="Oct 12 – 18: 29 films"><span class="strip-week-name">Oct 12–18</span><span class="strip-count">29 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-12" data-week="2026-10-12" aria-pressed="false" aria-label="Monday, October 12: 14 films"><span class="strip-dow">Mon</span><span class="strip-num">12</span><span class="strip-month"></span><span class="strip-count">14 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-13" data-week="2026-10-12" aria-pressed="false" aria-label="Tuesday, October 13: 11 films"><span class="strip-dow">Tue</span><span class="strip-num">13</span><span class="strip-month"></span><span class="strip-count">11 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-14" data-week="2026-10-12" aria-pressed="false" aria-label="Wednesday, October 14: 9 films"><span class="strip-dow">Wed</span><span class="strip-num">14</span><span class="strip-month"></span><span class="strip-count">9 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-15" data-week="2026-10-12" aria-pressed="false" aria-label="Thursday, October 15: 8 films"><span class="strip-dow">Thu</span><span class="strip-num">15</span><span class="strip-month"></span><span class="strip-count">8 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-16" data-week="2026-10-12" aria-pressed="false" aria-label="Friday, October 16: 5 films"><span class="strip-dow">Fri</span><span class="strip-num">16</span><span class="strip-month"></span><span class="strip-count">5 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-17" data-week="2026-10-12" aria-pressed="false" aria-label="Saturday, October 17: 5 films"><span class="strip-dow">Sat</span><span class="strip-num">17</span><span class="strip-month"></span><span class="strip-count">5 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-18" data-week="2026-10-12" aria-pressed="false" aria-label="Sunday, October 18: 4 films"><span class="strip-dow">Sun</span><span class="strip-num">18</span><span class="strip-month"></span><span class="strip-count">4 films</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-10-19">
+          <button type="button" class="strip-week-label" data-week="2026-10-19" aria-pressed="false" aria-label="Oct 19 – 25: 13 films"><span class="strip-week-name">Oct 19–25</span><span class="strip-count">13 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-19" data-week="2026-10-19" aria-pressed="false" aria-label="Monday, October 19: 1 film"><span class="strip-dow">Mon</span><span class="strip-num">19</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-20" data-week="2026-10-19" aria-pressed="false" aria-label="Tuesday, October 20: 1 film"><span class="strip-dow">Tue</span><span class="strip-num">20</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-21" data-week="2026-10-19" aria-pressed="false" aria-label="Wednesday, October 21: 1 film"><span class="strip-dow">Wed</span><span class="strip-num">21</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-22" data-week="2026-10-19" aria-pressed="false" aria-label="Thursday, October 22: 1 film"><span class="strip-dow">Thu</span><span class="strip-num">22</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-23" data-week="2026-10-19" aria-pressed="false" aria-label="Friday, October 23: 6 films"><span class="strip-dow">Fri</span><span class="strip-num">23</span><span class="strip-month"></span><span class="strip-count">6 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-24" data-week="2026-10-19" aria-pressed="false" aria-label="Saturday, October 24: 3 films"><span class="strip-dow">Sat</span><span class="strip-num">24</span><span class="strip-month"></span><span class="strip-count">3 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-25" data-week="2026-10-19" aria-pressed="false" aria-label="Sunday, October 25: 4 films"><span class="strip-dow">Sun</span><span class="strip-num">25</span><span class="strip-month"></span><span class="strip-count">4 films</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-10-26">
+          <button type="button" class="strip-week-label" data-week="2026-10-26" aria-pressed="false" aria-label="Oct 26 – Nov 1: 10 films"><span class="strip-week-name">Oct 26–Nov 1</span><span class="strip-count">10 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-26" data-week="2026-10-26" aria-pressed="false" disabled aria-label="Monday, October 26: none"><span class="strip-dow">Mon</span><span class="strip-num">26</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-27" data-week="2026-10-26" aria-pressed="false" aria-label="Tuesday, October 27: 1 film"><span class="strip-dow">Tue</span><span class="strip-num">27</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-28" data-week="2026-10-26" aria-pressed="false" aria-label="Wednesday, October 28: 1 film"><span class="strip-dow">Wed</span><span class="strip-num">28</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-29" data-week="2026-10-26" aria-pressed="false" aria-label="Thursday, October 29: 1 film"><span class="strip-dow">Thu</span><span class="strip-num">29</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-30" data-week="2026-10-26" aria-pressed="false" aria-label="Friday, October 30: 2 films"><span class="strip-dow">Fri</span><span class="strip-num">30</span><span class="strip-month"></span><span class="strip-count">2 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-10-31" data-week="2026-10-26" aria-pressed="false" aria-label="Saturday, October 31: 3 films"><span class="strip-dow">Sat</span><span class="strip-num">31</span><span class="strip-month"></span><span class="strip-count">3 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-01" data-week="2026-10-26" aria-pressed="false" aria-label="Sunday, November 1: 5 films"><span class="strip-dow">Sun</span><span class="strip-num">1</span><span class="strip-month">Nov</span><span class="strip-count">5 films</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-11-02">
+          <button type="button" class="strip-week-label" data-week="2026-11-02" aria-pressed="false" aria-label="Nov 2 – 8: 2 films"><span class="strip-week-name">Nov 2–8</span><span class="strip-count">2 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-02" data-week="2026-11-02" aria-pressed="false" disabled aria-label="Monday, November 2: none"><span class="strip-dow">Mon</span><span class="strip-num">2</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-03" data-week="2026-11-02" aria-pressed="false" disabled aria-label="Tuesday, November 3: none"><span class="strip-dow">Tue</span><span class="strip-num">3</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-04" data-week="2026-11-02" aria-pressed="false" disabled aria-label="Wednesday, November 4: none"><span class="strip-dow">Wed</span><span class="strip-num">4</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-05" data-week="2026-11-02" aria-pressed="false" aria-label="Thursday, November 5: 1 film"><span class="strip-dow">Thu</span><span class="strip-num">5</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-06" data-week="2026-11-02" aria-pressed="false" aria-label="Friday, November 6: 1 film"><span class="strip-dow">Fri</span><span class="strip-num">6</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-07" data-week="2026-11-02" aria-pressed="false" disabled aria-label="Saturday, November 7: none"><span class="strip-dow">Sat</span><span class="strip-num">7</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-08" data-week="2026-11-02" aria-pressed="false" disabled aria-label="Sunday, November 8: none"><span class="strip-dow">Sun</span><span class="strip-num">8</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-11-09">
+          <button type="button" class="strip-week-label" data-week="2026-11-09" aria-pressed="false" aria-label="Nov 9 – 15: 2 films"><span class="strip-week-name">Nov 9–15</span><span class="strip-count">2 films</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-09" data-week="2026-11-09" aria-pressed="false" disabled aria-label="Monday, November 9: none"><span class="strip-dow">Mon</span><span class="strip-num">9</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-10" data-week="2026-11-09" aria-pressed="false" disabled aria-label="Tuesday, November 10: none"><span class="strip-dow">Tue</span><span class="strip-num">10</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-11" data-week="2026-11-09" aria-pressed="false" disabled aria-label="Wednesday, November 11: none"><span class="strip-dow">Wed</span><span class="strip-num">11</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-12" data-week="2026-11-09" aria-pressed="false" disabled aria-label="Thursday, November 12: none"><span class="strip-dow">Thu</span><span class="strip-num">12</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-13" data-week="2026-11-09" aria-pressed="false" disabled aria-label="Friday, November 13: none"><span class="strip-dow">Fri</span><span class="strip-num">13</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-14" data-week="2026-11-09" aria-pressed="false" aria-label="Saturday, November 14: 1 film"><span class="strip-dow">Sat</span><span class="strip-num">14</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-15" data-week="2026-11-09" aria-pressed="false" aria-label="Sunday, November 15: 2 films"><span class="strip-dow">Sun</span><span class="strip-num">15</span><span class="strip-month"></span><span class="strip-count">2 films</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-11-16">
+          <button type="button" class="strip-week-label" data-week="2026-11-16" aria-pressed="false" aria-label="Nov 16 – 22: none"><span class="strip-week-name">Nov 16–22</span><span class="strip-count">none</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-16" data-week="2026-11-16" aria-pressed="false" disabled aria-label="Monday, November 16: none"><span class="strip-dow">Mon</span><span class="strip-num">16</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-17" data-week="2026-11-16" aria-pressed="false" disabled aria-label="Tuesday, November 17: none"><span class="strip-dow">Tue</span><span class="strip-num">17</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-18" data-week="2026-11-16" aria-pressed="false" disabled aria-label="Wednesday, November 18: none"><span class="strip-dow">Wed</span><span class="strip-num">18</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-19" data-week="2026-11-16" aria-pressed="false" disabled aria-label="Thursday, November 19: none"><span class="strip-dow">Thu</span><span class="strip-num">19</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-20" data-week="2026-11-16" aria-pressed="false" disabled aria-label="Friday, November 20: none"><span class="strip-dow">Fri</span><span class="strip-num">20</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-21" data-week="2026-11-16" aria-pressed="false" disabled aria-label="Saturday, November 21: none"><span class="strip-dow">Sat</span><span class="strip-num">21</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-22" data-week="2026-11-16" aria-pressed="false" disabled aria-label="Sunday, November 22: none"><span class="strip-dow">Sun</span><span class="strip-num">22</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-11-23">
+          <button type="button" class="strip-week-label" data-week="2026-11-23" aria-pressed="false" aria-label="Nov 23 – 29: none"><span class="strip-week-name">Nov 23–29</span><span class="strip-count">none</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-23" data-week="2026-11-23" aria-pressed="false" disabled aria-label="Monday, November 23: none"><span class="strip-dow">Mon</span><span class="strip-num">23</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-24" data-week="2026-11-23" aria-pressed="false" disabled aria-label="Tuesday, November 24: none"><span class="strip-dow">Tue</span><span class="strip-num">24</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-25" data-week="2026-11-23" aria-pressed="false" disabled aria-label="Wednesday, November 25: none"><span class="strip-dow">Wed</span><span class="strip-num">25</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-26" data-week="2026-11-23" aria-pressed="false" disabled aria-label="Thursday, November 26: none"><span class="strip-dow">Thu</span><span class="strip-num">26</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-27" data-week="2026-11-23" aria-pressed="false" disabled aria-label="Friday, November 27: none"><span class="strip-dow">Fri</span><span class="strip-num">27</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-28" data-week="2026-11-23" aria-pressed="false" disabled aria-label="Saturday, November 28: none"><span class="strip-dow">Sat</span><span class="strip-num">28</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-29" data-week="2026-11-23" aria-pressed="false" disabled aria-label="Sunday, November 29: none"><span class="strip-dow">Sun</span><span class="strip-num">29</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-11-30">
+          <button type="button" class="strip-week-label" data-week="2026-11-30" aria-pressed="false" aria-label="Nov 30 – Dec 6: none"><span class="strip-week-name">Nov 30–Dec 6</span><span class="strip-count">none</span></button>
+          <button type="button" class="strip-day" data-date="2026-11-30" data-week="2026-11-30" aria-pressed="false" disabled aria-label="Monday, November 30: none"><span class="strip-dow">Mon</span><span class="strip-num">30</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-01" data-week="2026-11-30" aria-pressed="false" disabled aria-label="Tuesday, December 1: none"><span class="strip-dow">Tue</span><span class="strip-num">1</span><span class="strip-month">Dec</span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-02" data-week="2026-11-30" aria-pressed="false" disabled aria-label="Wednesday, December 2: none"><span class="strip-dow">Wed</span><span class="strip-num">2</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-03" data-week="2026-11-30" aria-pressed="false" disabled aria-label="Thursday, December 3: none"><span class="strip-dow">Thu</span><span class="strip-num">3</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-04" data-week="2026-11-30" aria-pressed="false" disabled aria-label="Friday, December 4: none"><span class="strip-dow">Fri</span><span class="strip-num">4</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-05" data-week="2026-11-30" aria-pressed="false" disabled aria-label="Saturday, December 5: none"><span class="strip-dow">Sat</span><span class="strip-num">5</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-06" data-week="2026-11-30" aria-pressed="false" disabled aria-label="Sunday, December 6: none"><span class="strip-dow">Sun</span><span class="strip-num">6</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+        </div>
+        <div class="strip-week" data-week="2026-12-07">
+          <button type="button" class="strip-week-label" data-week="2026-12-07" aria-pressed="false" aria-label="Dec 7 – 13: 1 film"><span class="strip-week-name">Dec 7–13</span><span class="strip-count">1 film</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-07" data-week="2026-12-07" aria-pressed="false" disabled aria-label="Monday, December 7: none"><span class="strip-dow">Mon</span><span class="strip-num">7</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-08" data-week="2026-12-07" aria-pressed="false" disabled aria-label="Tuesday, December 8: none"><span class="strip-dow">Tue</span><span class="strip-num">8</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-09" data-week="2026-12-07" aria-pressed="false" disabled aria-label="Wednesday, December 9: none"><span class="strip-dow">Wed</span><span class="strip-num">9</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-10" data-week="2026-12-07" aria-pressed="false" disabled aria-label="Thursday, December 10: none"><span class="strip-dow">Thu</span><span class="strip-num">10</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-11" data-week="2026-12-07" aria-pressed="false" disabled aria-label="Friday, December 11: none"><span class="strip-dow">Fri</span><span class="strip-num">11</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-12" data-week="2026-12-07" aria-pressed="false" disabled aria-label="Saturday, December 12: none"><span class="strip-dow">Sat</span><span class="strip-num">12</span><span class="strip-month"></span><span class="strip-count">–</span></button>
+          <button type="button" class="strip-day" data-date="2026-12-13" data-week="2026-12-07" aria-pressed="false" aria-label="Sunday, December 13: 1 film"><span class="strip-dow">Sun</span><span class="strip-num">13</span><span class="strip-month"></span><span class="strip-count">1 film</span></button>
+        </div>
+      </div>
+      <button type="button" class="strip-scroll" data-dir="1" aria-label="Later dates"><span aria-hidden="true">›</span></button>
     </div>
-    <div class="screenings-view-toggle" role="group" aria-label="Organize screenings">
-      <span class="view-toggle-label">Organize by</span>
-      <button type="button" data-view="day" aria-pressed="true">Day</button>
-      <button type="button" data-view="movie" aria-pressed="false">Movie</button>
+    <div class="screenings-controls-row">
+      <div class="screenings-view-toggle" role="group" aria-label="Organize screenings">
+        <span class="view-toggle-label">Organize by</span>
+        <button type="button" data-view="day" aria-pressed="true">Day</button>
+        <button type="button" data-view="movie" aria-pressed="false">Movie</button>
+      </div>
+      <p class="screenings-hint"><span class="hint-item"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Pick a showtime for tickets</span><span class="hint-sep">·</span><span class="hint-item"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Pick a theater for directions</span></p>
     </div>
   </div>
-  <p class="screenings-hint"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Pick a showtime for tickets<span class="hint-sep">·</span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Pick a theater for directions</p>
   <div class="screenings-week" data-week="2026-10-10" data-end="2026-10-11" data-short="Oct 10" data-current="true">
     <p class="screenings-summary"><strong>19</strong> films from my watchlist, <strong>115</strong> showtimes at 8 venues — Oct 10 – 11, 2026</p>
     <div class="screenings-view" data-view="day">
-    <div class="day-group" data-date="2026-10-10">
+    <div class="day-group" data-date="2026-10-10" data-summary="&lt;strong&gt;15&lt;/strong&gt; films from my watchlist, &lt;strong&gt;61&lt;/strong&gt; showtimes at 8 venues — Saturday, October 10">
       <h2 class="day-header">Saturday, October 10</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/15YTy" target="_blank" rel="noopener">NAZA</a> (2026)</div>
@@ -273,7 +359,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-11">
+    <div class="day-group" data-date="2026-10-11" data-summary="&lt;strong&gt;13&lt;/strong&gt; films from my watchlist, &lt;strong&gt;54&lt;/strong&gt; showtimes at 8 venues — Sunday, October 11">
       <h2 class="day-header">Sunday, October 11</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/TMIY" target="_blank" rel="noopener">Behemoth!</a> (2026)</div>
@@ -469,7 +555,7 @@
     <div class="screenings-view" data-view="movie" hidden>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1WgM" target="_blank" rel="noopener">The Age of Innocence</a> (1993)</div>
-      <div class="screening-meta">Dir. Martin Scorsese &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Martin Scorsese<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-11">
           <span class="venue-day">Sun, Oct 11</span>
@@ -483,7 +569,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1JP0" target="_blank" rel="noopener">All About Lily Chou-Chou</a> (2001)</div>
-      <div class="screening-meta">Dir. Shunji Iwai &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Shunji Iwai<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -496,7 +582,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/5uE" target="_blank" rel="noopener">An Autumn&#x27;s Tale</a> (1987)</div>
-      <div class="screening-meta">Dir. Mabel Cheung &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Mabel Cheung<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -510,7 +596,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/JseO" target="_blank" rel="noopener">Bad Apples</a> (2025)</div>
-      <div class="screening-meta">Dir. Jonatan Etzler &bull; 5 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Jonatan Etzler<span class="card-count"> &bull; 5 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -530,7 +616,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/TMIY" target="_blank" rel="noopener">Behemoth!</a> (2026)</div>
-      <div class="screening-meta">Dir. Tony Gilroy &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Tony Gilroy<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-11">
           <span class="venue-day">Sun, Oct 11</span>
@@ -543,7 +629,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1U4Y" target="_blank" rel="noopener">A Bittersweet Life</a> (2005)</div>
-      <div class="screening-meta">Dir. Kim Jee-woon &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Kim Jee-woon<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-11">
           <span class="venue-day">Sun, Oct 11</span>
@@ -557,7 +643,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1iVq" target="_blank" rel="noopener">The Boy Friend</a> (1971)</div>
-      <div class="screening-meta">Dir. Ken Russell &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Ken Russell<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-11">
           <span class="venue-day">Sun, Oct 11</span>
@@ -570,7 +656,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/ST8Q" target="_blank" rel="noopener">Bucking Fastard</a> (2026)</div>
-      <div class="screening-meta">Dir. Werner Herzog &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Werner Herzog<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -583,7 +669,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/ZAnm" target="_blank" rel="noopener">Chronovisor</a> (2026)</div>
-      <div class="screening-meta">Dirs. Jack Auen, Kevin Walker &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dirs. Jack Auen, Kevin Walker<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -603,7 +689,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/Rw9k" target="_blank" rel="noopener">The Debut</a> (2026)</div>
-      <div class="screening-meta">Dir. Jesse Eisenberg &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Jesse Eisenberg<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -616,7 +702,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/LwDC" target="_blank" rel="noopener">Digger</a> (2026)</div>
-      <div class="screening-meta">Dir. Alejandro G. Iñárritu &bull; 15 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Alejandro G. Iñárritu<span class="card-count"> &bull; 15 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -650,7 +736,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/RVja" target="_blank" rel="noopener">Fjord</a> (2026)</div>
-      <div class="screening-meta">Dir. Cristian Mungiu &bull; 9 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Cristian Mungiu<span class="card-count"> &bull; 9 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -686,7 +772,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/Uitc" target="_blank" rel="noopener">Forgotten Island</a> (2026)</div>
-      <div class="screening-meta">Dirs. Januel P. Mercado, Joel Crawford &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dirs. Januel P. Mercado, Joel Crawford<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -706,7 +792,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1RSc" target="_blank" rel="noopener">High and Low</a> (1963)</div>
-      <div class="screening-meta">Dir. Akira Kurosawa &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Akira Kurosawa<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -720,7 +806,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/ZsHI" target="_blank" rel="noopener">The History of Concrete</a> (2026)</div>
-      <div class="screening-meta">Dir. John Wilson &bull; 22 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. John Wilson<span class="card-count"> &bull; 22 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -754,7 +840,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/15YTy" target="_blank" rel="noopener">NAZA</a> (2026)</div>
-      <div class="screening-meta">Dirs. Yuval Abraham, Rachel Szor &bull; 34 showtimes on 2 days</div>
+      <div class="screening-meta">Dirs. Yuval Abraham, Rachel Szor<span class="card-count"> &bull; 34 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -802,7 +888,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/QX5s" target="_blank" rel="noopener">Primetime</a> (2026)</div>
-      <div class="screening-meta">Dir. Lance Oppenheim &bull; 8 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Lance Oppenheim<span class="card-count"> &bull; 8 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -822,7 +908,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/SEXE" target="_blank" rel="noopener">Resident Evil</a> (2026)</div>
-      <div class="screening-meta">Dir. Zach Cregger &bull; 8 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Zach Cregger<span class="card-count"> &bull; 8 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -842,7 +928,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/22Wu" target="_blank" rel="noopener">RoboCop</a> (1987)</div>
-      <div class="screening-meta">Dir. Paul Verhoeven &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Paul Verhoeven<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-10">
           <span class="venue-day">Sat, Oct 10</span>
@@ -859,7 +945,7 @@
   <div class="screenings-week" data-week="2026-10-12" data-end="2026-10-18" data-short="Oct 12" hidden>
     <p class="screenings-summary"><strong>29</strong> films from my watchlist, <strong>204</strong> showtimes at 8 venues — Oct 12 – 18, 2026</p>
     <div class="screenings-view" data-view="day">
-    <div class="day-group" data-date="2026-10-12">
+    <div class="day-group" data-date="2026-10-12" data-summary="&lt;strong&gt;14&lt;/strong&gt; films from my watchlist, &lt;strong&gt;51&lt;/strong&gt; showtimes at 8 venues — Monday, October 12">
       <h2 class="day-header">Monday, October 12</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/V4WQ" target="_blank" rel="noopener">Possible Love</a> (2026)</div>
@@ -1055,7 +1141,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-13">
+    <div class="day-group" data-date="2026-10-13" data-summary="&lt;strong&gt;11&lt;/strong&gt; films from my watchlist, &lt;strong&gt;41&lt;/strong&gt; showtimes at 5 venues — Tuesday, October 13">
       <h2 class="day-header">Tuesday, October 13</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/15YTy" target="_blank" rel="noopener">NAZA</a> (2026)</div>
@@ -1218,7 +1304,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-14">
+    <div class="day-group" data-date="2026-10-14" data-summary="&lt;strong&gt;9&lt;/strong&gt; films from my watchlist, &lt;strong&gt;43&lt;/strong&gt; showtimes at 4 venues — Wednesday, October 14">
       <h2 class="day-header">Wednesday, October 14</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/15YTy" target="_blank" rel="noopener">NAZA</a> (2026)</div>
@@ -1347,7 +1433,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-15">
+    <div class="day-group" data-date="2026-10-15" data-summary="&lt;strong&gt;8&lt;/strong&gt; films from my watchlist, &lt;strong&gt;32&lt;/strong&gt; showtimes at 4 venues — Thursday, October 15">
       <h2 class="day-header">Thursday, October 15</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/15YTy" target="_blank" rel="noopener">NAZA</a> (2026)</div>
@@ -1471,7 +1557,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-16">
+    <div class="day-group" data-date="2026-10-16" data-summary="&lt;strong&gt;5&lt;/strong&gt; films from my watchlist, &lt;strong&gt;13&lt;/strong&gt; showtimes at 3 venues — Friday, October 16">
       <h2 class="day-header">Friday, October 16</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
@@ -1545,7 +1631,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-17">
+    <div class="day-group" data-date="2026-10-17" data-summary="&lt;strong&gt;5&lt;/strong&gt; films from my watchlist, &lt;strong&gt;13&lt;/strong&gt; showtimes at 3 venues — Saturday, October 17">
       <h2 class="day-header">Saturday, October 17</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/dvXe" target="_blank" rel="noopener">Okja</a> (2017)</div>
@@ -1619,7 +1705,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-18">
+    <div class="day-group" data-date="2026-10-18" data-summary="&lt;strong&gt;4&lt;/strong&gt; films from my watchlist, &lt;strong&gt;11&lt;/strong&gt; showtimes at 4 venues — Sunday, October 18">
       <h2 class="day-header">Sunday, October 18</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
@@ -1683,7 +1769,7 @@
     <div class="screenings-view" data-view="movie" hidden>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29lU" target="_blank" rel="noopener">All the President&#x27;s Men</a> (1976)</div>
-      <div class="screening-meta">Dir. Alan J. Pakula &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Alan J. Pakula<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-18">
           <span class="venue-day">Sun, Oct 18</span>
@@ -1698,7 +1784,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29CQ" target="_blank" rel="noopener">Almost Famous</a> (2000)</div>
-      <div class="screening-meta">Dir. Cameron Crowe &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Cameron Crowe<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-16">
           <span class="venue-day">Fri, Oct 16</span>
@@ -1713,7 +1799,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/23q0" target="_blank" rel="noopener">Ashes and Diamonds</a> (1958)</div>
-      <div class="screening-meta">1 showtime on 1 day</div>
+      <div class="screening-meta"><span class="card-count">1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -1726,7 +1812,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/5uE" target="_blank" rel="noopener">An Autumn&#x27;s Tale</a> (1987)</div>
-      <div class="screening-meta">Dir. Mabel Cheung &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Mabel Cheung<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -1740,7 +1826,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/JseO" target="_blank" rel="noopener">Bad Apples</a> (2025)</div>
-      <div class="screening-meta">Dir. Jonatan Etzler &bull; 5 showtimes on 4 days</div>
+      <div class="screening-meta">Dir. Jonatan Etzler<span class="card-count"> &bull; 5 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -1774,7 +1860,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1iVq" target="_blank" rel="noopener">The Boy Friend</a> (1971)</div>
-      <div class="screening-meta">Dir. Ken Russell &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Ken Russell<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-14">
           <span class="venue-day">Wed, Oct 14</span>
@@ -1787,7 +1873,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1RxS" target="_blank" rel="noopener">Broadcast News</a> (1987)</div>
-      <div class="screening-meta">Dir. James L. Brooks &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. James L. Brooks<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-17">
           <span class="venue-day">Sat, Oct 17</span>
@@ -1801,7 +1887,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/ST8Q" target="_blank" rel="noopener">Bucking Fastard</a> (2026)</div>
-      <div class="screening-meta">Dir. Werner Herzog &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Werner Herzog<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -1814,7 +1900,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/LwDC" target="_blank" rel="noopener">Digger</a> (2026)</div>
-      <div class="screening-meta">Dir. Alejandro G. Iñárritu &bull; 24 showtimes on 4 days</div>
+      <div class="screening-meta">Dir. Alejandro G. Iñárritu<span class="card-count"> &bull; 24 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -1869,7 +1955,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/4DLW" target="_blank" rel="noopener">The Double</a> (2013)</div>
-      <div class="screening-meta">Dir. Richard  Ayoade &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Richard  Ayoade<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-13">
           <span class="venue-day">Tue, Oct 13</span>
@@ -1882,7 +1968,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/RVja" target="_blank" rel="noopener">Fjord</a> (2026)</div>
-      <div class="screening-meta">Dir. Cristian Mungiu &bull; 16 showtimes on 4 days</div>
+      <div class="screening-meta">Dir. Cristian Mungiu<span class="card-count"> &bull; 16 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -1932,7 +2018,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/Uitc" target="_blank" rel="noopener">Forgotten Island</a> (2026)</div>
-      <div class="screening-meta">Dirs. Januel P. Mercado, Joel Crawford &bull; 5 showtimes on 4 days</div>
+      <div class="screening-meta">Dirs. Januel P. Mercado, Joel Crawford<span class="card-count"> &bull; 5 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -1966,7 +2052,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1YYc" target="_blank" rel="noopener">Ghost in the Shell</a> (1995)</div>
-      <div class="screening-meta">Dir. Mamoru  Oshii &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Mamoru  Oshii<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-13">
           <span class="venue-day">Tue, Oct 13</span>
@@ -1981,7 +2067,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/18Im" target="_blank" rel="noopener">The Graduate</a> (1967)</div>
-      <div class="screening-meta">1 showtime on 1 day</div>
+      <div class="screening-meta"><span class="card-count">1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-18">
           <span class="venue-day">Sun, Oct 18</span>
@@ -1995,7 +2081,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/26x4" target="_blank" rel="noopener">Heathers</a> (1989)</div>
-      <div class="screening-meta">Dir. Michael  Lehmann &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Michael  Lehmann<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -2008,7 +2094,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/ZsHI" target="_blank" rel="noopener">The History of Concrete</a> (2026)</div>
-      <div class="screening-meta">Dir. John Wilson &bull; 35 showtimes on 4 days</div>
+      <div class="screening-meta">Dir. John Wilson<span class="card-count"> &bull; 35 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -2070,7 +2156,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1ZoE" target="_blank" rel="noopener">The Insider</a> (1999)</div>
-      <div class="screening-meta">Dir. Michael Mann &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Michael Mann<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-17">
           <span class="venue-day">Sat, Oct 17</span>
@@ -2085,7 +2171,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1WYO" target="_blank" rel="noopener">The Little Mermaid</a> (1989)</div>
-      <div class="screening-meta">Dirs. Ron Clements, John Musker &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dirs. Ron Clements, John Musker<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -2099,7 +2185,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/i4a" target="_blank" rel="noopener">Midnight in Paris</a> (2011)</div>
-      <div class="screening-meta">Dir. Woody Allen &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Woody Allen<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-16">
           <span class="venue-day">Fri, Oct 16</span>
@@ -2113,7 +2199,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/15YTy" target="_blank" rel="noopener">NAZA</a> (2026)</div>
-      <div class="screening-meta">Dirs. Yuval Abraham, Rachel Szor &bull; 46 showtimes on 4 days</div>
+      <div class="screening-meta">Dirs. Yuval Abraham, Rachel Szor<span class="card-count"> &bull; 46 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -2182,7 +2268,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/dvXe" target="_blank" rel="noopener">Okja</a> (2017)</div>
-      <div class="screening-meta">Dir. Bong Joon Ho &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Bong Joon Ho<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-16">
           <span class="venue-day">Fri, Oct 16</span>
@@ -2204,7 +2290,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29R2" target="_blank" rel="noopener">Oldboy</a> (2003)</div>
-      <div class="screening-meta">Dir. Park Chan-wook &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Park Chan-wook<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-17">
           <span class="venue-day">Sat, Oct 17</span>
@@ -2218,7 +2304,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/V4WQ" target="_blank" rel="noopener">Possible Love</a> (2026)</div>
-      <div class="screening-meta">Dir. Lee Chang-dong &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Lee Chang-dong<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -2231,7 +2317,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/QX5s" target="_blank" rel="noopener">Primetime</a> (2026)</div>
-      <div class="screening-meta">Dir. Lance Oppenheim &bull; 11 showtimes on 4 days</div>
+      <div class="screening-meta">Dir. Lance Oppenheim<span class="card-count"> &bull; 11 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -2265,7 +2351,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/26iI" target="_blank" rel="noopener">Reality Bites</a> (1994)</div>
-      <div class="screening-meta">Dir. Ben Stiller &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Ben Stiller<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-18">
           <span class="venue-day">Sun, Oct 18</span>
@@ -2279,7 +2365,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/SEXE" target="_blank" rel="noopener">Resident Evil</a> (2026)</div>
-      <div class="screening-meta">Dir. Zach Cregger &bull; 9 showtimes on 3 days</div>
+      <div class="screening-meta">Dir. Zach Cregger<span class="card-count"> &bull; 9 showtimes on 3 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-12">
           <span class="venue-day">Mon, Oct 12</span>
@@ -2306,7 +2392,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29tk" target="_blank" rel="noopener">Strangers on a Train</a> (1951)</div>
-      <div class="screening-meta">Dir. Alfred Hitchcock &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Alfred Hitchcock<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-16">
           <span class="venue-day">Fri, Oct 16</span>
@@ -2320,7 +2406,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/24GI" target="_blank" rel="noopener">Women on the Verge of a Nervous Breakdown</a> (1988)</div>
-      <div class="screening-meta">Dir. Pedro Almodóvar &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Pedro Almodóvar<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-13">
           <span class="venue-day">Tue, Oct 13</span>
@@ -2334,7 +2420,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
-      <div class="screening-meta">Dir. Nathan Fielder &bull; 32 showtimes on 4 days</div>
+      <div class="screening-meta">Dir. Nathan Fielder<span class="card-count"> &bull; 32 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-15">
           <span class="venue-day">Thu, Oct 15</span>
@@ -2399,7 +2485,7 @@
   <div class="screenings-week" data-week="2026-10-19" data-end="2026-10-25" data-short="Oct 19" hidden>
     <p class="screenings-summary"><strong>13</strong> films from my watchlist, <strong>27</strong> showtimes at 3 venues — Oct 19 – 25, 2026</p>
     <div class="screenings-view" data-view="day">
-    <div class="day-group" data-date="2026-10-19">
+    <div class="day-group" data-date="2026-10-19" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;4&lt;/strong&gt; showtimes at 1 venue — Monday, October 19">
       <h2 class="day-header">Monday, October 19</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
@@ -2414,7 +2500,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-20">
+    <div class="day-group" data-date="2026-10-20" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;4&lt;/strong&gt; showtimes at 1 venue — Tuesday, October 20">
       <h2 class="day-header">Tuesday, October 20</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
@@ -2429,7 +2515,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-21">
+    <div class="day-group" data-date="2026-10-21" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;4&lt;/strong&gt; showtimes at 1 venue — Wednesday, October 21">
       <h2 class="day-header">Wednesday, October 21</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
@@ -2444,7 +2530,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-22">
+    <div class="day-group" data-date="2026-10-22" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;2&lt;/strong&gt; showtimes at 1 venue — Thursday, October 22">
       <h2 class="day-header">Thursday, October 22</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
@@ -2459,7 +2545,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-23">
+    <div class="day-group" data-date="2026-10-23" data-summary="&lt;strong&gt;6&lt;/strong&gt; films from my watchlist, &lt;strong&gt;6&lt;/strong&gt; showtimes at 1 venue — Friday, October 23">
       <h2 class="day-header">Friday, October 23</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29R2" target="_blank" rel="noopener">Oldboy</a> (2003)</div>
@@ -2540,7 +2626,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-24">
+    <div class="day-group" data-date="2026-10-24" data-summary="&lt;strong&gt;3&lt;/strong&gt; films from my watchlist, &lt;strong&gt;3&lt;/strong&gt; showtimes at 2 venues — Saturday, October 24">
       <h2 class="day-header">Saturday, October 24</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1INM" target="_blank" rel="noopener">Grey Gardens</a> (1975)</div>
@@ -2578,7 +2664,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-25">
+    <div class="day-group" data-date="2026-10-25" data-summary="&lt;strong&gt;4&lt;/strong&gt; films from my watchlist, &lt;strong&gt;4&lt;/strong&gt; showtimes at 2 venues — Sunday, October 25">
       <h2 class="day-header">Sunday, October 25</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/yXaQ" target="_blank" rel="noopener">All We Imagine as Light</a> (2024)</div>
@@ -2636,7 +2722,7 @@
     <div class="screenings-view" data-view="movie" hidden>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/UNi" target="_blank" rel="noopener">All That Heaven Allows</a> (1955)</div>
-      <div class="screening-meta">Dir. Douglas Sirk &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Douglas Sirk<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-23">
           <span class="venue-day">Fri, Oct 23</span>
@@ -2650,7 +2736,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/yXaQ" target="_blank" rel="noopener">All We Imagine as Light</a> (2024)</div>
-      <div class="screening-meta">Dir. Payal  Kapadia &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Payal  Kapadia<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-25">
           <span class="venue-day">Sun, Oct 25</span>
@@ -2663,7 +2749,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29CQ" target="_blank" rel="noopener">Almost Famous</a> (2000)</div>
-      <div class="screening-meta">Dir. Cameron Crowe &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Cameron Crowe<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-23">
           <span class="venue-day">Fri, Oct 23</span>
@@ -2678,7 +2764,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/QdU" target="_blank" rel="noopener">Eve&#x27;s Bayou</a> (1997)</div>
-      <div class="screening-meta">Dir. Kasi Lemmons &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Kasi Lemmons<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-24">
           <span class="venue-day">Sat, Oct 24</span>
@@ -2691,7 +2777,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/28fQ" target="_blank" rel="noopener">Giant</a> (1956)</div>
-      <div class="screening-meta">Dir. George Stevens &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. George Stevens<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-25">
           <span class="venue-day">Sun, Oct 25</span>
@@ -2705,7 +2791,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/25ds" target="_blank" rel="noopener">Girl, Interrupted</a> (1999)</div>
-      <div class="screening-meta">Dir. James  Mangold &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. James  Mangold<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-25">
           <span class="venue-day">Sun, Oct 25</span>
@@ -2719,7 +2805,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1INM" target="_blank" rel="noopener">Grey Gardens</a> (1975)</div>
-      <div class="screening-meta">Dirs. Albert Maysles, David Maysles, Ellen Hovde, Muffie Meyer &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dirs. Albert Maysles, David Maysles, Ellen Hovde, Muffie Meyer<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-24">
           <span class="venue-day">Sat, Oct 24</span>
@@ -2732,7 +2818,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/2ayq" target="_blank" rel="noopener">Night on Earth</a> (1991)</div>
-      <div class="screening-meta">Dir. Jim Jarmusch &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Jim Jarmusch<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-23">
           <span class="venue-day">Fri, Oct 23</span>
@@ -2746,7 +2832,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29R2" target="_blank" rel="noopener">Oldboy</a> (2003)</div>
-      <div class="screening-meta">Dir. Park Chan-wook &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Park Chan-wook<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-23">
           <span class="venue-day">Fri, Oct 23</span>
@@ -2768,7 +2854,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1TAO" target="_blank" rel="noopener">Rushmore</a> (1998)</div>
-      <div class="screening-meta">Dir. Wes Anderson &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Wes Anderson<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-23">
           <span class="venue-day">Fri, Oct 23</span>
@@ -2781,7 +2867,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/29tk" target="_blank" rel="noopener">Strangers on a Train</a> (1951)</div>
-      <div class="screening-meta">Dir. Alfred Hitchcock &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Alfred Hitchcock<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-23">
           <span class="venue-day">Fri, Oct 23</span>
@@ -2795,7 +2881,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1Vt6" target="_blank" rel="noopener">Waitress</a> (2007)</div>
-      <div class="screening-meta">1 showtime on 1 day</div>
+      <div class="screening-meta"><span class="card-count">1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-24">
           <span class="venue-day">Sat, Oct 24</span>
@@ -2808,7 +2894,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/16mVo" target="_blank" rel="noopener">You Can See Everything</a> (2026)</div>
-      <div class="screening-meta">Dirs. Nathan Fielder, Lance Oppenheim &bull; 14 showtimes on 4 days</div>
+      <div class="screening-meta">Dirs. Nathan Fielder, Lance Oppenheim<span class="card-count"> &bull; 14 showtimes on 4 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-19">
           <span class="venue-day">Mon, Oct 19</span>
@@ -2845,7 +2931,7 @@
   <div class="screenings-week" data-week="2026-10-26" data-end="2026-11-01" data-short="Oct 26" hidden>
     <p class="screenings-summary"><strong>10</strong> films from my watchlist, <strong>13</strong> showtimes at 4 venues — Oct 26 – Nov 1, 2026</p>
     <div class="screenings-view" data-view="day">
-    <div class="day-group" data-date="2026-10-27">
+    <div class="day-group" data-date="2026-10-27" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;1&lt;/strong&gt; showtime at 1 venue — Tuesday, October 27">
       <h2 class="day-header">Tuesday, October 27</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1INM" target="_blank" rel="noopener">Grey Gardens</a> (1975)</div>
@@ -2860,7 +2946,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-28">
+    <div class="day-group" data-date="2026-10-28" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;1&lt;/strong&gt; showtime at 1 venue — Wednesday, October 28">
       <h2 class="day-header">Wednesday, October 28</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1POC" target="_blank" rel="noopener">Labyrinth</a> (1986)</div>
@@ -2875,7 +2961,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-29">
+    <div class="day-group" data-date="2026-10-29" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;1&lt;/strong&gt; showtime at 1 venue — Thursday, October 29">
       <h2 class="day-header">Thursday, October 29</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/QdU" target="_blank" rel="noopener">Eve&#x27;s Bayou</a> (1997)</div>
@@ -2890,7 +2976,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-30">
+    <div class="day-group" data-date="2026-10-30" data-summary="&lt;strong&gt;2&lt;/strong&gt; films from my watchlist, &lt;strong&gt;2&lt;/strong&gt; showtimes at 1 venue — Friday, October 30">
       <h2 class="day-header">Friday, October 30</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1TAO" target="_blank" rel="noopener">Rushmore</a> (1998)</div>
@@ -2918,7 +3004,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-10-31">
+    <div class="day-group" data-date="2026-10-31" data-summary="&lt;strong&gt;3&lt;/strong&gt; films from my watchlist, &lt;strong&gt;3&lt;/strong&gt; showtimes at 2 venues — Saturday, October 31">
       <h2 class="day-header">Saturday, October 31</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/28kc" target="_blank" rel="noopener">Godzilla</a> (1954)</div>
@@ -2960,7 +3046,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-11-01">
+    <div class="day-group" data-date="2026-11-01" data-summary="&lt;strong&gt;5&lt;/strong&gt; films from my watchlist, &lt;strong&gt;5&lt;/strong&gt; showtimes at 2 venues — Sunday, November 1">
       <h2 class="day-header">Sunday, November 1</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/28kc" target="_blank" rel="noopener">Godzilla</a> (1954)</div>
@@ -3031,7 +3117,7 @@
     <div class="screenings-view" data-view="movie" hidden>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/UNi" target="_blank" rel="noopener">All That Heaven Allows</a> (1955)</div>
-      <div class="screening-meta">Dir. Douglas Sirk &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Douglas Sirk<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-11-01">
           <span class="venue-day">Sun, Nov 1</span>
@@ -3045,7 +3131,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/24QI" target="_blank" rel="noopener">Beetlejuice</a> (1988)</div>
-      <div class="screening-meta">Dir. Tim Burton &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Tim Burton<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-31">
           <span class="venue-day">Sat, Oct 31</span>
@@ -3059,7 +3145,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/223a" target="_blank" rel="noopener">Bram Stoker&#x27;s Dracula</a> (1992)</div>
-      <div class="screening-meta">Dir. Francis Ford  Coppola &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Francis Ford  Coppola<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-30">
           <span class="venue-day">Fri, Oct 30</span>
@@ -3081,7 +3167,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/QdU" target="_blank" rel="noopener">Eve&#x27;s Bayou</a> (1997)</div>
-      <div class="screening-meta">Dir. Kasi Lemmons &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Kasi Lemmons<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-29">
           <span class="venue-day">Thu, Oct 29</span>
@@ -3094,7 +3180,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1VzS" target="_blank" rel="noopener">Far from Heaven</a> (2002)</div>
-      <div class="screening-meta">Dir. Todd Haynes &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Todd Haynes<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-11-01">
           <span class="venue-day">Sun, Nov 1</span>
@@ -3108,7 +3194,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/28kc" target="_blank" rel="noopener">Godzilla</a> (1954)</div>
-      <div class="screening-meta">Dir. Ishirô Honda &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Ishirô Honda<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-31">
           <span class="venue-day">Sat, Oct 31</span>
@@ -3130,7 +3216,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1INM" target="_blank" rel="noopener">Grey Gardens</a> (1975)</div>
-      <div class="screening-meta">Dirs. Albert Maysles, David Maysles, Ellen Hovde, Muffie Meyer &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dirs. Albert Maysles, David Maysles, Ellen Hovde, Muffie Meyer<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-27">
           <span class="venue-day">Tue, Oct 27</span>
@@ -3143,7 +3229,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1POC" target="_blank" rel="noopener">Labyrinth</a> (1986)</div>
-      <div class="screening-meta">Dir. Jim Henson &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Jim Henson<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-28">
           <span class="venue-day">Wed, Oct 28</span>
@@ -3156,7 +3242,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/i4a" target="_blank" rel="noopener">Midnight in Paris</a> (2011)</div>
-      <div class="screening-meta">Dir. Woody Allen &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Woody Allen<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-11-01">
           <span class="venue-day">Sun, Nov 1</span>
@@ -3170,7 +3256,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1TAO" target="_blank" rel="noopener">Rushmore</a> (1998)</div>
-      <div class="screening-meta">Dir. Wes Anderson &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Wes Anderson<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-10-30">
           <span class="venue-day">Fri, Oct 30</span>
@@ -3193,7 +3279,7 @@
   <div class="screenings-week" data-week="2026-11-02" data-end="2026-11-08" data-short="Nov 2" hidden>
     <p class="screenings-summary"><strong>2</strong> films from my watchlist, <strong>2</strong> showtimes at 2 venues — Nov 2 – 8, 2026</p>
     <div class="screenings-view" data-view="day">
-    <div class="day-group" data-date="2026-11-05">
+    <div class="day-group" data-date="2026-11-05" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;1&lt;/strong&gt; showtime at 1 venue — Thursday, November 5">
       <h2 class="day-header">Thursday, November 5</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1VhO" target="_blank" rel="noopener">The Draughtsman&#x27;s Contract</a> (1982)</div>
@@ -3208,7 +3294,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-11-06">
+    <div class="day-group" data-date="2026-11-06" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;1&lt;/strong&gt; showtime at 1 venue — Friday, November 6">
       <h2 class="day-header">Friday, November 6</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1efg" target="_blank" rel="noopener">Crooklyn</a> (1994)</div>
@@ -3228,7 +3314,7 @@
     <div class="screenings-view" data-view="movie" hidden>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1efg" target="_blank" rel="noopener">Crooklyn</a> (1994)</div>
-      <div class="screening-meta">Dir. Spike Lee &bull; 1 showtime on 1 day</div>
+      <div class="screening-meta">Dir. Spike Lee<span class="card-count"> &bull; 1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-11-06">
           <span class="venue-day">Fri, Nov 6</span>
@@ -3242,7 +3328,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1VhO" target="_blank" rel="noopener">The Draughtsman&#x27;s Contract</a> (1982)</div>
-      <div class="screening-meta">1 showtime on 1 day</div>
+      <div class="screening-meta"><span class="card-count">1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-11-05">
           <span class="venue-day">Thu, Nov 5</span>
@@ -3259,7 +3345,7 @@
   <div class="screenings-week" data-week="2026-11-09" data-end="2026-11-15" data-short="Nov 9" hidden>
     <p class="screenings-summary"><strong>2</strong> films from my watchlist, <strong>3</strong> showtimes at 2 venues — Nov 9 – 15, 2026</p>
     <div class="screenings-view" data-view="day">
-    <div class="day-group" data-date="2026-11-14">
+    <div class="day-group" data-date="2026-11-14" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;1&lt;/strong&gt; showtime at 1 venue — Saturday, November 14">
       <h2 class="day-header">Saturday, November 14</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1W4G" target="_blank" rel="noopener">Castle in the Sky</a> (1986)</div>
@@ -3275,7 +3361,7 @@
       </ul>
     </div>
     </div>
-    <div class="day-group" data-date="2026-11-15">
+    <div class="day-group" data-date="2026-11-15" data-summary="&lt;strong&gt;2&lt;/strong&gt; films from my watchlist, &lt;strong&gt;2&lt;/strong&gt; showtimes at 2 venues — Sunday, November 15">
       <h2 class="day-header">Sunday, November 15</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1W4G" target="_blank" rel="noopener">Castle in the Sky</a> (1986)</div>
@@ -3308,7 +3394,7 @@
     <div class="screenings-view" data-view="movie" hidden>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1W4G" target="_blank" rel="noopener">Castle in the Sky</a> (1986)</div>
-      <div class="screening-meta">Dir. Hayao Miyazaki &bull; 2 showtimes on 2 days</div>
+      <div class="screening-meta">Dir. Hayao Miyazaki<span class="card-count"> &bull; 2 showtimes on 2 days</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-11-14">
           <span class="venue-day">Sat, Nov 14</span>
@@ -3330,7 +3416,7 @@
     </div>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/1Uiw" target="_blank" rel="noopener">Local Hero</a> (1983)</div>
-      <div class="screening-meta">1 showtime on 1 day</div>
+      <div class="screening-meta"><span class="card-count">1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-11-15">
           <span class="venue-day">Sun, Nov 15</span>
@@ -3357,7 +3443,7 @@
   <div class="screenings-week" data-week="2026-12-07" data-end="2026-12-13" data-short="Dec 7" hidden>
     <p class="screenings-summary"><strong>1</strong> film from my watchlist, <strong>1</strong> showtime at 1 venue — Dec 7 – 13, 2026</p>
     <div class="screenings-view" data-view="day">
-    <div class="day-group" data-date="2026-12-13">
+    <div class="day-group" data-date="2026-12-13" data-summary="&lt;strong&gt;1&lt;/strong&gt; film from my watchlist, &lt;strong&gt;1&lt;/strong&gt; showtime at 1 venue — Sunday, December 13">
       <h2 class="day-header">Sunday, December 13</h2>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/h0w" target="_blank" rel="noopener">Kramer vs. Kramer</a> (1979)</div>
@@ -3376,7 +3462,7 @@
     <div class="screenings-view" data-view="movie" hidden>
     <div class="screening-card">
       <div class="screening-title"><a href="https://boxd.it/h0w" target="_blank" rel="noopener">Kramer vs. Kramer</a> (1979)</div>
-      <div class="screening-meta">1 showtime on 1 day</div>
+      <div class="screening-meta"><span class="card-count">1 showtime on 1 day</span></div>
       <ul class="screening-venues screening-week">
         <li class="screening-venue new-day" data-date="2026-12-13">
           <span class="venue-day">Sun, Dec 13</span>
@@ -3394,11 +3480,10 @@
   (function () {
     var section = document.currentScript.closest('.screenings-section');
     if (!section) return;
+    function all(sel, root) { return Array.prototype.slice.call((root || section).querySelectorAll(sel)); }
     var controls = section.querySelector('.screenings-controls');
-    var weeks = Array.prototype.slice.call(section.querySelectorAll('.screenings-week'));
-    var select = section.querySelector('.week-select');
-    var steps = section.querySelectorAll('.week-step');
-    var viewButtons = section.querySelectorAll('.screenings-view-toggle button[data-view]');
+    var track = section.querySelector('.strip-track');
+    var viewButtons = all('.screenings-view-toggle button[data-view]');
     var heading = document.querySelector('.title-card h1');
     var headingText = heading ? heading.textContent : '';
     var KEY = 'screenings-view';
@@ -3407,84 +3492,141 @@
       today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
     } catch (e) { today = new Date().toISOString().slice(0, 10); }
 
-    // Hide what has already happened.
-    section.querySelectorAll('[data-date]').forEach(function (el) {
-      if (el.getAttribute('data-date') < today) el.hidden = true;
+    // Drop what has already happened (only matters if a daily rebuild is late).
+    all('[data-date]').forEach(function (el) {
+      if (el.getAttribute('data-date') < today) { el.setAttribute('data-past', ''); el.hidden = true; }
     });
-    section.querySelectorAll('.screenings-view[data-view="movie"] .screening-card').forEach(function (card) {
-      if (!card.querySelector('.screening-venue:not([hidden])')) card.hidden = true;
-    });
-    weeks = weeks.filter(function (w) {
+    var weeks = all('.screenings-week').filter(function (w) {
       if (w.getAttribute('data-end') >= today) return true;
       w.hidden = true;
-      if (select) {
-        var opt = select.querySelector('option[value="' + w.getAttribute('data-week') + '"]');
-        if (opt) opt.remove();
-      }
+      all('.strip-week[data-week="' + w.getAttribute('data-week') + '"]').forEach(function (s) { s.hidden = true; });
       return false;
     });
     if (!weeks.length) return;
+    function weekEl(id) { return weeks.filter(function (w) { return w.getAttribute('data-week') === id; })[0]; }
 
-    function setUrl(name, value) {
+    var state = { week: weeks[0].getAttribute('data-week'), day: null };
+
+    function setUrl() {
       try {
         var url = new URL(window.location.href);
-        if (value) url.searchParams.set(name, value); else url.searchParams.delete(name);
+        url.searchParams.delete('week'); url.searchParams.delete('date');
+        if (state.day) url.searchParams.set('date', state.day);
+        else if (state.week !== weeks[0].getAttribute('data-week')) url.searchParams.set('week', state.week);
         history.replaceState(null, '', url);
       } catch (e) {}
     }
+    function prettyDay(iso) {
+      var d = new Date(iso + 'T12:00:00');
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    }
+    function apply(remember) {
+      weeks.forEach(function (w) { w.hidden = w.getAttribute('data-week') !== state.week; });
+      var w = weekEl(state.week);
+      all('.day-group', w).forEach(function (g) {
+        g.hidden = g.hasAttribute('data-past') || (state.day !== null && g.getAttribute('data-date') !== state.day);
+      });
+      all('.screenings-view[data-view="movie"] .screening-venue', w).forEach(function (r) {
+        r.hidden = r.hasAttribute('data-past') || (state.day !== null && r.getAttribute('data-date') !== state.day);
+      });
+      all('.screenings-view[data-view="movie"] .screening-card', w).forEach(function (c) {
+        c.hidden = !c.querySelector('.screening-venue:not([hidden])');
+      });
+      all('.card-count', w).forEach(function (s) { s.hidden = state.day !== null; });
+      var summary = w.querySelector('.screenings-summary');
+      if (summary) {
+        if (!summary.hasAttribute('data-week-html')) summary.setAttribute('data-week-html', summary.innerHTML);
+        var g = state.day && w.querySelector('.day-group[data-date="' + state.day + '"]');
+        summary.innerHTML = g ? g.getAttribute('data-summary') : summary.getAttribute('data-week-html');
+      }
+      all('.strip-week-label').forEach(function (b) {
+        b.setAttribute('aria-pressed', !state.day && b.getAttribute('data-week') === state.week ? 'true' : 'false');
+      });
+      all('.strip-day').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-date') === state.day ? 'true' : 'false');
+        b.classList.toggle('in-selection', !state.day && b.getAttribute('data-week') === state.week);
+      });
+      if (heading && /^This Week/.test(headingText)) {
+        var lead = 'This Week';
+        if (state.day) lead = state.day === today ? 'Today' : prettyDay(state.day);
+        else if (state.week !== weeks[0].getAttribute('data-week')) lead = 'Week of ' + w.getAttribute('data-short');
+        heading.textContent = headingText.replace(/^This Week/, lead);
+      }
+      if (remember) setUrl();
+    }
     function showView(view, remember) {
       if (view !== 'movie') view = 'day';
-      section.querySelectorAll('.screenings-view').forEach(function (v) {
-        v.hidden = v.getAttribute('data-view') !== view;
-      });
+      all('.screenings-view').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view; });
       viewButtons.forEach(function (b) {
         b.setAttribute('aria-pressed', b.getAttribute('data-view') === view ? 'true' : 'false');
       });
       if (remember) {
         try { localStorage.setItem(KEY, view); } catch (e) {}
-        setUrl('view', view === 'movie' ? 'movie' : null);
+        try {
+          var url = new URL(window.location.href);
+          if (view === 'movie') url.searchParams.set('view', 'movie'); else url.searchParams.delete('view');
+          history.replaceState(null, '', url);
+        } catch (e) {}
       }
     }
-    function showWeek(index, remember) {
-      index = Math.max(0, Math.min(weeks.length - 1, index));
-      weeks.forEach(function (w, i) { w.hidden = i !== index; });
-      var w = weeks[index];
-      if (select) select.value = w.getAttribute('data-week');
-      if (steps.length) {
-        steps[0].disabled = index === 0;
-        steps[1].disabled = index === weeks.length - 1;
-      }
-      var isDefault = index === 0;
-      if (heading && /^This Week/.test(headingText)) {
-        heading.textContent = isDefault ? headingText
-          : headingText.replace(/^This Week/, 'Week of ' + w.getAttribute('data-short'));
-      }
-      if (remember) setUrl('week', isDefault ? null : w.getAttribute('data-week'));
-      current = index;
-    }
-    var current = 0;
-    var params;
-    try { params = new URL(window.location.href).searchParams; } catch (e) { params = null; }
+
+    // Initial selection: from the URL, else this week (or next week if this
+    // week has nothing left).
+    var params = null;
+    try { params = new URL(window.location.href).searchParams; } catch (e) {}
+    var wantDay = params && params.get('date');
     var wantWeek = params && params.get('week');
-    var start = 0;
-    weeks.forEach(function (w, i) { if (w.getAttribute('data-week') === wantWeek) start = i; });
-    // If this week's remaining days have nothing, open on the next week.
-    if (!wantWeek && !weeks[0].querySelector('.day-group:not([hidden])') && weeks.length > 1
-        && weeks[0].querySelector('.day-group')) start = 1;
-    showWeek(start, false);
+    var dayTile = wantDay && section.querySelector('.strip-day[data-date="' + wantDay + '"]:not([disabled]):not([data-past])');
+    if (dayTile && weekEl(dayTile.getAttribute('data-week'))) {
+      state = { week: dayTile.getAttribute('data-week'), day: wantDay };
+    } else if (wantWeek && weekEl(wantWeek)) {
+      state = { week: wantWeek, day: null };
+    } else if (weeks.length > 1 && weeks[0].querySelector('.day-group')
+               && !weeks[0].querySelector('.day-group:not([data-past])')) {
+      state = { week: weeks[1].getAttribute('data-week'), day: null };
+    }
+    apply(false);
     var view = params && params.get('view');
     if (!view) { try { view = localStorage.getItem(KEY); } catch (e) {} }
     showView(view, false);
 
-    if (select) select.addEventListener('change', function () {
-      weeks.forEach(function (w, i) { if (w.getAttribute('data-week') === select.value) showWeek(i, true); });
+    all('.strip-week-label').forEach(function (b) {
+      b.addEventListener('click', function () { state = { week: b.getAttribute('data-week'), day: null }; apply(true); });
     });
-    steps.forEach(function (b) {
-      b.addEventListener('click', function () { showWeek(current + Number(b.getAttribute('data-step')), true); });
+    all('.strip-day').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var d = b.getAttribute('data-date');
+        state = state.day === d ? { week: b.getAttribute('data-week'), day: null }
+                                : { week: b.getAttribute('data-week'), day: d };
+        apply(true);
+      });
     });
     viewButtons.forEach(function (b) {
       b.addEventListener('click', function () { showView(b.getAttribute('data-view'), true); });
     });
+
+    // Scroll arrows: page through the strip, hidden when there's nothing more.
+    if (track) {
+      var arrows = all('.strip-scroll');
+      function updateArrows() {
+        arrows[0].disabled = track.scrollLeft <= 2;
+        arrows[1].disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+      }
+      arrows.forEach(function (a) {
+        a.addEventListener('click', function () {
+          track.scrollBy({ left: Number(a.getAttribute('data-dir')) * track.clientWidth * 0.8, behavior: 'smooth' });
+        });
+      });
+      track.addEventListener('scroll', updateArrows, { passive: true });
+      window.addEventListener('resize', updateArrows);
+      controls.hidden = false;
+      var sel = section.querySelector('.strip-day[aria-pressed="true"]')
+             || section.querySelector('.strip-week-label[aria-pressed="true"]');
+      if (sel && sel.offsetLeft + sel.offsetWidth > track.clientWidth) {
+        track.scrollLeft = sel.offsetLeft - 8;
+      }
+      updateArrows();
+    }
     controls.hidden = false;
   })();
   </script>
