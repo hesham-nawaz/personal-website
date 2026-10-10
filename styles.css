@@ -1339,6 +1339,80 @@ p {
     color: var(--white);
 }
 
+/* With "Weekends only" on, Monday to Thursday recede. */
+.strip-day.filtered-out {
+    opacity: 0.35;
+}
+
+.strip-day.filtered-out[aria-pressed="true"] {
+    opacity: 0.6;
+}
+
+.weekend-toggle {
+    font: inherit;
+    font-size: 0.92rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary-dark);
+    background: var(--card-bg);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.weekend-box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--primary-color);
+    border-radius: 3px;
+    background: var(--card-bg);
+    flex: none;
+    position: relative;
+}
+
+.weekend-days {
+    color: var(--text-light);
+    font-size: 0.85em;
+}
+
+.weekend-toggle[aria-pressed="true"] {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.weekend-toggle[aria-pressed="true"] .weekend-days {
+    color: var(--white);
+}
+
+.weekend-toggle[aria-pressed="true"] .weekend-box {
+    border-color: var(--white);
+    background: var(--white);
+}
+
+.weekend-toggle[aria-pressed="true"] .weekend-box::after {
+    content: "";
+    position: absolute;
+    left: 3.5px;
+    top: 0.5px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--primary-dark);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.weekend-toggle:hover:not([aria-pressed="true"]) {
+    background: var(--light-bg);
+}
+
+.weekend-toggle:focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+}
+
 .strip-selection {
     min-height: 1.4em;
     margin: -6px 0 12px;

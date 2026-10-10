@@ -318,6 +318,10 @@ def render_site_fragment(matches: list[MatchedScreening],
     parts.append('        <button type="button" data-view="day" aria-pressed="true">Day</button>')
     parts.append('        <button type="button" data-view="movie" aria-pressed="false">Movie</button>')
     parts.append('      </div>')
+    if strip:
+        parts.append('      <button type="button" class="weekend-toggle" aria-pressed="false">'
+                     '<span class="weekend-box" aria-hidden="true"></span>Weekends only '
+                     '<span class="weekend-days">(Fri–Sun)</span></button>')
     has_links = any(u for m in all_matches for u in m.screening.ticket_urls)
     if has_links or map_query:
         bits = []
@@ -395,6 +399,7 @@ def _render_date_strip(weeks: list[SiteWeek]) -> str:
         for ms in w.matches:
             films_by_day[ms.screening.day].add(_film_key(ms))
         week_films = len({_film_key(ms) for ms in w.matches})
+        weekend_films = len({_film_key(ms) for ms in w.matches if ms.screening.day.weekday() >= 4})
         label = "This week" if w.is_current else _range_label(w.start, w.end)
         tile = "This week" if w.is_current else _range_label(w.start, w.end).replace(" – ", "–")
         lines.append(f'        <div class="strip-week" data-week="{w.start.isoformat()}" '
@@ -402,7 +407,8 @@ def _render_date_strip(weeks: list[SiteWeek]) -> str:
         lines.append(f'          <button type="button" class="strip-week-label" data-week="{w.start.isoformat()}" '
                      f'aria-pressed="false" aria-label="{html.escape(label)}: {_count_text(week_films)}">'
                      f'<span class="strip-week-name">{html.escape(tile)}</span>'
-                     f'<span class="strip-count">{_count_text(week_films)}</span></button>')
+                     f'<span class="strip-count" data-all="{_count_text(week_films)}" '
+                     f'data-weekend="{_count_text(weekend_films)}">{_count_text(week_films)}</span></button>')
         d = w.start
         while d <= w.end:
             n = len(films_by_day.get(d, ()))
@@ -449,8 +455,13 @@ def _summary_html(films: int, showtimes: int, venues: int, when: str) -> str:
 #  - The page is rebuilt daily; in case a rebuild is late, days before today
 #    (New York time) are dropped, and if this week has nothing left the next
 #    week is shown instead.
+#  - "Weekends only" narrows any selection to Fridays, Saturdays and Sundays
+#    and dims the other days in the strip. Like the view, it is kept in the
+#    URL (?weekends=1) and in localStorage.
 #  - The heading follows the selection: "This Week in NYC", "Week of Oct 12
-#    in NYC", "Today in NYC", "Wednesday, Oct 14 in NYC", "Oct 11 – 25 in NYC".
+#    in NYC", "Today in NYC", "Wednesday, Oct 14 in NYC", "Oct 11 – 25 in NYC",
+#    and with weekends only "This Weekend in NYC", "Weekend of Oct 16 in NYC",
+#    "Weekends, Oct 11 – 25 in NYC".
 _SCREENINGS_SCRIPT = """  <script>
   (function () {
     var section = document.currentScript.closest('.screenings-section');
@@ -491,6 +502,10 @@ _SCREENINGS_SCRIPT = """  <script>
     var summary = section.querySelector('.screenings-summary');
     var empty = section.querySelector('.screenings-empty');
     var selectionLine = section.querySelector('.strip-selection');
+    var weekendButton = section.querySelector('.weekend-toggle');
+    var WEEKEND_KEY = 'screenings-weekends';
+    var weekendsOnly = false;
+    function isWeekend(iso) { var g = dateObj(iso).getDay(); return g === 5 || g === 6 || g === 0; }
     var today;
     try {
       today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
@@ -530,7 +545,7 @@ _SCREENINGS_SCRIPT = """  <script>
       var from = state.from, to = state.to;
       function inRange(el) {
         var d = el.getAttribute('data-date');
-        return d >= today && d >= from && d <= to;
+        return d >= today && d >= from && d <= to && (!weekendsOnly || isWeekend(d));
       }
       all('.day-group').forEach(function (g) { g.hidden = !inRange(g); });
       var films = 0;
@@ -561,11 +576,16 @@ _SCREENINGS_SCRIPT = """  <script>
         if (v) venues[v.textContent.replace(' (map)', '').trim()] = true;
       });
       var label = rangeLabel(from, to);
+      if (weekendsOnly && from !== to) label = 'Weekends, ' + label;
       if (films) {
         summary.innerHTML = '<strong>' + films + '</strong> ' + (films === 1 ? 'film' : 'films') +
           ' from my watchlist, <strong>' + showtimes + '</strong> ' + (showtimes === 1 ? 'showtime' : 'showtimes') +
           ' at ' + plural(Object.keys(venues).length, 'venue') + ' — ' + label;
         summary.hidden = false; empty.hidden = true;
+      } else if (weekendsOnly && state.kind === 'day' && !isWeekend(from)) {
+        empty.textContent = fmt(from, { weekday: 'long' }) + ' isn\u2019t a weekend day. ' +
+          'Turn off \u201cWeekends only\u201d to see ' + label + '.';
+        summary.hidden = true; empty.hidden = false;
       } else {
         empty.textContent = 'No screenings from my watchlist are listed for ' + label +
           ' yet. Theaters post their schedules a few weeks ahead, so later dates fill in over time.';
@@ -580,13 +600,22 @@ _SCREENINGS_SCRIPT = """  <script>
         var end = state.kind !== 'week' && (d === from || d === to);
         t.setAttribute('aria-pressed', end ? 'true' : 'false');
         t.classList.toggle('in-selection', !end && d >= from && d <= to);
+        t.classList.toggle('filtered-out', weekendsOnly && !isWeekend(d));
+      });
+      if (weekendButton) weekendButton.setAttribute('aria-pressed', weekendsOnly ? 'true' : 'false');
+      all('.strip-week-label .strip-count').forEach(function (c) {
+        c.textContent = c.getAttribute(weekendsOnly ? 'data-weekend' : 'data-all');
       });
 
       var isDefault = state.kind === 'week' && state.week === defaultState.week;
       if (heading && /^This Week/.test(headingText)) {
-        var lead = 'This Week';
+        var lead = weekendsOnly ? 'This Weekend' : 'This Week';
         if (state.kind === 'day') lead = from === today ? 'Today' : fmt(from, { weekday: 'long', month: 'short', day: 'numeric' });
-        else if (state.kind === 'range') lead = rangeLabel(from, to);
+        else if (state.kind === 'range') lead = (weekendsOnly ? 'Weekends, ' : '') + rangeLabel(from, to);
+        else if (!isDefault && weekendsOnly) {
+          var fri = dateObj(state.week); fri.setDate(fri.getDate() + ((5 - fri.getDay() + 7) % 7));
+          lead = 'Weekend of ' + fri.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
         else if (!isDefault) lead = 'Week of ' + weekOf(state.week).getAttribute('data-short');
         heading.textContent = headingText.replace(/^This Week/, lead);
       }
@@ -604,7 +633,8 @@ _SCREENINGS_SCRIPT = """  <script>
       if (remember) {
         try {
           var url = new URL(window.location.href);
-          ['week', 'date', 'from', 'to'].forEach(function (k) { url.searchParams.delete(k); });
+          ['week', 'date', 'from', 'to', 'weekends'].forEach(function (k) { url.searchParams.delete(k); });
+          if (weekendsOnly) url.searchParams.set('weekends', '1');
           if (state.kind === 'day') url.searchParams.set('date', from);
           else if (state.kind === 'range') { url.searchParams.set('from', from); url.searchParams.set('to', to); }
           else if (!isDefault) url.searchParams.set('week', state.week);
@@ -629,8 +659,16 @@ _SCREENINGS_SCRIPT = """  <script>
                && all('.day-group').some(function (g) { return g.getAttribute('data-date') >= today; })) {
       defaultState = state = weekState(stripWeeks[1]);
     }
+    var w0 = params && params.get('weekends');
+    if (w0 === null || w0 === undefined) { try { w0 = localStorage.getItem(WEEKEND_KEY); } catch (e) {} }
+    weekendsOnly = w0 === '1';
     apply(false);
     showView(startView, false);
+    if (weekendButton) weekendButton.addEventListener('click', function () {
+      weekendsOnly = !weekendsOnly;
+      try { localStorage.setItem(WEEKEND_KEY, weekendsOnly ? '1' : '0'); } catch (e) {}
+      apply(true);
+    });
 
     all('.strip-week-label').forEach(function (b) {
       b.addEventListener('click', function () { state = weekState(weekOf(b.getAttribute('data-week'))); apply(true); });
