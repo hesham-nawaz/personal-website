@@ -1,11 +1,17 @@
 name: Weekly Screenings (NYC)
 
 # Updates screenings-nyc.html with the matches between repertory.nyc's public
-# JSON feed (aggregating Film Forum, Metrograph, IFC, BAM, Anthology, MoMA,
-# MoMI, Quad, Roxy, Nitehawk, and more) and Hesham's Letterboxd watchlist,
-# then commits to main so Cloudflare Pages re-deploys.
+# JSON feed and Hesham's Letterboxd watchlist, then commits to main so
+# Cloudflare Pages re-deploys.
 #
-# No auth needed — repertory.nyc/api/screenings is a public JSON feed.
+# As of Oct 2026 the feed covers 11 venues: Film Forum, Film at Lincoln
+# Center, IFC Center, Metrograph, Quad, BAM Rose Cinemas, Anthology Film
+# Archives, Roxy, New Plaza, and both Nitehawks. It does NOT include MoMA,
+# Museum of the Moving Image, Japan Society, the Paris Theater or Alamo.
+#
+# No auth needed — repertory.nyc/api/screenings is a public JSON feed, and the
+# Letterboxd watchlist is public, so each run first refreshes
+# data/watchlist.csv from it (keeping the last good copy if that fails).
 
 on:
   schedule:
@@ -26,7 +32,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Check out repo
@@ -39,6 +45,17 @@ jobs:
 
       # Stdlib only — no install step needed.
 
+      # Refresh the watchlist so films added on Letterboxd since the last run
+      # can match. If Letterboxd is unreachable or returns a suspiciously short
+      # list, the script leaves data/watchlist.csv as it was and this step is
+      # marked failed without stopping the screenings update.
+      - name: Refresh watchlist from Letterboxd
+        continue-on-error: true
+        run: |
+          cd tool && python letterboxd_watchlist.py \
+            --user hnawaz \
+            --out "../data/watchlist.csv"
+
       - name: Fetch, match, and splice screenings-nyc.html
         run: |
           UPDATED=$(TZ=America/New_York date +%F)
@@ -47,15 +64,23 @@ jobs:
             --site-page "../screenings-nyc.html" \
             --updated "$UPDATED"
 
-      - name: Commit and push if screenings-nyc.html changed
+      - name: Commit and push if anything changed
         run: |
           git config user.name  "screenings-bot"
           git config user.email "screenings-bot@users.noreply.github.com"
-          git add screenings-nyc.html
+          git add screenings-nyc.html data/watchlist.csv
           if git diff --cached --quiet; then
-            echo "No changes to screenings-nyc.html — nothing to commit."
+            echo "No changes to screenings-nyc.html or the watchlist — nothing to commit."
             exit 0
           fi
           WEEK_LABEL=$(TZ=America/New_York date +%F)
           git commit -m "Update NYC weekly screenings (week of ${WEEK_LABEL})"
-          git push
+          # main may have moved since checkout (another workflow or a manual
+          # commit, or a "Re-run jobs" of an old run); replay this commit on
+          # top of it rather than failing the push.
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push && exit 0
+            echo "Push attempt ${attempt} failed; retrying in 10s."
+            sleep 10
+          done
+          exit 1

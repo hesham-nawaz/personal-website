@@ -1,9 +1,10 @@
 """Fetch NYC repertory screenings from repertory.nyc's public JSON API.
 
-repertory.nyc aggregates 12+ NYC arthouse/repertory theaters (Film Forum,
-Metrograph, IFC Center, Anthology, BAM, MoMA, MoMI, Nitehawk, Quad, Roxy,
-New Plaza, Film at Lincoln Center) into a single feed at
-https://repertory.nyc/api/screenings.
+repertory.nyc aggregates NYC arthouse/repertory theaters into a single feed at
+https://repertory.nyc/api/screenings. As of Oct 2026 that is 11 venues: Film
+Forum, Film at Lincoln Center, IFC Center, Metrograph, Quad, BAM Rose Cinemas,
+Anthology Film Archives, Roxy, New Plaza and both Nitehawks. MoMA, Museum of
+the Moving Image, Japan Society, the Paris Theater and Alamo are not in it.
 
 The feed is far cleaner than any newsletter — no email/IMAP dependency, no
 auth, structured JSON with title/year/director/theater/date/time/format.
@@ -26,8 +27,13 @@ USER_AGENT = "hesham-nawaz-personal-website/1.0 (+https://hesham-nawaz.com)"
 DEFAULT_TIMEOUT = 30  # seconds
 
 
+PAGE_SIZE = 100  # the API caps a single response; 100 is the largest page it honours
+MAX_PAGES_PER_DAY = 20  # safety stop; a busy day is ~130 screenings (2 pages)
+
+
 def fetch_raw(url: str = API_URL, timeout: int = DEFAULT_TIMEOUT,
-              query_date: date | None = None) -> list[dict]:
+              query_date: date | None = None,
+              limit: int | None = None, offset: int = 0) -> list[dict]:
     """GET the JSON feed. Returns the list of screening dicts as-is.
 
     IMPORTANT: The bare `/api/screenings` endpoint returns a fixed/stale
@@ -35,11 +41,22 @@ def fetch_raw(url: str = API_URL, timeout: int = DEFAULT_TIMEOUT,
     regardless of when you call it). To get current data you MUST pass
     `?date=YYYY-MM-DD` — that returns everything scheduled for that specific
     day. We iterate one call per day of the week in fetch_screenings_for_week.
+
+    The API is paginated: without `limit` it returns at most 50 rows, sorted
+    by time, so a single call silently drops every evening screening. Pass
+    `limit`/`offset` and keep paging (see fetch_day) to get the whole day.
     """
-    full = url
+    params = []
     if query_date is not None:
+        params.append(f"date={query_date.isoformat()}")
+    if limit is not None:
+        params.append(f"limit={limit}")
+    if offset:
+        params.append(f"offset={offset}")
+    full = url
+    if params:
         sep = "&" if "?" in url else "?"
-        full = f"{url}{sep}date={query_date.isoformat()}"
+        full = f"{url}{sep}{'&'.join(params)}"
     req = urllib.request.Request(full, headers={
         "Accept": "application/json",
         "User-Agent": USER_AGENT,
@@ -47,6 +64,55 @@ def fetch_raw(url: str = API_URL, timeout: int = DEFAULT_TIMEOUT,
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         payload = resp.read()
     return json.loads(payload)
+
+
+def fetch_day(day: date, url: str = API_URL) -> list[dict]:
+    """Every screening listed for `day`, following pagination until a page
+    comes back empty. Rows are de-duplicated by id because consecutive pages
+    can overlap by a row when the listing shifts between requests."""
+    rows: dict[str, dict] = {}
+    offset = 0
+    for _ in range(MAX_PAGES_PER_DAY):
+        page = fetch_raw(url, query_date=day, limit=PAGE_SIZE, offset=offset)
+        if not isinstance(page, list):
+            raise ValueError(f"unexpected API response type: {type(page).__name__}")
+        if not page:
+            break
+        for entry in page:
+            key = entry.get("id") or json.dumps(entry, sort_keys=True)
+            rows[key] = entry
+        offset += len(page)
+    else:
+        import sys
+        print(f"[nyc_repertory] WARNING: stopped paging {day} after "
+              f"{MAX_PAGES_PER_DAY} pages", file=sys.stderr)
+    return list(rows.values())
+
+
+def _special_event_label(special) -> str | None:
+    """special_event is null, a string, or an object like
+    {"event_type": "q_and_a", "description": "...", "guests": [...]}.
+    Turn it into short readable text instead of a raw dict dump."""
+    if not special:
+        return None
+    if isinstance(special, str):
+        return special.strip() or None
+    if isinstance(special, dict):
+        names = {"q_and_a": "Q&A", "intro": "Intro", "introduction": "Intro",
+                 "discussion": "Discussion", "conversation": "Conversation",
+                 "live_performance": "Live performance", "panel": "Panel"}
+        etype = special.get("event_type") or ""
+        label = names.get(etype, etype.replace("_", " ").strip().capitalize())
+        guests = [g if isinstance(g, str) else (g.get("name") if isinstance(g, dict) else None)
+                  for g in (special.get("guests") or [])]
+        guests = [g for g in guests if g]
+        if label and guests:
+            label = f"{label} with {', '.join(guests)}"
+        desc = (special.get("description") or "").strip()
+        if not label and desc:
+            label = desc if len(desc) <= 120 else desc[:117].rstrip() + "..."
+        return label or None
+    return str(special)
 
 
 def _time_24_to_12(hhmm: str) -> str:
@@ -109,9 +175,9 @@ def _entry_to_screening(entry: dict) -> Screening | None:
     fmt = entry.get("format")
     if fmt:
         note_bits.append(str(fmt))
-    special = entry.get("special_event")
+    special = _special_event_label(entry.get("special_event"))
     if special:
-        note_bits.append(str(special))
+        note_bits.append(special)
     notes = " • ".join(note_bits) if note_bits else None
 
     return Screening(
@@ -192,16 +258,16 @@ def fetch_screenings_for_week(reference: date | None = None,
     convert to Screening objects, and merge same-day same-film-same-theater
     entries by concatenating their times.
 
-    Defaults to today's calendar week. Makes one API call per day (7 total)
-    because the bare API endpoint returns a stale/fixed window; only
-    `?date=YYYY-MM-DD` returns current data.
+    Defaults to today's calendar week. Queries one day at a time because the
+    bare API endpoint returns a stale/fixed window; only `?date=YYYY-MM-DD`
+    returns current data. Each day is paged through in full (fetch_day).
     """
     monday, sunday = _week_bounds(reference)
     screenings: list[Screening] = []
     day = monday
     while day <= sunday:
         try:
-            raw = fetch_raw(url, query_date=day)
+            raw = fetch_day(day, url)
         except Exception as e:
             # Log and skip; a single-day failure shouldn't kill the whole week.
             import sys

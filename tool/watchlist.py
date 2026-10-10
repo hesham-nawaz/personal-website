@@ -56,6 +56,54 @@ def normalize_title(title: str) -> str:
     return t
 
 
+# Theater listings decorate titles with event and format details that are not
+# part of the film's name. These are stripped only as a fallback, after the
+# exact title fails to match, and the year check still applies afterwards.
+_DECORATION_PATTERNS = [
+    # trailing "+ Q&A", "+ Live Performance | ...", "+ intro by ..."
+    r"\s*\+\s*(q\s*&\s*a|live performance|intro\b|introduction|discussion|conversation|panel|talk)\b.*$",
+    # trailing format/version tags: " - 35MM", " in 70mm", " - The Director's Cut"
+    r"\s*[-–—]\s*(\d+mm\b.*|the director'?s cut|director'?s cut|4k restoration|restored)\s*$",
+    r"\s+(in|on)\s+\d+mm\s*$",
+    # trailing parentheticals: "(1969)", "(Open Captioning)", "(4K Restoration)",
+    # "(25th Anniversary Screening)", "(Director's Cut)"
+    r"\s*\((\d{4}|open caption(ed|ing)?|4k( restoration)?|restored|director'?s cut|"
+    r"\d+(st|nd|rd|th) anniversary[^)]*|\d+mm)\)\s*$",
+    # ": 30th Anniversary Remaster", ": 4K Restoration"
+    r"\s*:\s*(\d+(st|nd|rd|th) anniversary.*|4k restoration.*|new restoration.*)$",
+]
+_PREFIX_PATTERNS = [
+    # "The Downtown Festival: Title", "Downtown Fest: Title"
+    r"^(the )?downtown fest(ival)?\s*:\s*",
+    # "Cinema Tehran presents: Title", "X Presents Title"
+    r"^.{1,60}?\bpresents?\s*:?\s+",
+]
+
+
+def title_variants(title: str) -> list[str]:
+    """Plausible bare film titles hidden inside a decorated listing title,
+    most specific first. Does not include `title` itself."""
+    if not title:
+        return []
+    out: list[str] = []
+    queue = [title.strip()]
+    while queue:
+        t = queue.pop(0)
+        for pat in _DECORATION_PATTERNS + _PREFIX_PATTERNS:
+            new = re.sub(pat, "", t, flags=re.IGNORECASE).strip()
+            if new and new != t and new not in out and new != title:
+                out.append(new)
+                queue.append(new)
+        # "All the Mornings of the World | Instruments of Desire": the film is
+        # usually the part before the bar (series name after it).
+        if "|" in t:
+            left = t.split("|", 1)[0].strip()
+            if left and left not in out and left != title:
+                out.append(left)
+                queue.append(left)
+    return out
+
+
 @dataclass
 class Watchlist:
     entries: list[WatchlistEntry]
@@ -63,6 +111,16 @@ class Watchlist:
     by_title_year: dict[tuple[str, int], WatchlistEntry]
 
     def match(self, title: str, year: int | None) -> WatchlistEntry | None:
+        hit = self._match_exact(title, year)
+        if hit is not None:
+            return hit
+        for variant in title_variants(title):
+            hit = self._match_exact(variant, year)
+            if hit is not None:
+                return hit
+        return None
+
+    def _match_exact(self, title: str, year: int | None) -> WatchlistEntry | None:
         norm = normalize_title(title)
         if not norm:
             return None
