@@ -1317,10 +1317,106 @@ p {
     font-style: italic;
 }
 
+/* "Organize by Day / Movie" switch */
+.screenings-view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 0 0 28px;
+}
+
+.screenings-view-toggle[hidden],
+.screenings-view[hidden] {
+    display: none;
+}
+
+.view-toggle-label {
+    color: var(--text-medium);
+    font-size: 0.92rem;
+    margin-right: 12px;
+}
+
+.screenings-view-toggle button {
+    font: inherit;
+    font-size: 0.92rem;
+    color: var(--primary-dark);
+    background: var(--card-bg);
+    border: 1px solid var(--primary-color);
+    padding: 5px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.screenings-view-toggle button + button {
+    border-left: none;
+}
+
+.screenings-view-toggle button:first-of-type {
+    border-radius: 6px 0 0 6px;
+}
+
+.screenings-view-toggle button:last-of-type {
+    border-radius: 0 6px 6px 0;
+}
+
+.screenings-view-toggle button[aria-pressed="true"] {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.screenings-view-toggle button:hover:not([aria-pressed="true"]) {
+    background: var(--light-bg);
+}
+
+.screenings-view-toggle button:focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+}
+
+/* By-movie view: a row per day and venue; the date shows once per day. */
+.screening-week .screening-venue {
+    grid-template-columns: 105px minmax(150px, 230px) 1fr;
+}
+
+.screening-week .screening-venue:not(.new-day) {
+    border-top: none;
+    padding-top: 0;
+}
+
+.venue-day {
+    color: var(--text-medium);
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 640px) {
     .screening-venue {
         grid-template-columns: 1fr;
         row-gap: 2px;
+    }
+
+    /* date and venue share a line; times wrap underneath */
+    .screening-week .screening-venue {
+        grid-template-columns: auto 1fr;
+        column-gap: 10px;
+    }
+
+    .screening-week .venue-showings {
+        grid-column: 1 / -1;
+    }
+
+    /* the repeated (screen-reader-only) date shouldn't take up a grid cell */
+    .screening-week .screening-venue:not(.new-day) .venue-day {
+        position: absolute;
+    }
+
+    .screening-week .screening-venue:not(.new-day) {
+        padding-top: 6px;
+    }
+
+    .venue-day {
+        font-weight: 600;
+        color: var(--text-dark);
     }
 }
 

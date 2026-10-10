@@ -302,6 +302,16 @@ def render_site_fragment(matches: list[MatchedScreening],
             f'</p>'
         )
 
+    # View switch. Hidden until the script below runs, so without JavaScript
+    # the page simply shows the by-day view.
+    parts.append('  <div class="screenings-view-toggle" role="group" '
+                 'aria-label="Organize screenings" hidden>')
+    parts.append('    <span class="view-toggle-label">Organize by</span>')
+    parts.append('    <button type="button" data-view="day" aria-pressed="true">Day</button>')
+    parts.append('    <button type="button" data-view="movie" aria-pressed="false">Movie</button>')
+    parts.append('  </div>')
+
+    parts.append('  <div class="screenings-view" data-view="day">')
     for day in days:
         header = day.strftime("%A, %B %-d")
         parts.append('  <div class="day-group">')
@@ -309,44 +319,160 @@ def render_site_fragment(matches: list[MatchedScreening],
         for group in _group_by_film(by_day[day]):
             parts.append(_render_site_film(group))
         parts.append('  </div>')
+    parts.append('  </div>')
 
+    parts.append('  <div class="screenings-view" data-view="movie" hidden>')
+    for group in _group_by_film_for_week(matches):
+        parts.append(_render_site_film_week(group))
+    parts.append('  </div>')
+
+    parts.append(_VIEW_TOGGLE_SCRIPT)
     parts.append('</section>')
     return "\n".join(parts)
 
 
-def _render_site_film(group: list[MatchedScreening]) -> str:
-    """One card for one film on one day, with a row per venue."""
+# Switches between the by-day and by-movie views. The choice is kept in the
+# URL (?view=movie, so a link opens the same view) and in localStorage (so a
+# returning visitor gets the view they last used). Storage can throw in
+# private windows, hence the try/catch.
+_VIEW_TOGGLE_SCRIPT = """  <script>
+  (function () {
+    var section = document.currentScript.closest('.screenings-section');
+    if (!section) return;
+    var toggle = section.querySelector('.screenings-view-toggle');
+    var views = section.querySelectorAll('.screenings-view');
+    var buttons = toggle.querySelectorAll('button[data-view]');
+    var KEY = 'screenings-view';
+    function show(view, remember) {
+      if (view !== 'movie') view = 'day';
+      views.forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view; });
+      buttons.forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-view') === view ? 'true' : 'false');
+      });
+      if (!remember) return;
+      try { localStorage.setItem(KEY, view); } catch (e) {}
+      try {
+        var url = new URL(window.location.href);
+        if (view === 'movie') url.searchParams.set('view', 'movie');
+        else url.searchParams.delete('view');
+        history.replaceState(null, '', url);
+      } catch (e) {}
+    }
+    var initial = null;
+    try { initial = new URL(window.location.href).searchParams.get('view'); } catch (e) {}
+    if (!initial) { try { initial = localStorage.getItem(KEY); } catch (e) {} }
+    show(initial, false);
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () { show(b.getAttribute('data-view'), true); });
+    });
+    toggle.hidden = false;
+  })();
+  </script>"""
+
+
+def _film_header_lines(group: list[MatchedScreening], extra_meta: str | None = None) -> list[str]:
     first = group[0]
     directors = next((m.screening.directors for m in group if m.screening.directors), [])
-
     klass = "screening-card"
     if len(first.screening.films) > 1:
         klass += " double-feature"
-
     lines = [f'    <div class="{klass}">']
     lines.append(f'      <div class="screening-title">{_canonical_title_html(first)}</div>')
+    meta = []
     if directors:
         label = "Dir." if len(directors) == 1 else "Dirs."
-        lines.append(f'      <div class="screening-meta">{label} '
-                     f'{html.escape(", ".join(directors))}</div>')
+        meta.append(f"{label} {html.escape(', '.join(directors))}")
+    if extra_meta:
+        meta.append(html.escape(extra_meta))
+    if meta:
+        lines.append(f'      <div class="screening-meta">{" &bull; ".join(meta)}</div>')
+    return lines
+
+
+def _showings_lines(ms: MatchedScreening, indent: str) -> list[str]:
+    """Times, format/event tags and any alternate listing title for one
+    screening row."""
+    scr = ms.screening
+    tags = []
+    if scr.notes:
+        tags.extend(t.strip() for t in scr.notes.split("•") if t.strip())
+    if scr.presenter:
+        tags.append(f"pres. by {scr.presenter}")
+    listed = _listed_as(ms)
+    lines = [f'{indent}<span class="venue-showings">']
+    lines.append(f'{indent}  <span class="venue-times">{html.escape(", ".join(scr.times))}</span>')
+    for t in tags:
+        lines.append(f'{indent}  <span class="screening-tag">{html.escape(t)}</span>')
+    if listed:
+        lines.append(f'{indent}  <span class="venue-listed">Listed as “{html.escape(listed)}”</span>')
+    lines.append(f'{indent}</span>')
+    return lines
+
+
+def _render_site_film(group: list[MatchedScreening]) -> str:
+    """By-day view: one card for one film on one day, with a row per venue."""
+    lines = _film_header_lines(group)
     lines.append('      <ul class="screening-venues">')
     for ms in group:
-        scr = ms.screening
-        tags = []
-        if scr.notes:
-            tags.extend(t.strip() for t in scr.notes.split("•") if t.strip())
-        if scr.presenter:
-            tags.append(f"pres. by {scr.presenter}")
-        listed = _listed_as(ms)
         lines.append('        <li class="screening-venue">')
-        lines.append(f'          <span class="venue-name">{html.escape(scr.theater or "Venue TBA")}</span>')
-        lines.append('          <span class="venue-showings">')
-        lines.append(f'            <span class="venue-times">{html.escape(", ".join(scr.times))}</span>')
-        for t in tags:
-            lines.append(f'            <span class="screening-tag">{html.escape(t)}</span>')
-        if listed:
-            lines.append(f'            <span class="venue-listed">Listed as “{html.escape(listed)}”</span>')
-        lines.append('          </span>')
+        lines.append(f'          <span class="venue-name">'
+                     f'{html.escape(ms.screening.theater or "Venue TBA")}</span>')
+        lines.extend(_showings_lines(ms, '          '))
+        lines.append('        </li>')
+    lines.append('      </ul>')
+    lines.append('    </div>')
+    return "\n".join(lines)
+
+
+def _title_sort_key(ms: MatchedScreening) -> str:
+    """Alphabetical order for the by-movie view, ignoring a leading article
+    and case ("The Age of Innocence" sorts under A)."""
+    film, match = ms.screening.films[0], ms.matches[0]
+    return normalize_title(match.title if match is not None else film.title)
+
+
+def _group_by_film_for_week(matches: list[MatchedScreening]) -> list[list[MatchedScreening]]:
+    """Group the whole week's screenings by film, films in alphabetical order,
+    each film's screenings in date, time and venue order."""
+    groups: dict[tuple, list[MatchedScreening]] = {}
+    for ms in matches:
+        groups.setdefault(_film_key(ms), []).append(ms)
+    out = []
+    for items in groups.values():
+        items.sort(key=lambda m: (m.screening.day, _sort_key(m.screening.times),
+                                  m.screening.theater.lower()))
+        out.append(items)
+    out.sort(key=lambda g: _title_sort_key(g[0]))
+    return out
+
+
+def _render_site_film_week(group: list[MatchedScreening]) -> str:
+    """By-movie view: one card for one film across the week, with a row per
+    day and venue. The day label appears on the first row of each day."""
+    showtimes = sum(len(m.screening.times) for m in group)
+    days = len({m.screening.day for m in group})
+    extra = (f'{showtimes} showtime{"s" if showtimes != 1 else ""} '
+             f'on {days} day{"s" if days != 1 else ""}')
+    lines = _film_header_lines(group, extra_meta=extra)
+    lines.append('      <ul class="screening-venues screening-week">')
+    prev_day = None
+    for ms in group:
+        day = ms.screening.day
+        new_day = day != prev_day
+        prev_day = day
+        klass = "screening-venue" + (" new-day" if new_day else "")
+        label = day.strftime("%a, %b %-d")
+        lines.append(f'        <li class="{klass}">')
+        # Repeat rows of the same day keep the date for screen readers but hide
+        # it visually, so each day's rows read as one block.
+        if new_day:
+            lines.append(f'          <span class="venue-day">{html.escape(label)}</span>')
+        else:
+            lines.append(f'          <span class="venue-day"><span class="visually-hidden">'
+                         f'{html.escape(label)}</span></span>')
+        lines.append(f'          <span class="venue-name">'
+                     f'{html.escape(ms.screening.theater or "Venue TBA")}</span>')
+        lines.extend(_showings_lines(ms, '          '))
         lines.append('        </li>')
     lines.append('      </ul>')
     lines.append('    </div>')
