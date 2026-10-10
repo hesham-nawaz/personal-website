@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blogpost &amp; Paper Reviews | Hesham Nawaz</title>
     <meta name="description" content="My notes on engineering blog posts and papers about applied ML and LLM systems, searchable by company and topic.">
-    <link rel="stylesheet" href="styles.css?v=22f02988">
+    <link rel="stylesheet" href="styles.css?v=0842a42c">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -71,11 +71,27 @@
         </div>
 
         <!-- READING:START -->
-<section class="reading-section" data-content-hash="311de258ea8a761a">
+<section class="reading-section" data-content-hash="b440df537f5381bb">
 <script type="application/json" id="reading-tag-defs">{"Search": {"group": "Topic", "definition": "Retrieval and ranking for user queries."}, "Query Understanding": {"group": "Topic", "definition": "Working out what a search query means: intent, categories, rewrites and expansion."}, "RecSys": {"group": "Topic", "definition": "Recommendations and personalization."}, "Classification": {"group": "Topic", "definition": "Assigning labels or categories to items such as content, emails, transactions or listings."}, "Information Extraction": {"group": "Topic", "definition": "Pulling structured fields out of documents, invoices, catalogs or contracts."}, "Trust & Safety": {"group": "Topic", "definition": "Content moderation, scams and platform abuse."}, "Security": {"group": "Topic", "definition": "Email security, phishing and cyberattack detection."}, "Customer Support": {"group": "Topic", "definition": "Conversational agents for support teams and contact centers."}, "Voice": {"group": "Topic", "definition": "Speech: transcription, voice agents and their latency."}, "ML": {"group": "Technique", "definition": "Trains or fine-tunes its own models, rather than only prompting off-the-shelf LLMs."}, "Classical ML": {"group": "Technique", "definition": "Gradient-boosted trees, logistic regression and hand-built tabular features."}, "Deep Learning": {"group": "Technique", "definition": "Neural networks the team trains itself, including transformers such as BERT."}, "Embeddings": {"group": "Technique", "definition": "Vector representations used for retrieval, similarity or as model features."}, "Fine-tuning": {"group": "Technique", "definition": "Adapting a pretrained model to the task, including distilling it into a smaller one."}, "LLMs": {"group": "Technique", "definition": "Builds on large language models through prompting, fine-tuning or orchestration."}, "Agents": {"group": "Technique", "definition": "LLM systems that plan and call tools over several steps, including multi-agent setups."}, "RAG": {"group": "Technique", "definition": "Retrieving context to ground an LLM's answer."}, "Evals": {"group": "Technique", "definition": "Measuring quality: offline evaluation, benchmarks, test suites and A/B tests."}, "LLM-as-a-Judge": {"group": "Technique", "definition": "Using an LLM to grade outputs, and checking whether that judge can be trusted."}, "Calibration": {"group": "Technique", "definition": "Turning model scores into probabilities or confidence you can act on."}, "Human-in-the-Loop": {"group": "Technique", "definition": "Human review or labeling built into the system."}, "Computer Vision": {"group": "Technique", "definition": "Models that work on images or video."}, "ML Infra": {"group": "Technique", "definition": "Pipelines, serving, latency and platform work around models."}}</script>
-<p class="reading-updated">Last updated October 9, 2026</p>
+<p class="reading-updated">Last updated October 10, 2026</p>
 <div class="reading-list">
-<article class="reading-entry" id="sierra-voice-ai-is-only-as-good-as-what-it-hears" data-company="Sierra" data-tags="Customer Support|Voice|Agents|Evals" data-year="2026" data-type="Blogpost" data-order="0">
+<article class="reading-entry" id="modus-financialauditbench-benchmark-construction-under-differential-privacy" data-company="Modus" data-tags="" data-year="" data-type="" data-order="0">
+  <div class="reading-head">
+    <div class="reading-meta"><button type="button" class="reading-company" data-company="Modus"><img class="reading-logo" src="reading/logos/modus.png?v=cbb521d5" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Modus</span></button> <span aria-hidden="true">·</span> <a class="reading-original" href="https://modusalliance.com/insights/introducing-financial-audit-bench/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
+    <h2 class="reading-title"><a href="#modus-financialauditbench-benchmark-construction-under-differential-privacy">FinancialAuditBench: Benchmark Construction under Differential Privacy Using Real-World Priors</a></h2>
+    <ul class="reading-tags"></ul>
+  </div>
+  <details class="reading-review">
+    <summary>My notes</summary>
+    <div class="reading-body">
+<ul><li><a href="https://modusalliance.com/insights/introducing-financial-audit-bench/" target="_blank" rel="noopener">Blogpost</a></li><li><a href="https://arxiv.org/pdf/2609.32835" target="_blank" rel="noopener">Paper</a></li></ul>
+<h3>Some key insights/new things I learned</h3><ul><li>Terminology<ul><li>An <em><strong>engagement</strong></em> is the audit of a company for a specific reporting period, usually a fiscal year. </li><li><em><strong>Prepared-by-client</strong></em> (PBC) files or PBCs are records, financial documents, and ledgers supplied by the audited company or client. </li><li>A <em><strong>workpaper</strong></em> is a spreadsheet organized using a predefined template in which auditors document procedures performed, evidence examined, and conclusions reached. </li><li>An engagement <em><strong>binder</strong></em> contains the materials for one synthetic audit engagement, including planning documents, client-provided records, third-party evidence, and blank workpaper templates.</li></ul></li></ul>
+<h3>Design Details</h3><ul><li><strong>Evaluation</strong><ul><li>Metric(s): </li></ul></li></ul>
+<h3>What I didn’t understand or am unsure about</h3><div class="table-wrap"><table class="qa-table"><thead><tr><th><p><strong>Question</strong></p></th><th><p><strong>Answer</strong></p></th></tr></thead><tbody><tr><td><p>“As AI agents are becoming widely adopted in the financial services industry” - what sub-industries are typically included in the financial services category?</p></td><td><p><strong>Background knowledge:</strong> Financial services usually covers banking (retail, commercial and investment), insurance, asset and wealth management, capital markets (brokerage, exchanges, trading), payments and fintech, and lending such as mortgages and consumer credit. Accounting, audit and tax firms are normally classed as professional services, even though they serve financial firms.</p><p><strong>Inference:</strong> That distinction weakens the paper's opening statistic. The 71% adoption figure comes from a survey of financial services firms, which is a different population from the CPA firms whose work FAB tests. It shows that auditors' clients are adopting AI, not that auditors are.</p></td></tr><tr><td><p>Why do audits happen in the first place? Who wants them to happen and who is paying for them? What is the incentive structure?</p></td><td><p><strong>Background knowledge:</strong> An audit gives outsiders independent assurance that a company's financial statements are fairly stated.</p><ul><li>Who requires it: US public companies must be audited under securities law. Private companies are usually audited because a lender, investor, buyer, regulator or grant-maker requires it, often as a loan condition.</li><li>Who pays: the audited company. That is a conflict of interest, controlled by independence rules, hiring through the board's audit committee at public companies, outside inspection (the PCAOB for public company audits, peer review for private ones), and the auditor's legal liability and reputation.</li><li>Incentives: management wants a clean opinion so it can borrow or raise money on better terms; investors and lenders want numbers they can rely on; the auditor wants the fee but bears the cost if a failed audit comes to light.</li></ul><p><strong>Inference:</strong> The blog's sample company, a synthetic manufacturer with a bank term loan that carries a loan-to-collateral covenant, fits the typical lender-driven private audit.</p></td></tr><tr><td><p>Why did Modus publish this benchmark in the first place? What do they get out of it?</p></td><td><p><strong>Inference:</strong> The benchmark serves that business in four ways: credibility on audit quality with partner firms, clients and regulators; recruiting AI researchers; an internal way to choose models (the blog argues for model-agnostic infrastructure); and influence over how the profession measures AI audit quality. Note the incentive: a company that buys audit firms and supplies their oversight benefits from the finding that agents need professional oversight.</p></td></tr><tr><td><p>“this domain is highly suitable for the strong information retrieval and reasoning capabilities that agents have shown to possess”</p><p>Why?</p></td><td><p><strong>Inference:</strong> The fit comes from the shape of the work. Evidence is mostly text and tables in PDFs and spreadsheets; procedures are written out step by step in templates; many steps are lookups, comparisons and arithmetic an agent can do in code; and most answers can be checked against documents.</p><p><strong>From the paper (Table 3):</strong> The results show where the fit ends. Average strict pass is 94.5% on journal-entry completeness, which is mostly mechanical, but 7.6% on revenue and 4.2% on accounts receivable, where the agent must judge which evidence to trust. "Highly suitable" holds for retrieval and calculation, not yet for evidence judgment.</p></td></tr><tr><td><p>“further progress in the evaluation and training of frontier models is increasingly constrained by the amount of accessible data”</p><p>What do they mean by "training" here?</p></td><td><p><strong>From the paper:</strong> They mean training frontier models. The conclusion says the framework can generate tasks for model training and evaluation in privacy-sensitive domains, and the citations (Villalobos et al.; Muennighoff et al.) are about running out of human-written data to train large models.</p><p><strong>Inference:</strong> The most likely use is post-training. Each generated binder plus its rubric is a reinforcement learning environment with a checkable reward, and expert or model trajectories can serve as fine-tuning data. The generator can make unlimited consistent binders, which real client data can never supply. That also points to a commercial angle: selling training environments to AI labs in a domain where real data can't be shared.</p></td></tr><tr><td><p>“use large language models (LLMs) to propose and validate tasks”</p><p>What does this mean?</p></td><td><p><strong>Background knowledge:</strong> In those methods an LLM explores an environment such as a website and writes candidate tasks, for example "find the cheapest flight from this page." An LLM then attempts each task and checks whether it is feasible and was solved, and the tasks that pass are kept. No human writes the tasks.</p><p><strong>Inference:</strong> The contrast the paper draws is that LLM-invented tasks reflect what a model finds plausible, and an LLM checking an LLM can share its blind spots. FAB grounds its values in private historical statistics and uses auditors as reviewers. It still uses LLMs at many steps: proposing and ranking variables, extracting values from historical binders, adding graph edges, writing feasibility tests, and copying rubric structure across tasks.</p></td></tr><tr><td><p>“require many hours of work by domain experts”</p><p>What role do the domain experts play exactly?</p></td><td><p><strong>From the paper:</strong> Auditors contributed a little over 1,100 hours in four kinds of work:</p><ul><li>Design: fifteen auditors identified the information used in these audits; three auditors assessed LLM-proposed variables, with a senior auditor (more than ten years of experience) consolidating; auditors defined the graph's variables, dependencies and accounting rules.</li><li>Quality control: auditors reviewed each round of generated binders for inconsistencies, implausible content, formatting problems and missing documents.</li><li>Labeling: at least one CPA completed or reviewed each reference workpaper and a senior auditor adjudicated; a senior auditor wrote example rubrics, and CPAs revised all rubrics against model outputs.</li><li>Analysis: auditors ran the failure review and estimated manual completion times.</li></ul><p><strong>Inference:</strong> In the expert-built benchmarks the paper contrasts itself with, experts write each task by hand. Here they mostly write rules and check outputs, which is what lets the generator scale.</p></td></tr><tr><td><p>“Task structure in FinancialAuditBench. The agent uses the provided supporting documents to perform the appropriate audit procedures in a workpaper template”</p><p>What is a workpaper and what does it mean to complete one?</p></td><td><p><strong>From the paper:</strong> A workpaper is a spreadsheet, built from a predefined template, where auditors record the procedures performed, the evidence examined and the conclusions reached. Figure 1 shows a cash lead sheet (a summary of one account area) listing each bank account's balance per the trial balance (the list of all ledger account balances), per the bank reconciliation, and whether the two agree.</p><p><strong>From the blog post:</strong> The cash template lists 31 procedures across 7 tabs: lead sheet, bank confirmation, bank reconciliation, outstanding checks, cutoff, depository financial condition, and presentation and disclosure. For each procedure the preparer records applicability, execution, evidence, result, open issues and sign-off.</p><p><strong>Inference:</strong> Completing one means performing each listed procedure with the binder's evidence, filling in the tables with amounts, dates and references to source files, recording exceptions, and writing conclusions the evidence supports. The workpaper is the record that the work was done and what it showed.</p></td></tr><tr><td><p>“a domain that examines whether a company’s reported financials are supported by sufficient evidence and are accurately reported within a set of tolerance bounds”</p><p>Is this “sufficient evidence” always internal information or could it include external knowledge?</p></td><td><p><strong>Background knowledge:</strong> It includes external evidence, which is preferred. Auditing standards treat evidence as more reliable the more independent its source: evidence sent directly to the auditor by an outside party, such as a bank confirmation, is strongest; then outside documents held by the client, such as bank statements and vendor invoices; then documents the client creates itself. Evidence the auditor produces, such as recalculations or watching an inventory count, is also strong. Public information is used too, for example the FDIC insurance limit or a bank's credit rating.</p><p><strong>From the paper:</strong> Binders contain client-provided records, third-party evidence, auditor-developed materials and public information. One of the four failure types is relying on client documents where third-party evidence was needed.</p><p><strong>Inference:</strong> "Sufficient" refers to both quantity and quality: enough items, from sources reliable enough for the assessed risk.</p></td></tr><tr><td><p>“a domain that examines whether a company’s reported financials are supported by sufficient evidence and are accurately reported within a set of tolerance bounds”</p><p>What’s the purpose of the tolerance bounds? Shouldn’t accounting be deterministic?</p></td><td><p><strong>Background knowledge:</strong> The tolerance bound is materiality: the size of misstatement that could change a reader's decisions. Bookkeeping arithmetic is deterministic, but financial statements are not, for two reasons. Many balances are estimates, such as the allowance for credit losses (expected bad debts) or obsolete inventory. And auditors test samples rather than every transaction, so they give reasonable assurance, not certainty; checking every cent would cost more than the extra accuracy is worth.</p><p><strong>From the blog post:</strong> The sample engagement sets overall materiality at $64,880, performance materiality (a lower working threshold) at $48,660, and a clearly trivial threshold of $3,244. In the cash run, a $108.29 difference between two bank statements was trivial in amount but was still flagged, because contradictory documents raise a question about the evidence itself.</p></td></tr><tr><td><p>“Auditors identify areas where significant reporting errors could occur”</p><p>What does this mean?</p></td><td><p><strong>Background knowledge:</strong> This is risk assessment. For each account, auditors judge how likely a material misstatement is for each assertion, meaning each claim the numbers make: the item exists, the record is complete, it is valued correctly, it is in the right period (cutoff), and it belongs to the company. Risk rises with size, complexity, reliance on estimates, and incentives to misstate. Revenue near year-end is a standard high-risk area, because sales can be pushed into the wrong year to meet targets.</p><p><strong>From the blog post:</strong> The sample planning file rates cash existence as moderate risk and revenue occurrence as high.</p><p><strong>From the paper:</strong> In FAB this step is already done; the agent receives the assessed risks as input.</p></td></tr><tr><td><p>“Obtain supporting evidence”</p><p>How? What are they looking for?</p></td><td></td></tr><tr><td><p>“test the company’s reported amounts against that evidence”</p><p>What does this mean?</p></td><td></td></tr><tr><td><p>“Thus, a data room used for evaluation or training requires a set of financial records whose amounts, dates, and relationships are internally consistent across documents.”</p><p>Does it require just internal consistency or completeness/comprehensiveness as well?</p></td><td></td></tr><tr><td><p>“provide priors for a subset of selected variables”</p><p>What do they mean by variables here, and why are we subsetting them?</p></td><td></td></tr><tr><td><p>“a synthetic engagement binder”</p><p>What does this phrase mean?</p></td><td></td></tr><tr><td><p>“single-attempt task pass rate of 69.17% (Pass@1)”</p><p>What is this metric? What are the numerator and the denominator? And how is passˆ8 different?</p></td><td></td></tr><tr><td><p>“Overall, we believe the quality, scale, and complexity of FinancialAuditBench make it a realistic and representative benchmark for evaluating agents’ abilities to complete common financial auditing procedures.”</p><p>How do they gauge the quality of the benchmark itself?</p></td><td></td></tr><tr><td><p>“containing 90 tasks across six synthetic audit engagements”</p><p>What's the difference between a task and an engagement?</p></td><td></td></tr><tr><td><p>“Benchmarks for AI systems. Benchmarks for agent evaluation have progressed from information retrieval tasks to longer-horizon, real-world tasks.”</p><p>In what ways specifically does the general literature on benchmarks for AI systems inform the work they've done here?</p></td><td></td></tr><tr><td><p>What are the shortcomings of the other accounting benchmarks they cited that necessitated their methodology?</p></td><td></td></tr><tr><td><p>“a workpaper is a spreadsheet organized using a predefined template in which auditors document procedures performed, evidence examined, and conclusions reached”</p><p>In what way does the template organize this spreadsheet?</p></td><td></td></tr><tr><td><p>“a workpaper is a spreadsheet organized using a predefined template in which auditors document procedures performed, evidence examined, and conclusions reached”</p><p>How can you document procedures performed and evidence examined in a single spreadsheet? Does that not require significant amounts of text that might not fit?</p></td><td></td></tr><tr><td><p>“including planning documents”</p><p>What do planning documents mean here?</p></td><td></td></tr><tr><td><p>“blank workpaper templates”</p><p>Why are there multiple templates?</p></td><td></td></tr><tr><td><p>“The benchmark includes financial documents for six synthetic companies spanning two industries, manufacturing and staffing services”</p><p>Is there a reason it focused on these two industries specifically?</p></td><td></td></tr><tr><td><p>“Each synthetic company’s binder includes either seven or eight workpapers, depending on industry, that can be independently completed, where a single task corresponds to completing or reviewing one workpaper.”</p><p>Why are there multiple workpapers, and what's the difference between them?</p></td><td></td></tr><tr><td><p>“In aggregate, FinancialAuditBench comprises 45 main tasks that measure workpaper completion performance and 45 corresponding review tasks.”</p><p>What's the difference between a completion and a review task?</p></td><td></td></tr><tr><td><p>“Agents receive an audit plan and assessed risks as inputs”</p><p>What does "assessed risk" mean, and why is that being given as an agent's input?</p></td><td></td></tr><tr><td><p>“the workpaper templates specify the procedures to perform”</p><p>Does a single template contain multiple procedures?</p></td><td></td></tr><tr><td><p>“The synthetic client binders, moreover, are designed to provide much of the supporting documentation required to complete these procedures, while limiting common errors and ambiguities in the supporting information”</p><p>Why limiting but not eliminating? Is it to make it more reflective of real life?</p></td><td></td></tr><tr><td><p>“Completed workpapers are graded against rubrics covering an auditor-guided sample of data points, calculations, and conclusions, using reference answers prepared and/or reviewed by CPA-licensed auditors.”</p><p>Are the reference answers numbers or free-form text? If it's the latter, how do you grade them?</p></td><td></td></tr><tr><td><p>“where reviewers exercise judgment about what to examine rather than systematically reperforming every procedure or checking every cell”</p><p>How do they determine what to examine?</p></td><td></td></tr><tr><td><p>“The rubrics contain an average of ten scored checks per workpaper, and a workpaper receives a passing score when all applicable criteria are met”</p><p>What are some examples of the relevant checks?</p></td><td></td></tr><tr><td><p>“it fails under a strict all-or-nothing grading metric”</p><p>Why do they have an all-or-nothing metric as opposed to something more granular?</p></td><td></td></tr><tr><td><p>“An engagement binder contains over a hundred financial documents that describe snapshots of the same shared underlying business activities”</p><p>What are some examples of the most common kinds of documents?</p></td><td></td></tr><tr><td><p>“At a high level, the graph contains three types of nodes. Source nodes encode user-defined inputs or values sampled from predefined distributions, conditionally sampled nodes draw values from distributions determined by the values of their parent node(s), and deterministic nodes apply accounting rules or calculations.”</p><p>What are examples of quantities that would fall in each category and why?</p></td><td></td></tr><tr><td><p>What are “auditor-developed materials”?</p></td><td></td></tr><tr><td><p>How is “third-party evidence” different from “public information”?</p></td><td></td></tr><tr><td><p>“An LLM then proposes candidate variables from these drafts, and three auditors independently assess each variable from its description and propose additions.”</p><p>What do they mean by candidate variables? Examples?</p></td><td></td></tr><tr><td><p>“In each round, the generator produces new binders”</p><p>New binders, as in completely new or updated? Why?</p></td><td></td></tr><tr><td><p>“A senior auditor reviewed the proposed ground truth answers, adjudicated disagreements, and corrected errors”</p><p>Disagreement in the event that multiple auditors had reviewed the proposed ground route? Or some other kind of disagreement?</p></td><td></td></tr><tr><td><p>“Subsequently, the rubrics were checked and revised by CPAs against multiple model submissions to assess their fairness and robustness.”</p><p>What do they mean by "against multiple model submissions" here?</p></td><td></td></tr><tr><td><p>What is the difference between rubric and the ground truth?</p></td><td></td></tr><tr><td><p>“eight independent runs per model-task pair”</p><p>Why eight runs? Also, what are the different sources of inconsistent behavior across runs?</p></td><td></td></tr><tr><td><p>“We evaluate all eleven models in a simple agent harness where the only tool provided to the agent is a bash tool, which executes shell commands”</p><p>How does it process PDFs if it only has access to a bash tool? Grep?</p></td><td></td></tr><tr><td><p>Is 69.17% the average across the 8 runs or is that pass@1?</p></td><td></td></tr><tr><td><p>“auditors compared workpapers completed by agents with reference workpapers completed by auditors and reperformed a limited subset of procedures.”</p><p>Which limited subset, and based on what?</p></td><td></td></tr><tr><td><p>“Failure to consider the effects of changes included cases where agents added information to the workpaper without assessing its downstream impacts (e.g., adding numeric details to a table when they should not have been included in the corresponding column total)”</p><p>I don't really understand this example.</p></td><td></td></tr><tr><td><p>“Insufficient retrieval” can’t really be distinguished from inaccurate retrieval, right?</p></td><td></td></tr><tr><td><p>“Insufficient retrieval”</p><p>Could the problem of insufficient retrieval be solved by modulating the number of model calls? Is there a better way to solve it?</p></td><td></td></tr><tr><td><p>“Inadequate evaluation of evidence sources included cases where agents vouched amounts to client-provided documents rather than third-party evidence”</p><p>Why is this a problem?</p></td><td></td></tr><tr><td><p>“These estimates exclude senior review and corrective rework and therefore do not establish equivalent time savings in practice.”</p><p>But those additional stages are excluded/included in both cases, right (whether it’s an agent or human doing it)? So the time savings should still apply?</p></td><td></td></tr><tr><td><p>“FinancialAuditBench includes 45 review tasks evaluated across ten models, with all models receiving the same starting workpaper”</p><p>What do they mean by “starting workpaper”?</p></td><td></td></tr><tr><td><p>“Claude Opus 5.5 achieves the largest improvement, increasing strict pass from 28.89%”</p><p>Where did the 28.89% number come from? Is this representative?</p></td><td></td></tr><tr><td><p>Why is the discussion on review tasks so much shorter than the discussion on completion tasks?</p></td><td></td></tr><tr><td><p>“To address these limitations, we restrict evaluation to workpaper sections that have well-defined ground truth, focusing on procedures that are common across financial statement audits in multiple industries.”</p><p>What are examples of those kinds of procedures?</p></td><td></td></tr><tr><td><p>“The overall process of a financial statement audit spans the general phases of planning, risk assessment, substantive fieldwork, concluding, and reporting”</p><p>What is the difference between these phases?</p></td><td></td></tr><tr><td><p>“Each firm organizes its workpapers differently and uses its own respective testing procedures, review processes, documentation processes, etc. that comply with applicable generally accepted auditing standards”</p><p>Is there any official criteria listed in any regulations or law somewhere?</p></td><td></td></tr><tr><td><p>“In this review setting, for each task, a completed workpaper from a randomly chosen model in the main experiments serves as the starting workpaper for every reviewing model.”</p><p>Why from a model as opposed to real life for review?</p></td><td></td></tr><tr><td><p>Any reporting of two-phase pipeline with the best model doing both completion and review?</p></td><td></td></tr><tr><td><p>Why is Astra reported separately?</p></td><td></td></tr><tr><td><p>“The default caching policy is used for all models.”</p><p>What is the default caching policy?</p></td><td></td></tr><tr><td><p>“Other parameters not explicitly outlined here retain their default values.”</p><p>What would those other parameters be?</p></td><td></td></tr><tr><td><p>“The agent harness does not perform context compaction or summarization.”</p><p>What happens if the context window limit is reached?</p></td><td></td></tr><tr><td><p>“n this work, rubrics are written by auditors who check the presence, absence, and/or correctness of specific cells or rows deemed vital in each workpaper.”</p><p>My understanding was that all cells will be present but the values in them may differ. Am I missing something?</p></td><td></td></tr><tr><td><p>“Agents may add or remove rows from each table during each task.”</p><p>Why would the agent do this?</p></td><td></td></tr><tr><td><p>“Our provided rubric criteria are then applied to each table via a keyed approach that first locates the column of the table to be evaluated and then extracts values from target row(s). This allows grading to accommodate changes in row positions without relying on fixed cell coordinates.”</p><p>I didn’t understand this.</p></td><td></td></tr><tr><td><p>“GPT-5.6 Luna with medium reasoning effort is used as the model for LLM-based evaluation.”</p><p>Why Luna?</p></td><td></td></tr><tr><td><p>"Access only the designated binder folder and its subfolders. Do not read, search, or modify files outside that folder, access other binders, or use websites or external data sources.”</p><p>Why is this restriction in the prompt as opposed to being an actual hard constraint somehow?</p></td><td></td></tr><tr><td><p>What is the purpose of the computer use experiment in the first place?</p></td><td></td></tr></tbody></table></div>
+    </div>
+  </details>
+</article>
+<article class="reading-entry" id="sierra-voice-ai-is-only-as-good-as-what-it-hears" data-company="Sierra" data-tags="Customer Support|Voice|Agents|Evals" data-year="2026" data-type="Blogpost" data-order="1">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Sierra"><img class="reading-logo" src="reading/logos/sierra.svg?v=1d5f9a9a" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Sierra</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://sierra.ai/blog/voice-ai-is-only-as-good-as-what-it-hears" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#sierra-voice-ai-is-only-as-good-as-what-it-hears">Voice AI is only as good as what it hears</a></h2>
@@ -88,7 +104,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="forus-we-built-agents-to-solve-the-last-mile-problem-pharmacy-selection" data-company="Forus" data-tags="LLMs|Agents" data-year="2026" data-type="Blogpost" data-order="1">
+<article class="reading-entry" id="forus-we-built-agents-to-solve-the-last-mile-problem-pharmacy-selection" data-company="Forus" data-tags="LLMs|Agents" data-year="2026" data-type="Blogpost" data-order="2">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Forus"><span class="reading-logo reading-logo-letter" aria-hidden="true">F</span><span class="reading-company-text">Forus</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://build.forus.com/we-built-agents-to-solve-the-last-mile-problem-pharmacy-selection?_gl=1*1jweud5*_up*MQ..*_ga*NDM1MjM3NTg3LjE3OTA4MTM5NTI.*_ga_CJLWJR4PVS*czE3OTA4MTM5NTEkbzEkZzAkdDE3OTA4MTM5NTEkajYwJGwwJGgwJGRvV1VjckJBTDM0enlMVkdXWXhyWkc4aUJnbUJ4MTJxaWhn" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#forus-we-built-agents-to-solve-the-last-mile-problem-pharmacy-selection">We built agents to solve the last mile problem: pharmacy selection</a></h2>
@@ -101,7 +117,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="forus-how-we-evaluate-our-llm-judge-a-perturbation-based-approach" data-company="Forus" data-tags="LLMs|Evals|LLM-as-a-Judge" data-year="2026" data-type="Blogpost" data-order="2">
+<article class="reading-entry" id="forus-how-we-evaluate-our-llm-judge-a-perturbation-based-approach" data-company="Forus" data-tags="LLMs|Evals|LLM-as-a-Judge" data-year="2026" data-type="Blogpost" data-order="3">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Forus"><span class="reading-logo reading-logo-letter" aria-hidden="true">F</span><span class="reading-company-text">Forus</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://build.forus.com/how-we-evaluate-our-llm-judge-a-perturbation-based-approach" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#forus-how-we-evaluate-our-llm-judge-a-perturbation-based-approach">How we evaluate our LLM judge: a perturbation-based approach</a></h2>
@@ -118,7 +134,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="cresta-building-and-deploying-productiongrade-ai-agents-crestas-endtoend" data-company="Cresta" data-tags="Customer Support|Voice|LLMs|Agents|Evals" data-year="2025" data-type="Blogpost" data-order="3">
+<article class="reading-entry" id="cresta-building-and-deploying-productiongrade-ai-agents-crestas-endtoend" data-company="Cresta" data-tags="Customer Support|Voice|LLMs|Agents|Evals" data-year="2025" data-type="Blogpost" data-order="4">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Cresta"><img class="reading-logo" src="reading/logos/cresta.png?v=8ffa0ac7" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Cresta</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://cresta.com/blog/building-and-deploying-production-grade-ai-agents-crestas-end-to-end-approach" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#cresta-building-and-deploying-productiongrade-ai-agents-crestas-endtoend">Building and Deploying Production‑Grade AI Agents: Cresta’s End‑to‑End Approach</a></h2>
@@ -132,7 +148,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="cresta-why-you-cant-trust-out-of-the-box-evaluators" data-company="Cresta" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="4">
+<article class="reading-entry" id="cresta-why-you-cant-trust-out-of-the-box-evaluators" data-company="Cresta" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="5">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Cresta"><img class="reading-logo" src="reading/logos/cresta.png?v=8ffa0ac7" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Cresta</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://cresta.com/blog/why-you-cant-trust-out-of-the-box-evaluators" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#cresta-why-you-cant-trust-out-of-the-box-evaluators">Why You Can’t Trust Out-of-the-Box Evaluators</a></h2>
@@ -145,7 +161,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="cresta-when-to-use-what-a-practical-guide-to-ai-agent-testing-and-evaluation" data-company="Cresta" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="5">
+<article class="reading-entry" id="cresta-when-to-use-what-a-practical-guide-to-ai-agent-testing-and-evaluation" data-company="Cresta" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="6">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Cresta"><img class="reading-logo" src="reading/logos/cresta.png?v=8ffa0ac7" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Cresta</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://cresta.com/blog/when-to-use-what-a-practical-guide-to-ai-agent-testing-and-evaluation" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#cresta-when-to-use-what-a-practical-guide-to-ai-agent-testing-and-evaluation">When to Use What: A Practical Guide to AI Agent Testing and Evaluation</a></h2>
@@ -158,7 +174,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="cresta-the-new-world-of-non-deterministic-testing-and-evaluation" data-company="Cresta" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="6">
+<article class="reading-entry" id="cresta-the-new-world-of-non-deterministic-testing-and-evaluation" data-company="Cresta" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="7">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Cresta"><img class="reading-logo" src="reading/logos/cresta.png?v=8ffa0ac7" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Cresta</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://cresta.com/blog/the-new-world-of-non-deterministic-testing-and-evaluation" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#cresta-the-new-world-of-non-deterministic-testing-and-evaluation">The New World of Non-Deterministic Testing and Evaluation</a></h2>
@@ -172,7 +188,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="propel-could-llms-reduce-procedural-disenrollment-in-the-snap-program" data-company="Propel" data-tags="LLMs" data-year="2026" data-type="Blogpost" data-order="7">
+<article class="reading-entry" id="propel-could-llms-reduce-procedural-disenrollment-in-the-snap-program" data-company="Propel" data-tags="LLMs" data-year="2026" data-type="Blogpost" data-order="8">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Propel"><img class="reading-logo" src="reading/logos/propel.png?v=389f1c03" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Propel</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.linkedin.com/pulse/could-llms-reduce-procedural-disenrollment-snap-program-rouault-nxqdc/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#propel-could-llms-reduce-procedural-disenrollment-in-the-snap-program">Could LLMs reduce procedural disenrollment in the SNAP Program?</a></h2>
@@ -185,7 +201,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="decagon-the-evaluation-engine-behind-decagons-ai-agents" data-company="Decagon" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="8">
+<article class="reading-entry" id="decagon-the-evaluation-engine-behind-decagons-ai-agents" data-company="Decagon" data-tags="Customer Support|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="9">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Decagon"><img class="reading-logo" src="reading/logos/decagon.png?v=352c0e4b" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Decagon</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://decagon.ai/blog/evaluation-engine-ai-agents" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#decagon-the-evaluation-engine-behind-decagons-ai-agents">The evaluation engine behind Decagon’s AI agents</a></h2>
@@ -201,7 +217,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="decagon-optimizing-gepa-for-production-a-test-driven-approach-to-prompt" data-company="Decagon" data-tags="Customer Support|LLMs|Evals|LLM-as-a-Judge" data-year="2026" data-type="Blogpost" data-order="9">
+<article class="reading-entry" id="decagon-optimizing-gepa-for-production-a-test-driven-approach-to-prompt" data-company="Decagon" data-tags="Customer Support|LLMs|Evals|LLM-as-a-Judge" data-year="2026" data-type="Blogpost" data-order="10">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Decagon"><img class="reading-logo" src="reading/logos/decagon.png?v=352c0e4b" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Decagon</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://decagon.ai/blog/optimizing-gepa-for-production" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#decagon-optimizing-gepa-for-production-a-test-driven-approach-to-prompt">Optimizing GEPA for production: A test-driven approach to prompt engineering</a></h2>
@@ -217,7 +233,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="decagon-designing-low-latency-ai-agents-through-reranker-optimization" data-company="Decagon" data-tags="Search|Voice|RAG|ML Infra" data-year="2026" data-type="Blogpost" data-order="10">
+<article class="reading-entry" id="decagon-designing-low-latency-ai-agents-through-reranker-optimization" data-company="Decagon" data-tags="Search|Voice|RAG|ML Infra" data-year="2026" data-type="Blogpost" data-order="11">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Decagon"><img class="reading-logo" src="reading/logos/decagon.png?v=352c0e4b" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Decagon</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://decagon.ai/blog/designing-low-latency-ai-agents-through-reranker-optimization" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#decagon-designing-low-latency-ai-agents-through-reranker-optimization">Designing low-latency AI agents through reranker optimization</a></h2>
@@ -234,7 +250,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="harvey-how-we-rebuilt-playbook-review-as-a-multi-agent-system" data-company="Harvey" data-tags="LLMs|Agents" data-year="2026" data-type="Blogpost" data-order="11">
+<article class="reading-entry" id="harvey-how-we-rebuilt-playbook-review-as-a-multi-agent-system" data-company="Harvey" data-tags="LLMs|Agents" data-year="2026" data-type="Blogpost" data-order="12">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Harvey"><img class="reading-logo" src="reading/logos/harvey.png?v=5e6d32e9" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Harvey</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.harvey.ai/blog/rebuilding-playbook-review-as-a-multi-agent-system" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#harvey-how-we-rebuilt-playbook-review-as-a-multi-agent-system">How We Rebuilt Playbook Review as a Multi-Agent System</a></h2>
@@ -251,7 +267,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="anthropic-effective-context-engineering-for-ai-agents" data-company="Anthropic" data-tags="LLMs|Agents" data-year="2025" data-type="Blogpost" data-order="12">
+<article class="reading-entry" id="anthropic-effective-context-engineering-for-ai-agents" data-company="Anthropic" data-tags="LLMs|Agents" data-year="2025" data-type="Blogpost" data-order="13">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Anthropic"><img class="reading-logo" src="reading/logos/anthropic.png?v=c9192291" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Anthropic</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#anthropic-effective-context-engineering-for-ai-agents">Effective context engineering for AI agents</a></h2>
@@ -267,7 +283,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-how-abnormal-taught-ai-agents-to-write-detectors" data-company="Abnormal AI" data-tags="Security|LLMs|Agents|Human-in-the-Loop" data-year="2026" data-type="Blogpost" data-order="13">
+<article class="reading-entry" id="abnormal-ai-how-abnormal-taught-ai-agents-to-write-detectors" data-company="Abnormal AI" data-tags="Security|LLMs|Agents|Human-in-the-Loop" data-year="2026" data-type="Blogpost" data-order="14">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://abnormal.ai/blog/ai-agents-build-detectors" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-how-abnormal-taught-ai-agents-to-write-detectors">How Abnormal Taught AI Agents To Write Detectors</a></h2>
@@ -280,7 +296,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="ramp-how-ramp-fixes-merchant-matches-with-ai" data-company="Ramp" data-tags="LLMs|Agents|RAG" data-year="2025" data-type="Blogpost" data-order="14">
+<article class="reading-entry" id="ramp-how-ramp-fixes-merchant-matches-with-ai" data-company="Ramp" data-tags="LLMs|Agents|RAG" data-year="2025" data-type="Blogpost" data-order="15">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Ramp"><img class="reading-logo" src="reading/logos/ramp.png?v=61f4fbf3" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Ramp</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://engineering.ramp.com/post/fixing-merchant-classifications-with-ai" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#ramp-how-ramp-fixes-merchant-matches-with-ai">How Ramp Fixes Merchant Matches with AI</a></h2>
@@ -296,7 +312,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="harvey-rebuilding-the-review-algorithm-to-increase-accuracy-and-speed" data-company="Harvey" data-tags="Information Extraction|LLMs" data-year="2026" data-type="Blogpost" data-order="15">
+<article class="reading-entry" id="harvey-rebuilding-the-review-algorithm-to-increase-accuracy-and-speed" data-company="Harvey" data-tags="Information Extraction|LLMs" data-year="2026" data-type="Blogpost" data-order="16">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Harvey"><img class="reading-logo" src="reading/logos/harvey.png?v=5e6d32e9" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Harvey</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.harvey.ai/blog/rebuilding-harveys-review-algorithm" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#harvey-rebuilding-the-review-algorithm-to-increase-accuracy-and-speed">Rebuilding the Review Algorithm to Increase Accuracy and Speed</a></h2>
@@ -313,7 +329,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="instacart-building-the-intent-engine-how-instacart-is-revamping-query" data-company="Instacart" data-tags="Search|Query Understanding|Fine-tuning|LLMs" data-year="2025" data-type="Blogpost" data-order="16">
+<article class="reading-entry" id="instacart-building-the-intent-engine-how-instacart-is-revamping-query" data-company="Instacart" data-tags="Search|Query Understanding|Fine-tuning|LLMs" data-year="2025" data-type="Blogpost" data-order="17">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Instacart"><img class="reading-logo" src="reading/logos/instacart.png?v=31cc81ce" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Instacart</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost</div>
     <h2 class="reading-title"><a href="#instacart-building-the-intent-engine-how-instacart-is-revamping-query">Building The Intent Engine: How Instacart is Revamping Query Understanding with LLMs</a></h2>
@@ -330,7 +346,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-lessons-from-building-ai-to-stop-cyberattacks" data-company="Abnormal AI" data-tags="Classification|Security|ML" data-year="2019" data-type="Blogpost" data-order="17">
+<article class="reading-entry" id="abnormal-ai-lessons-from-building-ai-to-stop-cyberattacks" data-company="Abnormal AI" data-tags="Classification|Security|ML" data-year="2019" data-type="Blogpost" data-order="18">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2019 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://medium.com/abnormal-security-engineering-blog/lessons-from-building-ai-to-stop-cyberattacks-7d593250989c" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-lessons-from-building-ai-to-stop-cyberattacks">Lessons from building AI to Stop Cyberattacks</a></h2>
@@ -343,7 +359,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="doordash-building-doordashs-product-knowledge-graph-with-large-language-models" data-company="DoorDash" data-tags="Information Extraction|LLMs" data-year="2024" data-type="Blogpost" data-order="18">
+<article class="reading-entry" id="doordash-building-doordashs-product-knowledge-graph-with-large-language-models" data-company="DoorDash" data-tags="Information Extraction|LLMs" data-year="2024" data-type="Blogpost" data-order="19">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="DoorDash"><img class="reading-logo" src="reading/logos/doordash.ico?v=dcee9c93" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">DoorDash</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://careersatdoordash.com/blog/building-doordashs-product-knowledge-graph-with-large-language-models/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#doordash-building-doordashs-product-knowledge-graph-with-large-language-models">Building DoorDash’s product knowledge graph with large language models</a></h2>
@@ -359,7 +375,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-re-scoring-an-ml-detection-engine-on-past-attacks-part-1" data-company="Abnormal AI" data-tags="Security|ML|Evals|ML Infra" data-year="2021" data-type="Blogpost" data-order="19">
+<article class="reading-entry" id="abnormal-ai-re-scoring-an-ml-detection-engine-on-past-attacks-part-1" data-company="Abnormal AI" data-tags="Security|ML|Evals|ML Infra" data-year="2021" data-type="Blogpost" data-order="20">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2021 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://medium.com/abnormal-security-engineering-blog/re-scoring-an-ml-detection-engine-on-past-attacks-part-1-2845fd9f09f6" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-re-scoring-an-ml-detection-engine-on-past-attacks-part-1">Re-Scoring an ML Detection Engine on Past Attacks (part 1)</a></h2>
@@ -372,7 +388,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="spotify-building-confidence-a-case-study-in-how-to-create-confidence-scores-for" data-company="Spotify" data-tags="Information Extraction|LLMs|Calibration|Human-in-the-Loop" data-year="2024" data-type="Blogpost" data-order="20">
+<article class="reading-entry" id="spotify-building-confidence-a-case-study-in-how-to-create-confidence-scores-for" data-company="Spotify" data-tags="Information Extraction|LLMs|Calibration|Human-in-the-Loop" data-year="2024" data-type="Blogpost" data-order="21">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Spotify"><img class="reading-logo" src="reading/logos/spotify.png?v=3fab5a12" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Spotify</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://engineering.atspotify.com/2024/12/building-confidence-a-case-study-in-how-to-create-confidence-scores-for-genai-applications" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#spotify-building-confidence-a-case-study-in-how-to-create-confidence-scores-for">Building Confidence: A Case Study in How to Create Confidence Scores for GenAI Applications</a></h2>
@@ -389,7 +405,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="doordash-evolving-doordashs-substitution-recommendations-algorithm" data-company="DoorDash" data-tags="RecSys|ML|Classical ML|Deep Learning|Embeddings" data-year="2022" data-type="Blogpost" data-order="21">
+<article class="reading-entry" id="doordash-evolving-doordashs-substitution-recommendations-algorithm" data-company="DoorDash" data-tags="RecSys|ML|Classical ML|Deep Learning|Embeddings" data-year="2022" data-type="Blogpost" data-order="22">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="DoorDash"><img class="reading-logo" src="reading/logos/doordash.ico?v=dcee9c93" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">DoorDash</span></button> <span aria-hidden="true">·</span> 2022 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://careersatdoordash.com/blog/evolving-doordashs-substitution-recommendations-algorithm/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#doordash-evolving-doordashs-substitution-recommendations-algorithm">Evolving DoorDash’s Substitution Recommendations Algorithm</a></h2>
@@ -406,7 +422,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-behavioral-ai-vs-general-purpose-llms-a-controlled-email-threat" data-company="Abnormal AI" data-tags="Classification|Security|LLMs|Evals" data-year="2026" data-type="Blogpost" data-order="22">
+<article class="reading-entry" id="abnormal-ai-behavioral-ai-vs-general-purpose-llms-a-controlled-email-threat" data-company="Abnormal AI" data-tags="Classification|Security|LLMs|Evals" data-year="2026" data-type="Blogpost" data-order="23">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://abnormal.ai/resources/white-papers/behavioral-ai-vs-llms" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-behavioral-ai-vs-general-purpose-llms-a-controlled-email-threat">Behavioral AI vs. General-Purpose LLMs: A Controlled Email Threat Detection Benchmark and Methodology</a></h2>
@@ -419,7 +435,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="instacart-how-instacart-uses-embeddings-to-improve-search-relevance" data-company="Instacart" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2022" data-type="Blogpost" data-order="23">
+<article class="reading-entry" id="instacart-how-instacart-uses-embeddings-to-improve-search-relevance" data-company="Instacart" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2022" data-type="Blogpost" data-order="24">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Instacart"><img class="reading-logo" src="reading/logos/instacart.png?v=31cc81ce" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Instacart</span></button> <span aria-hidden="true">·</span> 2022 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.instacart.com/company/tech-innovation/how-instacart-uses-embeddings-to-improve-search-relevance" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#instacart-how-instacart-uses-embeddings-to-improve-search-relevance">How Instacart Uses Embeddings to Improve Search Relevance</a></h2>
@@ -437,7 +453,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-how-abnormal-enhanced-its-detection-platform-with-bert-large" data-company="Abnormal AI" data-tags="Classification|Security|ML|Deep Learning|Fine-tuning" data-year="2022" data-type="Blogpost" data-order="24">
+<article class="reading-entry" id="abnormal-ai-how-abnormal-enhanced-its-detection-platform-with-bert-large" data-company="Abnormal AI" data-tags="Classification|Security|ML|Deep Learning|Fine-tuning" data-year="2022" data-type="Blogpost" data-order="25">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2022 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://abnormal.ai/blog/enhanced-detection-platform-bert-large-language-models" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-how-abnormal-enhanced-its-detection-platform-with-bert-large">How Abnormal Enhanced Its Detection Platform with BERT Large Language Models (LLMs)</a></h2>
@@ -450,7 +466,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-detecting-email-attacks-with-generative-llms" data-company="Abnormal AI" data-tags="Classification|Security|Fine-tuning|LLMs" data-year="2023" data-type="Blogpost" data-order="25">
+<article class="reading-entry" id="abnormal-ai-detecting-email-attacks-with-generative-llms" data-company="Abnormal AI" data-tags="Classification|Security|Fine-tuning|LLMs" data-year="2023" data-type="Blogpost" data-order="26">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2023 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://abnormal.ai/blog/detecting-email-attacks-with-generative-llms" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-detecting-email-attacks-with-generative-llms">Detecting Email Attacks with Generative LLMs</a></h2>
@@ -464,7 +480,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="anthropic-how-we-built-our-multi-agent-research-system" data-company="Anthropic" data-tags="LLMs|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="26">
+<article class="reading-entry" id="anthropic-how-we-built-our-multi-agent-research-system" data-company="Anthropic" data-tags="LLMs|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="27">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Anthropic"><img class="reading-logo" src="reading/logos/anthropic.png?v=c9192291" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Anthropic</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.anthropic.com/engineering/multi-agent-research-system" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#anthropic-how-we-built-our-multi-agent-research-system">How we built our multi-agent research system</a></h2>
@@ -481,7 +497,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="doppel-battling-scams-at-scale-inside-doppels-high-throughput-ml-platform" data-company="Doppel" data-tags="Trust &amp; Safety|Security|ML|ML Infra" data-year="2026" data-type="Blogpost" data-order="27">
+<article class="reading-entry" id="doppel-battling-scams-at-scale-inside-doppels-high-throughput-ml-platform" data-company="Doppel" data-tags="Trust &amp; Safety|Security|ML|ML Infra" data-year="2026" data-type="Blogpost" data-order="28">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Doppel"><img class="reading-logo" src="reading/logos/doppel.png?v=643752c0" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Doppel</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.doppel.com/blog/battling-scams-scale-inside-doppels-high-throughput-ml-platform" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#doppel-battling-scams-at-scale-inside-doppels-high-throughput-ml-platform">Battling Scams at Scale: Inside Doppel’s High-Throughput ML Platform</a></h2>
@@ -494,7 +510,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-model-calibration-when-subsampling-negatives" data-company="Abnormal AI" data-tags="Classification|Security|ML|Calibration" data-year="2019" data-type="Blogpost" data-order="28">
+<article class="reading-entry" id="abnormal-ai-model-calibration-when-subsampling-negatives" data-company="Abnormal AI" data-tags="Classification|Security|ML|Calibration" data-year="2019" data-type="Blogpost" data-order="29">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2019 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://nojeshua.medium.com/model-calibration-when-subsampling-negatives-548eb8790223" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-model-calibration-when-subsampling-negatives">Model Calibration when Subsampling Negatives</a></h2>
@@ -507,7 +523,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="spotify-evaluating-podcast-recommendations-with-profile-aware-llm-as-a-judge" data-company="Spotify" data-tags="RecSys|LLMs|Evals|LLM-as-a-Judge" data-year="2025" data-type="Paper" data-order="29">
+<article class="reading-entry" id="spotify-evaluating-podcast-recommendations-with-profile-aware-llm-as-a-judge" data-company="Spotify" data-tags="RecSys|LLMs|Evals|LLM-as-a-Judge" data-year="2025" data-type="Paper" data-order="30">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Spotify"><img class="reading-logo" src="reading/logos/spotify.png?v=3fab5a12" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Spotify</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://arxiv.org/pdf/2508.08777" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#spotify-evaluating-podcast-recommendations-with-profile-aware-llm-as-a-judge">Evaluating Podcast Recommendations with Profile-Aware LLM-as-a-Judge</a></h2>
@@ -525,7 +541,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="watershed-a-practical-framework-for-llm-system-evaluations-for-multi-step" data-company="Watershed" data-tags="LLMs|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="30">
+<article class="reading-entry" id="watershed-a-practical-framework-for-llm-system-evaluations-for-multi-step" data-company="Watershed" data-tags="LLMs|Agents|Evals|LLM-as-a-Judge" data-year="2025" data-type="Blogpost" data-order="31">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Watershed"><img class="reading-logo" src="reading/logos/watershed.svg?v=beb9043a" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Watershed</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://watershed.com/en-GB/blog/a-practical-framework-for-llm-system-evaluations-for-multi-step-processes" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#watershed-a-practical-framework-for-llm-system-evaluations-for-multi-step">A practical framework for LLM system evaluations for multi-step processes</a></h2>
@@ -542,7 +558,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="spotify-optimizing-query-expansions-via-llm-preference-alignment" data-company="Spotify" data-tags="Search|Query Understanding|Fine-tuning|LLMs" data-year="2025" data-type="Paper" data-order="31">
+<article class="reading-entry" id="spotify-optimizing-query-expansions-via-llm-preference-alignment" data-company="Spotify" data-tags="Search|Query Understanding|Fine-tuning|LLMs" data-year="2025" data-type="Paper" data-order="32">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Spotify"><img class="reading-logo" src="reading/logos/spotify.png?v=3fab5a12" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Spotify</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://research.atspotify.com/2025/7/optimizing-query-expansions-via-llm-preference-alignment" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#spotify-optimizing-query-expansions-via-llm-preference-alignment">Optimizing Query Expansions via LLM Preference Alignment</a></h2>
@@ -562,7 +578,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="anthropic-introducing-contextual-retrieval" data-company="Anthropic" data-tags="Search|Embeddings|LLMs|RAG" data-year="2024" data-type="Blogpost" data-order="32">
+<article class="reading-entry" id="anthropic-introducing-contextual-retrieval" data-company="Anthropic" data-tags="Search|Embeddings|LLMs|RAG" data-year="2024" data-type="Blogpost" data-order="33">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Anthropic"><img class="reading-logo" src="reading/logos/anthropic.png?v=c9192291" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Anthropic</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.anthropic.com/engineering/contextual-retrieval" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#anthropic-introducing-contextual-retrieval">Introducing Contextual Retrieval</a></h2>
@@ -580,7 +596,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="harvey-how-we-built-image-understanding-for-legal-documents" data-company="Harvey" data-tags="LLMs|Agents|Computer Vision" data-year="2026" data-type="Blogpost" data-order="33">
+<article class="reading-entry" id="harvey-how-we-built-image-understanding-for-legal-documents" data-company="Harvey" data-tags="LLMs|Agents|Computer Vision" data-year="2026" data-type="Blogpost" data-order="34">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Harvey"><img class="reading-logo" src="reading/logos/harvey.png?v=5e6d32e9" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Harvey</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.harvey.ai/blog/building-image-understanding-for-legal-documents" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#harvey-how-we-built-image-understanding-for-legal-documents">How we Built Image Understanding for Legal Documents</a></h2>
@@ -596,7 +612,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="reddit-reddits-llm-text-model-for-ads-safety" data-company="Reddit" data-tags="Classification|Trust &amp; Safety|ML|Deep Learning|Fine-tuning" data-year="2023" data-type="Blogpost" data-order="34">
+<article class="reading-entry" id="reddit-reddits-llm-text-model-for-ads-safety" data-company="Reddit" data-tags="Classification|Trust &amp; Safety|ML|Deep Learning|Fine-tuning" data-year="2023" data-type="Blogpost" data-order="35">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Reddit"><img class="reading-logo" src="reading/logos/reddit.png?v=b8198132" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Reddit</span></button> <span aria-hidden="true">·</span> 2023 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://sh.reddit.com/r/RedditEng/comments/16g7pn7/reddits_llm_text_model_for_ads_safety/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#reddit-reddits-llm-text-model-for-ads-safety">Reddit’s LLM text model for Ads Safety</a></h2>
@@ -614,7 +630,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="elicit-elicit-reports" data-company="Elicit" data-tags="LLMs|Agents|Evals" data-year="2025" data-type="Blogpost" data-order="35">
+<article class="reading-entry" id="elicit-elicit-reports" data-company="Elicit" data-tags="LLMs|Agents|Evals" data-year="2025" data-type="Blogpost" data-order="36">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Elicit"><img class="reading-logo" src="reading/logos/elicit.png?v=18789ffe" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Elicit</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://elicit.com/blog/elicit-reports-eval/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#elicit-elicit-reports">Elicit Reports</a></h2>
@@ -632,7 +648,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="ramp-financial-benchmarks" data-company="Ramp" data-tags="Information Extraction|LLMs|Evals" data-year="2026" data-type="Blogpost" data-order="36">
+<article class="reading-entry" id="ramp-financial-benchmarks" data-company="Ramp" data-tags="Information Extraction|LLMs|Evals" data-year="2026" data-type="Blogpost" data-order="37">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Ramp"><img class="reading-logo" src="reading/logos/ramp.png?v=61f4fbf3" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Ramp</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://builders.ramp.com/post/financial-benchmarks" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#ramp-financial-benchmarks">Financial Benchmarks</a></h2>
@@ -646,7 +662,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-an-abnormal-approach-to-machine-learning-feature-systems-and" data-company="Abnormal AI" data-tags="Classification|Security|ML|ML Infra" data-year="2023" data-type="Blogpost" data-order="37">
+<article class="reading-entry" id="abnormal-ai-an-abnormal-approach-to-machine-learning-feature-systems-and" data-company="Abnormal AI" data-tags="Classification|Security|ML|ML Infra" data-year="2023" data-type="Blogpost" data-order="38">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2023 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://abnormal.ai/blog/machine-learning-feature-systems-models" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-an-abnormal-approach-to-machine-learning-feature-systems-and">An Abnormal Approach to Machine Learning: Feature Systems and Language Models</a></h2>
@@ -659,7 +675,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="spotify-podtile-facilitating-podcast-episode-browsing-with-auto-generated" data-company="Spotify" data-tags="Search|ML|Deep Learning|Fine-tuning" data-year="2024" data-type="Paper" data-order="38">
+<article class="reading-entry" id="spotify-podtile-facilitating-podcast-episode-browsing-with-auto-generated" data-company="Spotify" data-tags="Search|ML|Deep Learning|Fine-tuning" data-year="2024" data-type="Paper" data-order="39">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Spotify"><img class="reading-logo" src="reading/logos/spotify.png?v=3fab5a12" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Spotify</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://arxiv.org/abs/2410.16148" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#spotify-podtile-facilitating-podcast-episode-browsing-with-auto-generated">PODTILE: Facilitating Podcast Episode Browsing with Auto-generated Chapters</a></h2>
@@ -677,7 +693,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="doordash-how-doordash-leverages-llms-for-better-search-retrieval" data-company="DoorDash" data-tags="Search|Query Understanding|LLMs|RAG" data-year="2024" data-type="Blogpost" data-order="39">
+<article class="reading-entry" id="doordash-how-doordash-leverages-llms-for-better-search-retrieval" data-company="DoorDash" data-tags="Search|Query Understanding|LLMs|RAG" data-year="2024" data-type="Blogpost" data-order="40">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="DoorDash"><img class="reading-logo" src="reading/logos/doordash.ico?v=dcee9c93" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">DoorDash</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://careersatdoordash.com/blog/how-doordash-leverages-llms-for-better-search-retrieval/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#doordash-how-doordash-leverages-llms-for-better-search-retrieval">How DoorDash leverages LLMs for better search retrieval</a></h2>
@@ -694,7 +710,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="spotify-contextualizing-spotifys-audiobook-list-recommendations-with" data-company="Spotify" data-tags="RecSys|LLMs" data-year="2025" data-type="Paper" data-order="40">
+<article class="reading-entry" id="spotify-contextualizing-spotifys-audiobook-list-recommendations-with" data-company="Spotify" data-tags="RecSys|LLMs" data-year="2025" data-type="Paper" data-order="41">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Spotify"><img class="reading-logo" src="reading/logos/spotify.png?v=3fab5a12" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Spotify</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://arxiv.org/pdf/2504.13572" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#spotify-contextualizing-spotifys-audiobook-list-recommendations-with">Contextualizing Spotify’s Audiobook List Recommendations with Descriptive Shelves</a></h2>
@@ -712,7 +728,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="pinterest-omnisearchsage-multi-task-multi-entity-embeddings-for-pinterest-search" data-company="Pinterest" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2024" data-type="Paper" data-order="41">
+<article class="reading-entry" id="pinterest-omnisearchsage-multi-task-multi-entity-embeddings-for-pinterest-search" data-company="Pinterest" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2024" data-type="Paper" data-order="42">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Pinterest"><img class="reading-logo" src="reading/logos/pinterest.png?v=09a54dc5" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Pinterest</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://arxiv.org/abs/2404.16260" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#pinterest-omnisearchsage-multi-task-multi-entity-embeddings-for-pinterest-search">OmniSearchSage: Multi-Task Multi-Entity Embeddings for Pinterest Search</a></h2>
@@ -729,7 +745,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="watershed-how-we-built-atlas-a-benchmark-for-spend-classification-in-scope-3" data-company="Watershed" data-tags="Classification|LLMs|Evals" data-year="2025" data-type="Paper" data-order="42">
+<article class="reading-entry" id="watershed-how-we-built-atlas-a-benchmark-for-spend-classification-in-scope-3" data-company="Watershed" data-tags="Classification|LLMs|Evals" data-year="2025" data-type="Paper" data-order="43">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Watershed"><img class="reading-logo" src="reading/logos/watershed.svg?v=beb9043a" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Watershed</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://ccai-papers.s3.us-east-1.amazonaws.com/neurips2024/70/paper.pdf" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#watershed-how-we-built-atlas-a-benchmark-for-spend-classification-in-scope-3">How we built ATLAS: a benchmark for spend classification in scope 3 carbon accounting</a></h2>
@@ -747,7 +763,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="doordash-agentic-multi-source-grounding-for-enhanced-query-intent-understanding" data-company="DoorDash" data-tags="Search|Query Understanding|Classification|LLMs|Agents" data-year="2026" data-type="Paper" data-order="43">
+<article class="reading-entry" id="doordash-agentic-multi-source-grounding-for-enhanced-query-intent-understanding" data-company="DoorDash" data-tags="Search|Query Understanding|Classification|LLMs|Agents" data-year="2026" data-type="Paper" data-order="44">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="DoorDash"><img class="reading-logo" src="reading/logos/doordash.ico?v=dcee9c93" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">DoorDash</span></button> <span aria-hidden="true">·</span> 2026 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://arxiv.org/abs/2603.01486" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#doordash-agentic-multi-source-grounding-for-enhanced-query-intent-understanding">Agentic Multi-Source Grounding for Enhanced Query Intent Understanding: A DoorDash Case Study</a></h2>
@@ -765,7 +781,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="elicit-from-grep-to-splade-a-journey-through-semantic-search" data-company="Elicit" data-tags="Search|Embeddings" data-year="2024" data-type="Blogpost" data-order="44">
+<article class="reading-entry" id="elicit-from-grep-to-splade-a-journey-through-semantic-search" data-company="Elicit" data-tags="Search|Embeddings" data-year="2024" data-type="Blogpost" data-order="45">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Elicit"><img class="reading-logo" src="reading/logos/elicit.png?v=18789ffe" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Elicit</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://elicit.com/blog/semantic-search/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#elicit-from-grep-to-splade-a-journey-through-semantic-search">From grep to SPLADE: A Journey Through Semantic Search</a></h2>
@@ -783,7 +799,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="ramp-improving-retrieval-on-ramp-with-transaction-embeddings" data-company="Ramp" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2024" data-type="Blogpost" data-order="45">
+<article class="reading-entry" id="ramp-improving-retrieval-on-ramp-with-transaction-embeddings" data-company="Ramp" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2024" data-type="Blogpost" data-order="46">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Ramp"><img class="reading-logo" src="reading/logos/ramp.png?v=61f4fbf3" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Ramp</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://engineering.ramp.com/post/transaction-embeddings" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#ramp-improving-retrieval-on-ramp-with-transaction-embeddings">Improving Retrieval on Ramp with Transaction Embeddings</a></h2>
@@ -800,7 +816,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="spotify-you-say-search-i-say-recs-a-scalable-agentic-approach-to-query" data-company="Spotify" data-tags="Search|Query Understanding|LLMs|Agents" data-year="2025" data-type="Paper" data-order="46">
+<article class="reading-entry" id="spotify-you-say-search-i-say-recs-a-scalable-agentic-approach-to-query" data-company="Spotify" data-tags="Search|Query Understanding|LLMs|Agents" data-year="2025" data-type="Paper" data-order="47">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Spotify"><img class="reading-logo" src="reading/logos/spotify.png?v=3fab5a12" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Spotify</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://research.atspotify.com/2025/9/you-say-search-i-say-recs-a-scalable-agentic-approach-to-query-understanding" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#spotify-you-say-search-i-say-recs-a-scalable-agentic-approach-to-query">You Say Search, I Say Recs: A Scalable Agentic Approach to Query Understanding and Exploratory Search at Spotify</a></h2>
@@ -818,7 +834,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="harvey-how-agentic-search-unlocks-legal-research-intelligence-at-harvey" data-company="Harvey" data-tags="Search|LLMs|Agents|RAG" data-year="2025" data-type="Blogpost" data-order="47">
+<article class="reading-entry" id="harvey-how-agentic-search-unlocks-legal-research-intelligence-at-harvey" data-company="Harvey" data-tags="Search|LLMs|Agents|RAG" data-year="2025" data-type="Blogpost" data-order="48">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Harvey"><img class="reading-logo" src="reading/logos/harvey.png?v=5e6d32e9" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Harvey</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.harvey.ai/blog/how-agentic-search-unlocks-legal-research-intelligence" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#harvey-how-agentic-search-unlocks-legal-research-intelligence-at-harvey">How Agentic Search Unlocks Legal Research Intelligence at Harvey</a></h2>
@@ -833,7 +849,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="pinterest-improving-pinterest-search-relevance-using-large-language-models" data-company="Pinterest" data-tags="Search|ML|Fine-tuning|LLMs" data-year="2025" data-type="Paper" data-order="48">
+<article class="reading-entry" id="pinterest-improving-pinterest-search-relevance-using-large-language-models" data-company="Pinterest" data-tags="Search|ML|Fine-tuning|LLMs" data-year="2025" data-type="Paper" data-order="49">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Pinterest"><img class="reading-logo" src="reading/logos/pinterest.png?v=09a54dc5" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Pinterest</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Paper <span aria-hidden="true">·</span> <a class="reading-original" href="https://medium.com/pinterest-engineering/improving-pinterest-search-relevance-using-large-language-models-4cd938d4e892" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#pinterest-improving-pinterest-search-relevance-using-large-language-models">Improving Pinterest Search Relevance Using Large Language Models</a></h2>
@@ -851,7 +867,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="reddit-building-mature-content-detection-for-mod-tools" data-company="Reddit" data-tags="Classification|Trust &amp; Safety|ML|Deep Learning|Computer Vision" data-year="2024" data-type="Blogpost" data-order="49">
+<article class="reading-entry" id="reddit-building-mature-content-detection-for-mod-tools" data-company="Reddit" data-tags="Classification|Trust &amp; Safety|ML|Deep Learning|Computer Vision" data-year="2024" data-type="Blogpost" data-order="50">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Reddit"><img class="reading-logo" src="reading/logos/reddit.png?v=b8198132" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Reddit</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.reddit.com/r/RedditEng/comments/185atgu/building_mature_content_detection_for_mod_tools/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#reddit-building-mature-content-detection-for-mod-tools">Building Mature Content Detection for Mod Tools</a></h2>
@@ -868,7 +884,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-innovating-email-protection-writing-detection-rules-with-llms" data-company="Abnormal AI" data-tags="Security|LLMs" data-year="2024" data-type="Blogpost" data-order="50">
+<article class="reading-entry" id="abnormal-ai-innovating-email-protection-writing-detection-rules-with-llms" data-company="Abnormal AI" data-tags="Security|LLMs" data-year="2024" data-type="Blogpost" data-order="51">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://abnormal.ai/blog/writing-detection-rules-with-llms" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-innovating-email-protection-writing-detection-rules-with-llms">Innovating Email Protection: Writing Detection Rules with LLMs</a></h2>
@@ -881,7 +897,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="ramp-from-rag-to-richness-how-ramp-revamped-industry-classification" data-company="Ramp" data-tags="Classification|Embeddings|LLMs|RAG" data-year="2025" data-type="Blogpost" data-order="51">
+<article class="reading-entry" id="ramp-from-rag-to-richness-how-ramp-revamped-industry-classification" data-company="Ramp" data-tags="Classification|Embeddings|LLMs|RAG" data-year="2025" data-type="Blogpost" data-order="52">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Ramp"><img class="reading-logo" src="reading/logos/ramp.png?v=61f4fbf3" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Ramp</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://engineering.ramp.com/post/industry_classification" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#ramp-from-rag-to-richness-how-ramp-revamped-industry-classification">From RAG to Richness: How Ramp Revamped Industry Classification</a></h2>
@@ -899,7 +915,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="material-security-classifying-chaos-how-material-automates-user-reported" data-company="Material Security" data-tags="Classification|Security|ML|Embeddings" data-year="2025" data-type="Blogpost" data-order="52">
+<article class="reading-entry" id="material-security-classifying-chaos-how-material-automates-user-reported" data-company="Material Security" data-tags="Classification|Security|ML|Embeddings" data-year="2025" data-type="Blogpost" data-order="53">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Material Security"><img class="reading-logo" src="reading/logos/material-security.ico?v=8f87d941" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Material Security</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://material.security/resources/classifying-chaos-how-material-automates-user-reported-phishing-at-scale" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#material-security-classifying-chaos-how-material-automates-user-reported">Classifying Chaos: How Material Automates User-Reported Phishing at Scale</a></h2>
@@ -916,7 +932,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="propel-using-ai-to-help-snap-recipients-diagnose-and-restore-lost-benefits" data-company="Propel" data-tags="LLMs" data-year="2025" data-type="Blogpost" data-order="53">
+<article class="reading-entry" id="propel-using-ai-to-help-snap-recipients-diagnose-and-restore-lost-benefits" data-company="Propel" data-tags="LLMs" data-year="2025" data-type="Blogpost" data-order="54">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Propel"><img class="reading-logo" src="reading/logos/propel.png?v=389f1c03" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Propel</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.propel.app/insights/using-ai-to-help-snap-recipients-diagnose-and-restore-lost-benefits/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#propel-using-ai-to-help-snap-recipients-diagnose-and-restore-lost-benefits">Using AI to help SNAP recipients diagnose and restore lost benefits</a></h2>
@@ -933,7 +949,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="propel-using-ai-to-help-snap-recipients-make-sense-of-notices" data-company="Propel" data-tags="Information Extraction|LLMs" data-year="2025" data-type="Blogpost" data-order="54">
+<article class="reading-entry" id="propel-using-ai-to-help-snap-recipients-make-sense-of-notices" data-company="Propel" data-tags="Information Extraction|LLMs" data-year="2025" data-type="Blogpost" data-order="55">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Propel"><img class="reading-logo" src="reading/logos/propel.png?v=389f1c03" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Propel</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://www.propel.app/insights/using-ai-for-snap-notices/" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#propel-using-ai-to-help-snap-recipients-make-sense-of-notices">Using AI to help SNAP recipients make sense of “notices&quot;</a></h2>
@@ -951,7 +967,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="abnormal-ai-how-abnormal-security-leverages-nlp-to-thwart-cyberattacks" data-company="Abnormal AI" data-tags="Classification|Security|ML|Deep Learning" data-year="2024" data-type="Blogpost" data-order="55">
+<article class="reading-entry" id="abnormal-ai-how-abnormal-security-leverages-nlp-to-thwart-cyberattacks" data-company="Abnormal AI" data-tags="Classification|Security|ML|Deep Learning" data-year="2024" data-type="Blogpost" data-order="56">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Abnormal AI"><img class="reading-logo" src="reading/logos/abnormal-ai.png?v=78dcaf11" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Abnormal AI</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://abnormal.ai/blog/how-abnormal-leverages-nlp" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#abnormal-ai-how-abnormal-security-leverages-nlp-to-thwart-cyberattacks">How Abnormal Security Leverages NLP to Thwart Cyberattacks</a></h2>
@@ -964,7 +980,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="instacart-optimizing-search-relevance-at-instacart-using-hybrid-retrieval" data-company="Instacart" data-tags="Search|Embeddings" data-year="2024" data-type="Blogpost" data-order="56">
+<article class="reading-entry" id="instacart-optimizing-search-relevance-at-instacart-using-hybrid-retrieval" data-company="Instacart" data-tags="Search|Embeddings" data-year="2024" data-type="Blogpost" data-order="57">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Instacart"><img class="reading-logo" src="reading/logos/instacart.png?v=31cc81ce" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Instacart</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://tech.instacart.com/optimizing-search-relevance-at-instacart-using-hybrid-retrieval-88cb579b959c" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#instacart-optimizing-search-relevance-at-instacart-using-hybrid-retrieval">Optimizing search relevance at Instacart using hybrid retrieval</a></h2>
@@ -982,7 +998,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="block-merchant-recommendations-2-0-in-afterpay" data-company="Block" data-tags="RecSys|ML|Deep Learning|ML Infra" data-year="2025" data-type="Blogpost" data-order="57">
+<article class="reading-entry" id="block-merchant-recommendations-2-0-in-afterpay" data-company="Block" data-tags="RecSys|ML|Deep Learning|ML Infra" data-year="2025" data-type="Blogpost" data-order="58">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Block"><img class="reading-logo" src="reading/logos/block.png?v=46879e09" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Block</span></button> <span aria-hidden="true">·</span> 2025 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://ai.cash.app/afterpay-merchant-recommendations" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#block-merchant-recommendations-2-0-in-afterpay">Merchant Recommendations 2.0 in Afterpay</a></h2>
@@ -1000,7 +1016,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="block-real-time-merchant-recommendations-on-cash-app-with-deep-learning" data-company="Block" data-tags="RecSys|ML|Deep Learning|ML Infra" data-year="2024" data-type="Blogpost" data-order="58">
+<article class="reading-entry" id="block-real-time-merchant-recommendations-on-cash-app-with-deep-learning" data-company="Block" data-tags="RecSys|ML|Deep Learning|ML Infra" data-year="2024" data-type="Blogpost" data-order="59">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Block"><img class="reading-logo" src="reading/logos/block.png?v=46879e09" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Block</span></button> <span aria-hidden="true">·</span> 2024 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://ai.cash.app/realtime-recommendations" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#block-real-time-merchant-recommendations-on-cash-app-with-deep-learning">Real-time Merchant Recommendations on Cash App with Deep Learning</a></h2>
@@ -1019,7 +1035,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="spotify-introducing-natural-language-search-for-podcast-episodes" data-company="Spotify" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2022" data-type="Blogpost" data-order="59">
+<article class="reading-entry" id="spotify-introducing-natural-language-search-for-podcast-episodes" data-company="Spotify" data-tags="Search|ML|Deep Learning|Embeddings" data-year="2022" data-type="Blogpost" data-order="60">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Spotify"><img class="reading-logo" src="reading/logos/spotify.png?v=3fab5a12" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Spotify</span></button> <span aria-hidden="true">·</span> 2022 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://engineering.atspotify.com/2022/3/introducing-natural-language-search-for-podcast-episodes" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#spotify-introducing-natural-language-search-for-podcast-episodes">Introducing Natural Language Search for Podcast Episodes</a></h2>
@@ -1039,7 +1055,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="airbnb-listing-embeddings-in-search-ranking" data-company="Airbnb" data-tags="Search|RecSys|ML|Embeddings" data-year="2018" data-type="Blogpost" data-order="60">
+<article class="reading-entry" id="airbnb-listing-embeddings-in-search-ranking" data-company="Airbnb" data-tags="Search|RecSys|ML|Embeddings" data-year="2018" data-type="Blogpost" data-order="61">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Airbnb"><img class="reading-logo" src="reading/logos/airbnb.png?v=ed6393ee" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Airbnb</span></button> <span aria-hidden="true">·</span> 2018 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://medium.com/airbnb-engineering/listing-embeddings-for-similar-listing-recommendations-and-real-time-personalization-in-search-601172f7603e" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#airbnb-listing-embeddings-in-search-ranking">Listing Embeddings in Search Ranking</a></h2>
@@ -1057,7 +1073,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="airbnb-building-airbnb-categories-with-ml-and-human-in-the-loop" data-company="Airbnb" data-tags="Classification|ML|Classical ML|Human-in-the-Loop|Computer Vision" data-year="2022" data-type="Blogpost" data-order="61">
+<article class="reading-entry" id="airbnb-building-airbnb-categories-with-ml-and-human-in-the-loop" data-company="Airbnb" data-tags="Classification|ML|Classical ML|Human-in-the-Loop|Computer Vision" data-year="2022" data-type="Blogpost" data-order="62">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Airbnb"><img class="reading-logo" src="reading/logos/airbnb.png?v=ed6393ee" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Airbnb</span></button> <span aria-hidden="true">·</span> 2022 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://medium.com/airbnb-engineering/building-airbnb-categories-with-ml-and-human-in-the-loop-e97988e70ebb" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#airbnb-building-airbnb-categories-with-ml-and-human-in-the-loop">Building Airbnb Categories with ML and Human-in-the-Loop</a></h2>
@@ -1076,7 +1092,7 @@
     </div>
   </details>
 </article>
-<article class="reading-entry" id="lime-identifying-commute-trips-at-lime" data-company="Lime" data-tags="Classification|ML|Classical ML" data-year="2021" data-type="Blogpost" data-order="62">
+<article class="reading-entry" id="lime-identifying-commute-trips-at-lime" data-company="Lime" data-tags="Classification|ML|Classical ML" data-year="2021" data-type="Blogpost" data-order="63">
   <div class="reading-head">
     <div class="reading-meta"><button type="button" class="reading-company" data-company="Lime"><img class="reading-logo" src="reading/logos/lime.png?v=9ec2db72" alt="" width="22" height="22" decoding="async"><span class="reading-company-text">Lime</span></button> <span aria-hidden="true">·</span> 2021 <span aria-hidden="true">·</span> Blogpost <span aria-hidden="true">·</span> <a class="reading-original" href="https://medium.com/lime-eng/identifying-commute-trips-at-lime-f10c79d7744f" target="_blank" rel="noopener">original <span aria-hidden="true">↗</span></a></div>
     <h2 class="reading-title"><a href="#lime-identifying-commute-trips-at-lime">Identifying Commute Trips at Lime</a></h2>
