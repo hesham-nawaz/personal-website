@@ -1258,6 +1258,72 @@ p {
     border-radius: 4px;
 }
 
+/* One card per film per day; each venue showing it is a row inside. */
+.screening-venues {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+}
+
+.screening-venue {
+    display: grid;
+    grid-template-columns: minmax(150px, 230px) 1fr;
+    column-gap: 16px;
+    row-gap: 6px;
+    align-items: baseline;
+    padding: 9px 0;
+    border-top: 1px solid #eeeeee;
+}
+
+.screening-venue:first-child {
+    border-top: none;
+    padding-top: 2px;
+}
+
+.venue-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.venue-showings {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 10px;
+    row-gap: 4px;
+}
+
+.venue-times {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.screening-tag {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    background-color: var(--primary-light);
+    color: var(--text-dark);
+    padding: 0 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.venue-listed {
+    flex-basis: 100%;
+    font-size: 0.82rem;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+@media (max-width: 640px) {
+    .screening-venue {
+        grid-template-columns: 1fr;
+        row-gap: 2px;
+    }
+}
+
 .screenings-empty {
     color: var(--text-light);
     font-style: italic;

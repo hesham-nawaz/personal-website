@@ -7,6 +7,7 @@ from datetime import date
 from pathlib import Path
 
 from match import MatchedScreening
+from watchlist import normalize_title
 
 
 CSS = """
@@ -189,26 +190,82 @@ SITE_FRAGMENT_START = "<!-- SCREENINGS:START -->"
 SITE_FRAGMENT_END = "<!-- SCREENINGS:END -->"
 
 
+def _film_key(ms: MatchedScreening) -> tuple:
+    """Identify the film(s) a screening shows, so listings of the same film
+    at different venues (or under slightly different listing titles, like
+    "Fjord" and "Fjord (Open Captioning)") land in one card. Matched films
+    are keyed by their Letterboxd URL; unmatched ones by title and year."""
+    key = []
+    for film, match in zip(ms.screening.films, ms.matches):
+        if match is not None and match.letterboxd_url:
+            key.append(("lb", match.letterboxd_url))
+        else:
+            key.append(("t", normalize_title(film.title), film.year))
+    return tuple(key)
+
+
+def _group_by_film(day_matches: list[MatchedScreening]) -> list[list[MatchedScreening]]:
+    """Group one day's screenings by film. Groups are ordered by their earliest
+    showtime, and venues within a group likewise."""
+    groups: dict[tuple, list[MatchedScreening]] = {}
+    for ms in day_matches:
+        groups.setdefault(_film_key(ms), []).append(ms)
+    out = []
+    for items in groups.values():
+        items.sort(key=lambda m: (_sort_key(m.screening.times), m.screening.theater.lower()))
+        out.append(items)
+    out.sort(key=lambda g: _sort_key(g[0].screening.times))
+    return out
+
+
+def _canonical_title_html(ms: MatchedScreening) -> str:
+    """Card heading: the Letterboxd title and year for matched films (clean and
+    consistent across venues), the listing title for unmatched ones."""
+    parts = []
+    for film, match in zip(ms.screening.films, ms.matches):
+        if match is not None:
+            title = match.title
+            year = match.year if match.year is not None else film.year
+            url = html.escape(match.letterboxd_url)
+            yr = f" ({year})" if year else ""
+            parts.append(f'<a href="{url}" target="_blank" rel="noopener">'
+                         f'{html.escape(title)}</a>{html.escape(yr)}')
+        else:
+            yr = f" ({film.year})" if film.year else ""
+            parts.append(f'<span class="unmatched">{html.escape(film.title)}{html.escape(yr)}</span>')
+    return " / ".join(parts)
+
+
+def _listed_as(ms: MatchedScreening) -> str | None:
+    """The venue's own listing title, when it carries more than the film's
+    name (e.g. "Ghost in the Shell: 30th Anniversary Remaster", "... + Q&A")."""
+    differs = False
+    for film, match in zip(ms.screening.films, ms.matches):
+        if match is not None and normalize_title(film.title) != normalize_title(match.title):
+            differs = True
+    if not differs:
+        return None
+    return " / ".join(f.title for f in ms.screening.films)
+
+
 def render_site_fragment(matches: list[MatchedScreening],
                          week_label: str | None = None,
                          updated_iso: str | None = None) -> str:
     """Render screenings as a site-page fragment.
 
     Output uses CSS classes defined in personal-website/styles.css
-    (.screenings-section, .day-group, .day-header, .screening-card, etc.) —
-    no inline <style>, no <html>/<head>/<body>. Designed to be spliced
-    into screenings.html between SCREENINGS:START / SCREENINGS:END markers.
+    (.screenings-section, .day-group, .day-header, .screening-card,
+    .screening-venues, etc.) — no inline <style>, no <html>/<head>/<body>.
+    Designed to be spliced into a page between SCREENINGS:START /
+    SCREENINGS:END markers.
+
+    Each day shows one card per film; every venue showing it that day is a
+    row inside the card with its own times and format/event tags.
     """
     by_day: dict[date, list[MatchedScreening]] = defaultdict(list)
     for ms in matches:
         by_day[ms.screening.day].append(ms)
-    for day in by_day:
-        by_day[day].sort(key=lambda m: _sort_key(m.screening.times))
-
     days = sorted(by_day.keys())
-
-    total = len(matches)
-    movie_count = sum(len(ms.matched_films) for ms in matches)
 
     if week_label is None and days:
         week_label = f"{days[0].strftime('%b %-d')} – {days[-1].strftime('%b %-d, %Y')}"
@@ -225,10 +282,14 @@ def render_site_fragment(matches: list[MatchedScreening],
         parts.append('</section>')
         return "\n".join(parts)
 
+    film_count = len({_film_key(ms) for ms in matches})
+    showtimes = sum(len(ms.screening.times) for ms in matches)
+    venue_count = len({ms.screening.theater for ms in matches if ms.screening.theater})
     parts.append(
         f'  <p class="screenings-summary">'
-        f'<strong>{total}</strong> screening{"s" if total != 1 else ""} '
-        f'({movie_count} matched title{"s" if movie_count != 1 else ""}) '
+        f'<strong>{film_count}</strong> film{"s" if film_count != 1 else ""} from my watchlist, '
+        f'<strong>{showtimes}</strong> showtime{"s" if showtimes != 1 else ""} '
+        f'at {venue_count} venue{"s" if venue_count != 1 else ""} '
         f'— {html.escape(week_label or "")}'
         f'</p>'
     )
@@ -243,45 +304,49 @@ def render_site_fragment(matches: list[MatchedScreening],
         header = day.strftime("%A, %B %-d")
         parts.append('  <div class="day-group">')
         parts.append(f'    <h2 class="day-header">{html.escape(header)}</h2>')
-        for ms in by_day[day]:
-            parts.append(_render_site_screening(ms))
+        for group in _group_by_film(by_day[day]):
+            parts.append(_render_site_film(group))
         parts.append('  </div>')
 
     parts.append('</section>')
     return "\n".join(parts)
 
 
-def _render_site_screening(ms: MatchedScreening) -> str:
-    scr = ms.screening
-
-    film_html_parts = []
-    for film, match in zip(scr.films, ms.matches):
-        film_html_parts.append(_film_title_html(film, match, scr.films))
-    title_html = " / ".join(film_html_parts)
-
-    times = ", ".join(scr.times)
-
-    meta_bits = []
-    if scr.directors:
-        label = "Dir." if len(scr.directors) == 1 else "Dirs."
-        meta_bits.append(f"{label} {html.escape(', '.join(scr.directors))}")
-    if scr.theater:
-        meta_bits.append(html.escape(scr.theater))
-    if scr.presenter:
-        meta_bits.append(f"pres. by {html.escape(scr.presenter)}")
-    meta = " &bull; ".join(meta_bits)
+def _render_site_film(group: list[MatchedScreening]) -> str:
+    """One card for one film on one day, with a row per venue."""
+    first = group[0]
+    directors = next((m.screening.directors for m in group if m.screening.directors), [])
 
     klass = "screening-card"
-    if len(scr.films) > 1:
+    if len(first.screening.films) > 1:
         klass += " double-feature"
 
     lines = [f'    <div class="{klass}">']
-    lines.append(f'      <div class="screening-title">{title_html}</div>')
-    if meta:
-        lines.append(f'      <div class="screening-meta">{meta}</div>')
-    lines.append(f'      <div class="screening-times">{html.escape(times)}</div>')
-    if scr.notes:
-        lines.append(f'      <div class="screening-notes">{html.escape(scr.notes)}</div>')
+    lines.append(f'      <div class="screening-title">{_canonical_title_html(first)}</div>')
+    if directors:
+        label = "Dir." if len(directors) == 1 else "Dirs."
+        lines.append(f'      <div class="screening-meta">{label} '
+                     f'{html.escape(", ".join(directors))}</div>')
+    lines.append('      <ul class="screening-venues">')
+    for ms in group:
+        scr = ms.screening
+        tags = []
+        if scr.notes:
+            tags.extend(t.strip() for t in scr.notes.split("•") if t.strip())
+        if scr.presenter:
+            tags.append(f"pres. by {scr.presenter}")
+        listed = _listed_as(ms)
+        lines.append('        <li class="screening-venue">')
+        lines.append(f'          <span class="venue-name">{html.escape(scr.theater or "Venue TBA")}</span>')
+        lines.append('          <span class="venue-showings">')
+        lines.append(f'            <span class="venue-times">{html.escape(", ".join(scr.times))}</span>')
+        for t in tags:
+            lines.append(f'            <span class="screening-tag">{html.escape(t)}</span>')
+        if listed:
+            lines.append(f'            <span class="venue-listed">Listed as “{html.escape(listed)}”</span>')
+        lines.append('          </span>')
+        lines.append('        </li>')
+    lines.append('      </ul>')
     lines.append('    </div>')
     return "\n".join(lines)
 
