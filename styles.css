@@ -1181,72 +1181,178 @@ p {
     margin: 0 0 16px;
 }
 
-/* Week picker + Day/Movie switch, then a one-line hint about the links */
+/* Date strip, then the Day/Movie switch and a one-line hint about the links */
 .screenings-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px 28px;
-    margin: 0 0 12px;
+    margin: 0 0 26px;
 }
 
 .screenings-controls[hidden],
 .screenings-week[hidden],
 .day-group[hidden],
 .screening-card[hidden],
-.screening-venue[hidden] {
+.screening-venue[hidden],
+.strip-week[hidden],
+.strip-day[hidden],
+.card-count[hidden] {
     display: none;
 }
 
-.week-picker {
+.screenings-controls-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    min-width: 0;
-    max-width: 100%;
+    gap: 10px 24px;
 }
 
-.week-step {
-    font: inherit;
-    font-size: 1.3rem;
-    line-height: 1;
+/* A row of day tiles grouped by week, scrolling sideways (as on Metrograph's
+   and Fandango's showtime pages). */
+.date-strip {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    margin: 0 0 16px;
+}
+
+.strip-track {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 2px 2px 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.strip-track::-webkit-scrollbar {
+    display: none;
+}
+
+.strip-week {
+    display: flex;
+    gap: 4px;
     flex: none;
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
+}
+
+.strip-week-label,
+.strip-day {
+    font: inherit;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 1px;
+    border: 1px solid #dfe8e7;
+    background: var(--card-bg);
+    color: var(--text-dark);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.strip-week-label {
+    min-width: 86px;
+    white-space: nowrap;
+    padding: 6px 8px;
+    border-color: var(--primary-color);
+    color: var(--primary-dark);
+    text-align: center;
+}
+
+.strip-week-name {
+    font-weight: 600;
+    font-size: 0.86rem;
+    line-height: 1.2;
+}
+
+.strip-day {
+    width: 58px;
+    padding: 6px 0 5px;
+}
+
+.strip-dow {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-medium);
+}
+
+.strip-num {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+}
+
+.strip-month {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    min-height: 0.9em;
+    line-height: 0.9;
+}
+
+.strip-count {
+    font-size: 0.72rem;
+    color: var(--primary-dark);
+    font-variant-numeric: tabular-nums;
+}
+
+.strip-day:disabled {
+    cursor: default;
+    opacity: 0.4;
+    background: #f6f6f6;
+}
+
+.strip-day:disabled .strip-count {
+    color: var(--text-light);
+}
+
+/* the days of the selected week */
+.strip-day.in-selection:not(:disabled) {
+    background: var(--light-bg);
+    border-color: var(--primary-light);
+}
+
+.strip-week-label:hover,
+.strip-day:hover:not(:disabled):not([aria-pressed="true"]) {
+    border-color: var(--primary-color);
+}
+
+.strip-week-label[aria-pressed="true"],
+.strip-day[aria-pressed="true"] {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+}
+
+.strip-week-label[aria-pressed="true"] .strip-count,
+.strip-day[aria-pressed="true"] .strip-dow,
+.strip-day[aria-pressed="true"] .strip-month,
+.strip-day[aria-pressed="true"] .strip-count {
+    color: var(--white);
+}
+
+.strip-scroll {
+    font: inherit;
+    font-size: 1.4rem;
+    line-height: 1;
+    flex: none;
+    width: 30px;
     color: var(--primary-dark);
     background: var(--card-bg);
-    border: 1px solid var(--primary-color);
-    border-radius: 6px;
+    border: 1px solid #dfe8e7;
+    border-radius: 8px;
     cursor: pointer;
 }
 
-.week-step:disabled {
-    opacity: 0.35;
+.strip-scroll:disabled {
+    opacity: 0.3;
     cursor: default;
 }
 
-.week-step:hover:not(:disabled) {
-    background: var(--light-bg);
-}
-
-.week-select {
-    font: inherit;
-    font-size: 0.95rem;
-    color: var(--text-dark);
-    background: var(--card-bg);
-    border: 1px solid var(--primary-color);
-    border-radius: 6px;
-    padding: 5px 10px;
-    min-width: 0;
-    max-width: 100%;
-    cursor: pointer;
-}
-
-.week-step:focus-visible,
-.week-select:focus-visible {
+.strip-week-label:focus-visible,
+.strip-day:focus-visible,
+.strip-scroll:focus-visible {
     outline: 2px solid var(--primary-dark);
     outline-offset: 2px;
 }
@@ -1254,7 +1360,7 @@ p {
 .screenings-hint {
     color: var(--text-light);
     font-size: 0.88rem;
-    margin: 0 0 26px;
+    margin: 0;
 }
 
 .screenings-hint i {
@@ -1264,6 +1370,10 @@ p {
 
 .hint-sep {
     margin: 0 8px;
+}
+
+.hint-item {
+    white-space: nowrap;
 }
 
 .day-group {
@@ -1542,13 +1652,9 @@ a.showtime:focus-visible {
         row-gap: 2px;
     }
 
-    .week-picker {
-        flex: 1 1 100%;
-    }
-
-    .week-select {
-        flex: 1 1 auto;
-        width: 0;
+    /* swipe the strip on phones; the arrows just take space */
+    .strip-scroll {
+        display: none;
     }
 
     /* date and venue share a line; times wrap underneath */
