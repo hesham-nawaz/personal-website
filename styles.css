@@ -1187,7 +1187,8 @@ p {
 }
 
 .screenings-controls[hidden],
-.screenings-week[hidden],
+.screenings-summary[hidden],
+.screenings-empty[hidden],
 .day-group[hidden],
 .screening-card[hidden],
 .screening-venue[hidden],
@@ -1297,24 +1298,29 @@ p {
     font-variant-numeric: tabular-nums;
 }
 
-.strip-day:disabled {
-    cursor: default;
-    opacity: 0.4;
+/* Days with no matches stay tappable (a range can end on one) but recede. */
+.strip-day.is-empty {
     background: #f6f6f6;
 }
 
-.strip-day:disabled .strip-count {
-    color: var(--text-light);
+.strip-day.is-empty .strip-dow,
+.strip-day.is-empty .strip-num,
+.strip-day.is-empty .strip-count {
+    color: #b8b8b8;
 }
 
-/* the days of the selected week */
-.strip-day.in-selection:not(:disabled) {
+/* days inside the selected week or range */
+.strip-day.in-selection {
     background: var(--light-bg);
     border-color: var(--primary-light);
 }
 
+.strip-day.in-selection.is-empty {
+    background: #eef6f5;
+}
+
 .strip-week-label:hover,
-.strip-day:hover:not(:disabled):not([aria-pressed="true"]) {
+.strip-day:hover:not([aria-pressed="true"]) {
     border-color: var(--primary-color);
 }
 
@@ -1327,9 +1333,34 @@ p {
 
 .strip-week-label[aria-pressed="true"] .strip-count,
 .strip-day[aria-pressed="true"] .strip-dow,
+.strip-day[aria-pressed="true"] .strip-num,
 .strip-day[aria-pressed="true"] .strip-month,
 .strip-day[aria-pressed="true"] .strip-count {
     color: var(--white);
+}
+
+.strip-selection {
+    min-height: 1.4em;
+    margin: -6px 0 12px;
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.strip-reset {
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--primary-dark);
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 10px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.strip-reset:focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
 }
 
 .strip-scroll {

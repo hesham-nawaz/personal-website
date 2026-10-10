@@ -281,12 +281,15 @@ def render_site_fragment(matches: list[MatchedScreening],
     Output uses CSS classes defined in personal-website/styles.css and is
     spliced into a page between SCREENINGS:START / SCREENINGS:END markers.
 
-    `weeks` lists the weeks a visitor can pick from, the first being the one
-    shown by default; they appear as a strip of day tiles grouped by week.
-    Without it, `matches` is shown as a single week with no strip (the LA
-    page). Each week has two views: by day (default), with one card per film
-    per day and a row per venue; and by movie, with one card per film for
-    the week. `map_query(venue)` returns a Google Maps search for a venue,
+    With `weeks` (the NYC page), the page holds every listed day once, under
+    a strip of day tiles grouped by week; the browser shows whatever the
+    visitor picks (a week, a day, or a range of days from one tap to a
+    second), opening on the first week. Without `weeks`, `matches` is shown
+    as one block with no strip (the LA page).
+
+    Two views of the selection: by day (default), one card per film per day
+    with a row per venue; and by movie, one card per film for the whole
+    selection. `map_query(venue)` returns a Google Maps search for a venue,
     which turns venue names into map links; showtimes link to their ticket
     pages when the data has them.
     """
@@ -296,6 +299,8 @@ def render_site_fragment(matches: list[MatchedScreening],
         start = days[0] if days else date.today()
         weeks = [SiteWeek(start=start, end=days[-1] if days else start,
                           matches=matches, is_current=True)]
+    all_matches = [m for w in weeks for m in w.matches]
+    first = weeks[0]
 
     parts: list[str] = ['<section class="screenings-section">']
     if updated_iso:
@@ -306,13 +311,14 @@ def render_site_fragment(matches: list[MatchedScreening],
     parts.append('  <div class="screenings-controls" hidden>')
     if strip:
         parts.append(_render_date_strip(weeks))
+        parts.append('    <p class="strip-selection" aria-live="polite"></p>')
     parts.append('    <div class="screenings-controls-row">')
     parts.append('      <div class="screenings-view-toggle" role="group" aria-label="Organize screenings">')
     parts.append('        <span class="view-toggle-label">Organize by</span>')
     parts.append('        <button type="button" data-view="day" aria-pressed="true">Day</button>')
     parts.append('        <button type="button" data-view="movie" aria-pressed="false">Movie</button>')
     parts.append('      </div>')
-    has_links = any(u for w in weeks for m in w.matches for u in m.screening.ticket_urls)
+    has_links = any(u for m in all_matches for u in m.screening.ticket_urls)
     if has_links or map_query:
         bits = []
         if has_links:
@@ -326,12 +332,48 @@ def render_site_fragment(matches: list[MatchedScreening],
     parts.append('    </div>')
     parts.append('  </div>')
 
-    for i, w in enumerate(weeks):
-        parts.append(_render_week(w, hidden=i > 0, map_query=map_query, week_label=week_label))
+    # Summary of the first week, as served; the script rewrites it for
+    # whatever is selected.
+    label = week_label or f"{_range_label(first.start, first.end)}, {first.end.year}"
+    if first.matches:
+        parts.append(f'  <p class="screenings-summary">{_summary_html(*_counts(first.matches), label)}</p>')
+        parts.append('  <p class="screenings-empty" hidden></p>')
+    else:
+        parts.append('  <p class="screenings-summary" hidden></p>')
+        parts.append(f'  <p class="screenings-empty">{_empty_text(label)}</p>')
+
+    by_day: dict[date, list[MatchedScreening]] = defaultdict(list)
+    for ms in all_matches:
+        by_day[ms.screening.day].append(ms)
+    parts.append('  <div class="screenings-view" data-view="day">')
+    for day in sorted(by_day):
+        outside = not (first.start <= day <= first.end)
+        parts.append(f'  <div class="day-group" data-date="{day.isoformat()}"{" hidden" if outside else ""}>')
+        parts.append(f'    <h2 class="day-header">{html.escape(day.strftime("%A, %B %-d"))}</h2>')
+        for group in _group_by_film(by_day[day]):
+            parts.append(_render_site_film(group, map_query))
+        parts.append('  </div>')
+    parts.append('  </div>')
+
+    parts.append('  <div class="screenings-view" data-view="movie" hidden>')
+    for group in _group_by_film_for_week(all_matches):
+        parts.append(_render_site_film_week(group, map_query))
+    parts.append('  </div>')
 
     parts.append(_SCREENINGS_SCRIPT)
     parts.append('</section>')
     return "\n".join(parts)
+
+
+def _counts(ms_list: list[MatchedScreening]) -> tuple[int, int, int]:
+    return (len({_film_key(m) for m in ms_list}),
+            sum(len(m.screening.times) for m in ms_list),
+            len({m.screening.theater for m in ms_list if m.screening.theater}))
+
+
+def _empty_text(label: str) -> str:
+    return (f'No screenings from my watchlist are listed for {html.escape(label)} yet. '
+            f'Theaters post their schedules a few weeks ahead, so later dates fill in over time.')
 
 
 def _count_text(n: int) -> str:
@@ -340,9 +382,8 @@ def _count_text(n: int) -> str:
 
 def _render_date_strip(weeks: list[SiteWeek]) -> str:
     """A row of tiles, one per day, grouped under a label tile per week (the
-    pattern Metrograph's and Fandango's showtime pages use). The week label
-    shows that whole week; a day tile shows just that day. Each day tile
-    counts the watchlist films playing; days with none are greyed out."""
+    pattern Metrograph's and Fandango's showtime pages use). Each tile counts
+    the watchlist films playing; days with none are greyed out."""
     today = weeks[0].start
     lines = ['    <div class="date-strip">',
              '      <button type="button" class="strip-scroll" data-dir="-1" aria-label="Earlier dates">'
@@ -356,7 +397,8 @@ def _render_date_strip(weeks: list[SiteWeek]) -> str:
         week_films = len({_film_key(ms) for ms in w.matches})
         label = "This week" if w.is_current else _range_label(w.start, w.end)
         tile = "This week" if w.is_current else _range_label(w.start, w.end).replace(" – ", "–")
-        lines.append(f'        <div class="strip-week" data-week="{w.start.isoformat()}">')
+        lines.append(f'        <div class="strip-week" data-week="{w.start.isoformat()}" '
+                     f'data-end="{w.end.isoformat()}" data-short="{html.escape(w.start.strftime("%b %-d"))}">')
         lines.append(f'          <button type="button" class="strip-week-label" data-week="{w.start.isoformat()}" '
                      f'aria-pressed="false" aria-label="{html.escape(label)}: {_count_text(week_films)}">'
                      f'<span class="strip-week-name">{html.escape(tile)}</span>'
@@ -369,9 +411,9 @@ def _render_date_strip(weeks: list[SiteWeek]) -> str:
             prev_month = d.month
             full = d.strftime("%A, %B %-d")
             lines.append(
-                f'          <button type="button" class="strip-day" data-date="{d.isoformat()}" '
-                f'data-week="{w.start.isoformat()}" aria-pressed="false"'
-                f'{" disabled" if not n else ""} aria-label="{html.escape(full)}: {_count_text(n)}">'
+                f'          <button type="button" class="strip-day{"" if n else " is-empty"}" '
+                f'data-date="{d.isoformat()}" data-week="{w.start.isoformat()}" aria-pressed="false" '
+                f'aria-label="{html.escape(full)}: {_count_text(n)}">'
                 f'<span class="strip-dow">{dow}</span>'
                 f'<span class="strip-num">{d.day}</span>'
                 f'<span class="strip-month">{month}</span>'
@@ -391,143 +433,35 @@ def _summary_html(films: int, showtimes: int, venues: int, when: str) -> str:
             f'at {venues} venue{"s" if venues != 1 else ""} — {html.escape(when)}')
 
 
-def _render_week(w: SiteWeek, hidden: bool, map_query, week_label: str | None) -> str:
-    label = _range_label(w.start, w.end)
-    short = w.start.strftime("%b %-d")
-    attrs = (f'class="screenings-week" data-week="{w.start.isoformat()}" '
-             f'data-end="{w.end.isoformat()}" data-short="{html.escape(short)}"'
-             + (' data-current="true"' if w.is_current else '') + (' hidden' if hidden else ''))
-    parts = [f'  <div {attrs}>']
-    if not w.matches:
-        parts.append(f'    <p class="screenings-empty">No screenings from my watchlist are listed for '
-                     f'{html.escape(label)} yet. Theaters post their schedules a few weeks ahead, '
-                     f'so later weeks fill in over time.</p>')
-        parts.append('  </div>')
-        return "\n".join(parts)
-
-    film_count = len({_film_key(ms) for ms in w.matches})
-    showtimes = sum(len(ms.screening.times) for ms in w.matches)
-    venue_count = len({ms.screening.theater for ms in w.matches if ms.screening.theater})
-    shown = week_label or f"{label}, {w.end.year}"
-    parts.append(f'    <p class="screenings-summary">{_summary_html(film_count, showtimes, venue_count, shown)}</p>')
-
-    by_day: dict[date, list[MatchedScreening]] = defaultdict(list)
-    for ms in w.matches:
-        by_day[ms.screening.day].append(ms)
-    parts.append('    <div class="screenings-view" data-view="day">')
-    for day in sorted(by_day):
-        day_ms = by_day[day]
-        # The summary for this day alone, shown when the day is picked.
-        day_summary = _summary_html(len({_film_key(m) for m in day_ms}),
-                                    sum(len(m.screening.times) for m in day_ms),
-                                    len({m.screening.theater for m in day_ms if m.screening.theater}),
-                                    day.strftime("%A, %B %-d"))
-        parts.append(f'    <div class="day-group" data-date="{day.isoformat()}" '
-                     f'data-summary="{html.escape(day_summary)}">')
-        parts.append(f'      <h2 class="day-header">{html.escape(day.strftime("%A, %B %-d"))}</h2>')
-        for group in _group_by_film(day_ms):
-            parts.append(_render_site_film(group, map_query))
-        parts.append('    </div>')
-    parts.append('    </div>')
-
-    parts.append('    <div class="screenings-view" data-view="movie" hidden>')
-    for group in _group_by_film_for_week(w.matches):
-        parts.append(_render_site_film_week(group, map_query))
-    parts.append('    </div>')
-    parts.append('  </div>')
-    return "\n".join(parts)
-
-
-# Date strip and Day / Movie switch.
-#  - Selection is a week (its label tile) or a single day (a day tile).
-#    Picking the selected day again goes back to its whole week.
+# Date strip, selection and Day / Movie switch.
+#  - A selection is a week (its label tile), a day (one tap on a day tile),
+#    or a range: after picking a day, tapping a later day selects everything
+#    from the first through the second. Tapping an earlier day starts over
+#    from it, and tapping the picked day again selects its week. "Back to
+#    this week" resets.
+#  - The page holds every listed day; the selection only shows and hides
+#    them, and the summary line and the movie cards' counts are recomputed
+#    from what is shown.
 #  - The view is kept in the URL (?view=movie) and in localStorage, so links
-#    and return visits open the same view. The dates are kept in the URL only
-#    (?week=YYYY-MM-DD or ?date=YYYY-MM-DD), so a plain visit always opens
+#    and return visits open the same view. Dates are kept in the URL only
+#    (?week=, ?date=, or ?from=&to=, all YYYY-MM-DD), so a plain visit opens
 #    on this week.
 #  - The page is rebuilt daily; in case a rebuild is late, days before today
-#    (New York time) are hidden, and if this week has nothing left the next
+#    (New York time) are dropped, and if this week has nothing left the next
 #    week is shown instead.
-#  - The page heading follows the selection: "This Week in NYC",
-#    "Week of Oct 12 in NYC", "Today in NYC", "Saturday, Oct 17 in NYC".
+#  - The heading follows the selection: "This Week in NYC", "Week of Oct 12
+#    in NYC", "Today in NYC", "Wednesday, Oct 14 in NYC", "Oct 11 – 25 in NYC".
 _SCREENINGS_SCRIPT = """  <script>
   (function () {
     var section = document.currentScript.closest('.screenings-section');
     if (!section) return;
     function all(sel, root) { return Array.prototype.slice.call((root || section).querySelectorAll(sel)); }
+    function plural(n, word) { return n + ' ' + word + (n === 1 ? '' : 's'); }
     var controls = section.querySelector('.screenings-controls');
     var track = section.querySelector('.strip-track');
     var viewButtons = all('.screenings-view-toggle button[data-view]');
-    var heading = document.querySelector('.title-card h1');
-    var headingText = heading ? heading.textContent : '';
     var KEY = 'screenings-view';
-    var today;
-    try {
-      today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
-    } catch (e) { today = new Date().toISOString().slice(0, 10); }
 
-    // Drop what has already happened (only matters if a daily rebuild is late).
-    all('[data-date]').forEach(function (el) {
-      if (el.getAttribute('data-date') < today) { el.setAttribute('data-past', ''); el.hidden = true; }
-    });
-    var weeks = all('.screenings-week').filter(function (w) {
-      if (w.getAttribute('data-end') >= today) return true;
-      w.hidden = true;
-      all('.strip-week[data-week="' + w.getAttribute('data-week') + '"]').forEach(function (s) { s.hidden = true; });
-      return false;
-    });
-    if (!weeks.length) return;
-    function weekEl(id) { return weeks.filter(function (w) { return w.getAttribute('data-week') === id; })[0]; }
-
-    var state = { week: weeks[0].getAttribute('data-week'), day: null };
-
-    function setUrl() {
-      try {
-        var url = new URL(window.location.href);
-        url.searchParams.delete('week'); url.searchParams.delete('date');
-        if (state.day) url.searchParams.set('date', state.day);
-        else if (state.week !== weeks[0].getAttribute('data-week')) url.searchParams.set('week', state.week);
-        history.replaceState(null, '', url);
-      } catch (e) {}
-    }
-    function prettyDay(iso) {
-      var d = new Date(iso + 'T12:00:00');
-      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-    }
-    function apply(remember) {
-      weeks.forEach(function (w) { w.hidden = w.getAttribute('data-week') !== state.week; });
-      var w = weekEl(state.week);
-      all('.day-group', w).forEach(function (g) {
-        g.hidden = g.hasAttribute('data-past') || (state.day !== null && g.getAttribute('data-date') !== state.day);
-      });
-      all('.screenings-view[data-view="movie"] .screening-venue', w).forEach(function (r) {
-        r.hidden = r.hasAttribute('data-past') || (state.day !== null && r.getAttribute('data-date') !== state.day);
-      });
-      all('.screenings-view[data-view="movie"] .screening-card', w).forEach(function (c) {
-        c.hidden = !c.querySelector('.screening-venue:not([hidden])');
-      });
-      all('.card-count', w).forEach(function (s) { s.hidden = state.day !== null; });
-      var summary = w.querySelector('.screenings-summary');
-      if (summary) {
-        if (!summary.hasAttribute('data-week-html')) summary.setAttribute('data-week-html', summary.innerHTML);
-        var g = state.day && w.querySelector('.day-group[data-date="' + state.day + '"]');
-        summary.innerHTML = g ? g.getAttribute('data-summary') : summary.getAttribute('data-week-html');
-      }
-      all('.strip-week-label').forEach(function (b) {
-        b.setAttribute('aria-pressed', !state.day && b.getAttribute('data-week') === state.week ? 'true' : 'false');
-      });
-      all('.strip-day').forEach(function (b) {
-        b.setAttribute('aria-pressed', b.getAttribute('data-date') === state.day ? 'true' : 'false');
-        b.classList.toggle('in-selection', !state.day && b.getAttribute('data-week') === state.week);
-      });
-      if (heading && /^This Week/.test(headingText)) {
-        var lead = 'This Week';
-        if (state.day) lead = state.day === today ? 'Today' : prettyDay(state.day);
-        else if (state.week !== weeks[0].getAttribute('data-week')) lead = 'Week of ' + w.getAttribute('data-short');
-        heading.textContent = headingText.replace(/^This Week/, lead);
-      }
-      if (remember) setUrl();
-    }
     function showView(view, remember) {
       if (view !== 'movie') view = 'day';
       all('.screenings-view').forEach(function (v) { v.hidden = v.getAttribute('data-view') !== view; });
@@ -543,65 +477,192 @@ _SCREENINGS_SCRIPT = """  <script>
         } catch (e) {}
       }
     }
-
-    // Initial selection: from the URL, else this week (or next week if this
-    // week has nothing left).
     var params = null;
     try { params = new URL(window.location.href).searchParams; } catch (e) {}
-    var wantDay = params && params.get('date');
-    var wantWeek = params && params.get('week');
-    var dayTile = wantDay && section.querySelector('.strip-day[data-date="' + wantDay + '"]:not([disabled]):not([data-past])');
-    if (dayTile && weekEl(dayTile.getAttribute('data-week'))) {
-      state = { week: dayTile.getAttribute('data-week'), day: wantDay };
-    } else if (wantWeek && weekEl(wantWeek)) {
-      state = { week: wantWeek, day: null };
-    } else if (weeks.length > 1 && weeks[0].querySelector('.day-group')
-               && !weeks[0].querySelector('.day-group:not([data-past])')) {
-      state = { week: weeks[1].getAttribute('data-week'), day: null };
-    }
-    apply(false);
-    var view = params && params.get('view');
-    if (!view) { try { view = localStorage.getItem(KEY); } catch (e) {} }
-    showView(view, false);
-
-    all('.strip-week-label').forEach(function (b) {
-      b.addEventListener('click', function () { state = { week: b.getAttribute('data-week'), day: null }; apply(true); });
-    });
-    all('.strip-day').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var d = b.getAttribute('data-date');
-        state = state.day === d ? { week: b.getAttribute('data-week'), day: null }
-                                : { week: b.getAttribute('data-week'), day: d };
-        apply(true);
-      });
-    });
+    var startView = params && params.get('view');
+    if (!startView) { try { startView = localStorage.getItem(KEY); } catch (e) {} }
     viewButtons.forEach(function (b) {
       b.addEventListener('click', function () { showView(b.getAttribute('data-view'), true); });
     });
+    if (!track) { showView(startView, false); controls.hidden = false; return; }
 
-    // Scroll arrows: page through the strip, hidden when there's nothing more.
-    if (track) {
-      var arrows = all('.strip-scroll');
-      function updateArrows() {
-        arrows[0].disabled = track.scrollLeft <= 2;
-        arrows[1].disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
-      }
-      arrows.forEach(function (a) {
-        a.addEventListener('click', function () {
-          track.scrollBy({ left: Number(a.getAttribute('data-dir')) * track.clientWidth * 0.8, behavior: 'smooth' });
-        });
-      });
-      track.addEventListener('scroll', updateArrows, { passive: true });
-      window.addEventListener('resize', updateArrows);
-      controls.hidden = false;
-      var sel = section.querySelector('.strip-day[aria-pressed="true"]')
-             || section.querySelector('.strip-week-label[aria-pressed="true"]');
-      if (sel && sel.offsetLeft + sel.offsetWidth > track.clientWidth) {
-        track.scrollLeft = sel.offsetLeft - 8;
-      }
-      updateArrows();
+    var heading = document.querySelector('.title-card h1');
+    var headingText = heading ? heading.textContent : '';
+    var summary = section.querySelector('.screenings-summary');
+    var empty = section.querySelector('.screenings-empty');
+    var selectionLine = section.querySelector('.strip-selection');
+    var today;
+    try {
+      today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+    } catch (e) { today = new Date().toISOString().slice(0, 10); }
+
+    // Drop what has already happened (only matters if a daily rebuild is late).
+    all('.strip-day').forEach(function (t) { if (t.getAttribute('data-date') < today) t.hidden = true; });
+    var stripWeeks = all('.strip-week').filter(function (w) {
+      if (w.getAttribute('data-end') >= today) return true;
+      w.hidden = true;
+      return false;
+    });
+    if (!stripWeeks.length) return;
+    var lastDay = stripWeeks[stripWeeks.length - 1].getAttribute('data-end');
+
+    function dateObj(iso) { return new Date(iso + 'T12:00:00'); }
+    function fmt(iso, opts) { return dateObj(iso).toLocaleDateString('en-US', opts); }
+    function rangeLabel(from, to) {
+      if (from === to) return fmt(from, { weekday: 'long', month: 'long', day: 'numeric' });
+      var a = dateObj(from), b = dateObj(to);
+      return fmt(from, { month: 'short', day: 'numeric' }) + ' – ' +
+        (a.getMonth() === b.getMonth() ? b.getDate() : fmt(to, { month: 'short', day: 'numeric' }));
     }
+    function weekState(w) {
+      var start = w.getAttribute('data-week');
+      return { kind: 'week', week: start, from: start < today ? today : start, to: w.getAttribute('data-end') };
+    }
+    function weekOf(iso) {
+      return stripWeeks.filter(function (w) {
+        return w.getAttribute('data-week') <= iso && iso <= w.getAttribute('data-end');
+      })[0];
+    }
+    var defaultState = weekState(stripWeeks[0]);
+    var state = defaultState;
+
+    function apply(remember) {
+      var from = state.from, to = state.to;
+      function inRange(el) {
+        var d = el.getAttribute('data-date');
+        return d >= today && d >= from && d <= to;
+      }
+      all('.day-group').forEach(function (g) { g.hidden = !inRange(g); });
+      var films = 0;
+      all('.screenings-view[data-view="movie"] .screening-card').forEach(function (card) {
+        var rows = all('.screening-venue', card);
+        var shown = 0, times = 0, dates = {};
+        rows.forEach(function (r) {
+          r.hidden = !inRange(r);
+          if (!r.hidden) {
+            shown++;
+            times += r.querySelectorAll('.showtime').length;
+            dates[r.getAttribute('data-date')] = true;
+          }
+        });
+        card.hidden = !shown;
+        if (shown) films++;
+        var count = card.querySelector('.card-count');
+        if (count) {
+          count.hidden = state.kind === 'day';
+          var sep = count.textContent.indexOf('•') >= 0 ? ' • ' : '';
+          count.textContent = sep + plural(times, 'showtime') + ' on ' + plural(Object.keys(dates).length, 'day');
+        }
+      });
+      var showtimes = 0, venues = {};
+      all('.day-group:not([hidden]) .screening-venue').forEach(function (r) {
+        showtimes += r.querySelectorAll('.showtime').length;
+        var v = r.querySelector('.venue-name');
+        if (v) venues[v.textContent.replace(' (map)', '').trim()] = true;
+      });
+      var label = rangeLabel(from, to);
+      if (films) {
+        summary.innerHTML = '<strong>' + films + '</strong> ' + (films === 1 ? 'film' : 'films') +
+          ' from my watchlist, <strong>' + showtimes + '</strong> ' + (showtimes === 1 ? 'showtime' : 'showtimes') +
+          ' at ' + plural(Object.keys(venues).length, 'venue') + ' — ' + label;
+        summary.hidden = false; empty.hidden = true;
+      } else {
+        empty.textContent = 'No screenings from my watchlist are listed for ' + label +
+          ' yet. Theaters post their schedules a few weeks ahead, so later dates fill in over time.';
+        summary.hidden = true; empty.hidden = false;
+      }
+
+      all('.strip-week-label').forEach(function (b) {
+        b.setAttribute('aria-pressed', state.kind === 'week' && b.getAttribute('data-week') === state.week ? 'true' : 'false');
+      });
+      all('.strip-day').forEach(function (t) {
+        var d = t.getAttribute('data-date');
+        var end = state.kind !== 'week' && (d === from || d === to);
+        t.setAttribute('aria-pressed', end ? 'true' : 'false');
+        t.classList.toggle('in-selection', !end && d >= from && d <= to);
+      });
+
+      var isDefault = state.kind === 'week' && state.week === defaultState.week;
+      if (heading && /^This Week/.test(headingText)) {
+        var lead = 'This Week';
+        if (state.kind === 'day') lead = from === today ? 'Today' : fmt(from, { weekday: 'long', month: 'short', day: 'numeric' });
+        else if (state.kind === 'range') lead = rangeLabel(from, to);
+        else if (!isDefault) lead = 'Week of ' + weekOf(state.week).getAttribute('data-short');
+        heading.textContent = headingText.replace(/^This Week/, lead);
+      }
+      var note = state.kind === 'day' ? 'Tap a later day to see a range from ' + fmt(from, { weekday: 'short', month: 'short', day: 'numeric' }) + '.'
+               : isDefault ? 'Tap a day to see just that day, or two days to see a range.' : '';
+      selectionLine.innerHTML = '';
+      selectionLine.appendChild(document.createTextNode(note));
+      if (!isDefault) {
+        var back = document.createElement('button');
+        back.type = 'button'; back.className = 'strip-reset'; back.textContent = 'Back to this week';
+        back.addEventListener('click', function () { state = defaultState; apply(true); });
+        selectionLine.appendChild(back);
+      }
+
+      if (remember) {
+        try {
+          var url = new URL(window.location.href);
+          ['week', 'date', 'from', 'to'].forEach(function (k) { url.searchParams.delete(k); });
+          if (state.kind === 'day') url.searchParams.set('date', from);
+          else if (state.kind === 'range') { url.searchParams.set('from', from); url.searchParams.set('to', to); }
+          else if (!isDefault) url.searchParams.set('week', state.week);
+          history.replaceState(null, '', url);
+        } catch (e) {}
+      }
+    }
+
+    // Initial selection: from the URL, else this week (or next week if this
+    // week has nothing left).
+    function valid(iso) { return /^\\d{4}-\\d{2}-\\d{2}$/.test(iso || '') && iso <= lastDay; }
+    var pDate = params && params.get('date'), pFrom = params && params.get('from'),
+        pTo = params && params.get('to'), pWeek = params && params.get('week');
+    if (valid(pDate) && pDate >= today) {
+      state = { kind: 'day', from: pDate, to: pDate };
+    } else if (valid(pTo) && /^\\d{4}-\\d{2}-\\d{2}$/.test(pFrom || '') && pFrom <= pTo && pTo >= today) {
+      state = { kind: 'range', from: pFrom < today ? today : pFrom, to: pTo };
+    } else if (pWeek && weekOf(pWeek) && weekOf(pWeek).getAttribute('data-week') === pWeek) {
+      state = weekState(weekOf(pWeek));
+    } else if (stripWeeks.length > 1 && !all('.day-group').some(function (g) {
+                 var d = g.getAttribute('data-date'); return d >= today && d <= defaultState.to; })
+               && all('.day-group').some(function (g) { return g.getAttribute('data-date') >= today; })) {
+      defaultState = state = weekState(stripWeeks[1]);
+    }
+    apply(false);
+    showView(startView, false);
+
+    all('.strip-week-label').forEach(function (b) {
+      b.addEventListener('click', function () { state = weekState(weekOf(b.getAttribute('data-week'))); apply(true); });
+    });
+    all('.strip-day').forEach(function (t) {
+      t.addEventListener('click', function () {
+        var d = t.getAttribute('data-date');
+        if (state.kind === 'day' && d === state.from) state = weekState(weekOf(d));
+        else if (state.kind === 'day' && d > state.from) state = { kind: 'range', from: state.from, to: d };
+        else state = { kind: 'day', from: d, to: d };
+        apply(true);
+      });
+    });
+
+    // Scroll arrows: page through the strip; disabled at either end.
+    var arrows = all('.strip-scroll');
+    function updateArrows() {
+      arrows[0].disabled = track.scrollLeft <= 2;
+      arrows[1].disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    }
+    arrows.forEach(function (a) {
+      a.addEventListener('click', function () {
+        track.scrollBy({ left: Number(a.getAttribute('data-dir')) * track.clientWidth * 0.8, behavior: 'smooth' });
+      });
+    });
+    track.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
     controls.hidden = false;
+    var sel = section.querySelector('.strip-day[aria-pressed="true"]')
+           || section.querySelector('.strip-week-label[aria-pressed="true"]');
+    if (sel && sel.offsetLeft + sel.offsetWidth > track.clientWidth) track.scrollLeft = sel.offsetLeft - 8;
+    updateArrows();
   })();
   </script>"""
 
