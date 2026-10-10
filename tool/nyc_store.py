@@ -11,10 +11,12 @@ watchlist later still matches screenings that were posted earlier.
 
 Bookkeeping per screening:
   first_seen  the run date it first appeared in the feed
-  last_seen   the latest run date it was still in the feed
   removed     the run date it disappeared from a day the feed returned
               successfully (a cancellation or a correction); null while listed.
               It is cleared if the screening comes back.
+There is deliberately no "last seen" date: it would change every line every
+day, and the daily commit would rewrite the whole store instead of only the
+screenings that changed.
 Days before today are never re-fetched, so past screenings stay as they were
 last seen.
 
@@ -35,7 +37,7 @@ STOP_AFTER_FAILED_DAYS = 5  # the feed is down; don't spend the run retrying
 
 FIELDS = ["id", "date", "time", "title", "year", "director", "theater",
           "theater_slug", "format", "event", "ticket_url",
-          "first_seen", "last_seen", "removed"]
+          "first_seen", "removed"]
 
 
 def _record(entry: dict, run_day: str) -> dict | None:
@@ -65,7 +67,6 @@ def _record(entry: dict, run_day: str) -> dict | None:
         "event": event_label(entry.get("special_event")),
         "ticket_url": ticket,
         "first_seen": run_day,
-        "last_seen": run_day,
         "removed": None,
     }
 
@@ -176,7 +177,7 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
             if old.get("removed"):
                 restored += 1
             rec["first_seen"] = old.get("first_seen") or run_day
-            if any(old.get(k) != rec.get(k) for k in FIELDS if k not in ("first_seen", "last_seen", "removed")):
+            if any(old.get(k) != rec.get(k) for k in FIELDS if k not in ("first_seen", "removed")):
                 updated += 1
             records[sid] = rec
         # Stored screenings on this day that the feed no longer lists.
