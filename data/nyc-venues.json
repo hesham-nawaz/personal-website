@@ -1,0 +1,152 @@
+{
+ "Alcove Cinema": {
+  "address": null,
+  "borough": null,
+  "slug": "alcove-cinema"
+ },
+ "Asia Society": {
+  "address": "Asia Society, 725 Park Ave, New York, NY 10021",
+  "borough": "Manhattan",
+  "slug": "asia-society"
+ },
+ "Cobble Hill Cinemas": {
+  "address": "265 Court St, Brooklyn, NY 11231",
+  "borough": "Brooklyn",
+  "slug": "cobble-hill-cinemas"
+ },
+ "Columbia University Lenfest Center for the Arts": {
+  "address": "Lenfest Center for the Arts, 615 W 129th St, New York, NY 10027",
+  "borough": "Manhattan",
+  "slug": "columbia-university-lenfest-center-arts"
+ },
+ "Czech Center": {
+  "address": "321 East 73 Street, New York, NY 10021",
+  "borough": "Manhattan",
+  "slug": "czech-center"
+ },
+ "E-flux Screening Room": {
+  "address": "172 Classon Avenue, Brooklyn, NY 11205",
+  "borough": "Brooklyn",
+  "slug": "e-flux-screening-room"
+ },
+ "Film-Makers’ Coop": {
+  "address": "475 Park Avenue South, Floor 6, New York, NY 10016",
+  "borough": "Manhattan",
+  "slug": "film-makers-coop"
+ },
+ "Firehouse: DCTV’s Cinema for Documentary Film": {
+  "address": "87 Lafayette Street, New York, NY 10013",
+  "borough": "Manhattan",
+  "slug": "firehouse-dctvs-cinema-documentary-film"
+ },
+ "Goethe-Institut New York": {
+  "address": "30 Irving Place, New York, NY 10003",
+  "borough": "Manhattan",
+  "slug": "goethe-institut-new-york"
+ },
+ "KAJE": {
+  "address": "74 15th Street Brooklyn, New York 11215",
+  "borough": "Brooklyn",
+  "slug": "kaje"
+ },
+ "Kings Theatre": {
+  "address": "1027 Flatbush Avenue, Brooklyn, NY 11226",
+  "borough": "Brooklyn",
+  "slug": "kings-theatre"
+ },
+ "L'Alliance New York": {
+  "address": "55 East 59 Street, New York, NY 10022",
+  "borough": "Manhattan",
+  "slug": "lalliance-new-york"
+ },
+ "Leonard Nimoy Thalia Theatre": {
+  "address": "2537 Broadway, New York, NY 10025",
+  "borough": "Manhattan",
+  "slug": "leonard-nimoy-thalia-theatre"
+ },
+ "Light Industry": {
+  "address": null,
+  "borough": null,
+  "slug": "light-industry"
+ },
+ "Low Cinema": {
+  "address": "70-11 60th St, Ridgewood, NY 11385",
+  "borough": "Queens",
+  "slug": "low-cinema"
+ },
+ "Maysles Cinema": {
+  "address": "343 Malcolm X Boulevard, New York, NY 10027",
+  "borough": "Manhattan",
+  "slug": "maysles-cinema"
+ },
+ "Millennium Film Workshop": {
+  "address": null,
+  "borough": null,
+  "slug": "millennium-film-workshop"
+ },
+ "Museum of Modern Art": {
+  "address": "11 West 53rd Street, New York, NY 10019",
+  "borough": "Manhattan",
+  "slug": "museum-modern-art"
+ },
+ "NYU Bobst Library": {
+  "address": null,
+  "borough": null,
+  "slug": "nyu-bobst-library"
+ },
+ "Nightclub 101": {
+  "address": "101 Avenue A New York, NY 10009",
+  "borough": "Manhattan",
+  "slug": "nightclub-101"
+ },
+ "Paris Theater": {
+  "address": "4 W 58th St, New York, NY 10019",
+  "borough": "Manhattan",
+  "slug": "paris-theater"
+ },
+ "SVA Theatre": {
+  "address": null,
+  "borough": null,
+  "slug": "sva-theatre"
+ },
+ "Scandinavia House": {
+  "address": "58 Park Avenue, New York, NY 10016",
+  "borough": "Manhattan",
+  "slug": "scandinavia-house"
+ },
+ "Soho House": {
+  "address": null,
+  "borough": null,
+  "slug": "soho-house"
+ },
+ "Spectacle": {
+  "address": "124 South 3 Street, Brooklyn, NY 11249",
+  "borough": "Brooklyn",
+  "slug": "spectacle"
+ },
+ "Swiss Institute": {
+  "address": "38 St Marks Pl, New York, NY 10003",
+  "borough": "Manhattan",
+  "slug": "swiss-institute"
+ },
+ "The 8th Floor": {
+  "address": "17 West 17th Street, 8th Floor New York, NY 10011",
+  "borough": "Manhattan",
+  "slug": "8th-floor"
+ },
+ "UnionDocs": {
+  "address": "352 Onderdonk Ave. Ridgewood, NY 11385",
+  "borough": "Queens",
+  "slug": "uniondocs"
+ },
+ "United Palace": {
+  "address": "United Palace, 4140 Broadway, New York, NY 10033",
+  "borough": "Manhattan",
+  "slug": "united-palace"
+ },
+ "Village East Cinema": {
+  "address": "Village East Cinema, 181-189 2nd Ave, New York, NY 10003",
+  "borough": "Manhattan",
+  "slug": "village-east-cinema"
+ }
+}
