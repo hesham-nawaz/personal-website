@@ -275,7 +275,8 @@ def render_site_fragment(matches: list[MatchedScreening],
                          week_label: str | None = None,
                          updated_iso: str | None = None,
                          weeks: list[SiteWeek] | None = None,
-                         map_query=None) -> str:
+                         map_query=None,
+                         venue_area=None) -> str:
     """Render screenings as a site-page fragment.
 
     Output uses CSS classes defined in personal-website/styles.css and is
@@ -291,7 +292,8 @@ def render_site_fragment(matches: list[MatchedScreening],
     with a row per venue; and by movie, one card per film for the whole
     selection. `map_query(venue)` returns a Google Maps search for a venue,
     which turns venue names into map links; showtimes link to their ticket
-    pages when the data has them.
+    pages when the data has them. `venue_area(venue)` names the borough a
+    venue is in, for grouping the theater filter.
     """
     strip = weeks is not None
     if weeks is None:
@@ -304,7 +306,10 @@ def render_site_fragment(matches: list[MatchedScreening],
 
     parts: list[str] = ['<section class="screenings-section">']
     if updated_iso:
-        parts.append(f'  <p class="screenings-updated">Last updated {html.escape(updated_iso)}</p>')
+        parts.append(f'  <p class="screenings-updated" data-updated="{html.escape(updated_iso)}">'
+                     f'Last updated {html.escape(updated_iso)}</p>')
+        # Filled in by the script when the last update is more than two days old.
+        parts.append('  <p class="screenings-stale" role="status" hidden></p>')
 
     # Controls are hidden until the script runs; without JavaScript the page
     # shows the first week by day.
@@ -319,6 +324,7 @@ def render_site_fragment(matches: list[MatchedScreening],
     parts.append('        <button type="button" data-view="movie" aria-pressed="false">Movie</button>')
     parts.append('      </div>')
     if strip:
+        parts.append(_render_venue_filter(all_matches, venue_area))
         parts.append('      <button type="button" class="weekend-toggle" aria-pressed="false">'
                      '<span class="weekend-box" aria-hidden="true"></span>Weekends only '
                      '<span class="weekend-days">(Fri–Sun)</span></button>')
@@ -367,6 +373,45 @@ def render_site_fragment(matches: list[MatchedScreening],
     parts.append(_SCREENINGS_SCRIPT)
     parts.append('</section>')
     return "\n".join(parts)
+
+
+def _venue_id(venue: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", (venue or "").lower()).strip("-") or "venue"
+
+
+def _film_id(ms: MatchedScreening) -> str:
+    """Stable id for a film across cards, used to count distinct films in
+    the browser."""
+    return "|".join("|".join(str(p) for p in k) for k in _film_key(ms))
+
+
+def _render_venue_filter(matches: list[MatchedScreening], venue_area) -> str:
+    """A "Theaters" dropdown (a native <details>, so it opens without the
+    script): a checkbox per venue, grouped by borough, with a shortcut per
+    borough to show only that borough."""
+    venues = sorted({m.screening.theater for m in matches if m.screening.theater})
+    by_area: dict[str, list[str]] = defaultdict(list)
+    for v in venues:
+        by_area[(venue_area(v) if venue_area else None) or "Other"].append(v)
+    order = sorted(by_area, key=lambda a: (a == "Other", a))
+    lines = ['      <details class="venue-filter">',
+             '        <summary><i class="fa-solid fa-film" aria-hidden="true"></i>'
+             '<span class="venue-filter-label">All theaters</span></summary>',
+             '        <div class="venue-panel">',
+             '          <div class="venue-shortcuts">',
+             '            <button type="button" data-only="all">All theaters</button>']
+    if len(order) > 1:
+        for a in order:
+            lines.append(f'            <button type="button" data-only="{html.escape(a)}">{html.escape(a)} only</button>')
+    lines.append('          </div>')
+    for a in order:
+        lines.append(f'          <fieldset class="venue-group" data-area="{html.escape(a)}">')
+        lines.append(f'            <legend>{html.escape(a)}</legend>')
+        for v in by_area[a]:
+            lines.append(f'            <label><input type="checkbox" value="{_venue_id(v)}" checked> {html.escape(v)}</label>')
+        lines.append('          </fieldset>')
+    lines += ['        </div>', '      </details>']
+    return "\n".join(lines)
 
 
 def _counts(ms_list: list[MatchedScreening]) -> tuple[int, int, int]:
@@ -455,6 +500,10 @@ def _summary_html(films: int, showtimes: int, venues: int, when: str) -> str:
 #  - The page is rebuilt daily; in case a rebuild is late, days before today
 #    (New York time) are dropped, and if this week has nothing left the next
 #    week is shown instead.
+#  - The theater filter (a checkbox per venue, grouped by borough) hides the
+#    other venues' rows everywhere, and the strip's counts follow it. It is
+#    kept in the URL (?skip=venue-id,...) and in localStorage.
+#  - If the page's last update is more than two days old, a notice says so.
 #  - "Weekends only" narrows any selection to Fridays, Saturdays and Sundays
 #    and dims the other days in the strip. Like the view, it is kept in the
 #    URL (?weekends=1) and in localStorage.
@@ -472,6 +521,27 @@ _SCREENINGS_SCRIPT = """  <script>
     var track = section.querySelector('.strip-track');
     var viewButtons = all('.screenings-view-toggle button[data-view]');
     var KEY = 'screenings-view';
+    var today;
+    try {
+      today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+    } catch (e) { today = new Date().toISOString().slice(0, 10); }
+    function dateObj(iso) { return new Date(iso + 'T12:00:00'); }
+    function fmt(iso, opts) { return dateObj(iso).toLocaleDateString('en-US', opts); }
+
+    // Out-of-date notice: the page is rebuilt every morning, so an update
+    // more than two days old means the daily job has been failing.
+    var updatedEl = section.querySelector('.screenings-updated');
+    var staleEl = section.querySelector('.screenings-stale');
+    if (updatedEl && staleEl && /^\d{4}-\d{2}-\d{2}$/.test(updatedEl.getAttribute('data-updated') || '')) {
+      var upd = updatedEl.getAttribute('data-updated');
+      var age = Math.round((dateObj(today) - dateObj(upd)) / 864e5);
+      if (age > 2) {
+        staleEl.textContent = 'This page hasn\u2019t been updated since ' +
+          fmt(upd, { weekday: 'long', month: 'long', day: 'numeric' }) + ' (' + age + ' days ago), ' +
+          'so some listings may have changed. Check the theater\u2019s site before you go.';
+        staleEl.hidden = false;
+      }
+    }
 
     function showView(view, remember) {
       if (view !== 'movie') view = 'day';
@@ -505,12 +575,13 @@ _SCREENINGS_SCRIPT = """  <script>
     var weekendButton = section.querySelector('.weekend-toggle');
     var WEEKEND_KEY = 'screenings-weekends';
     var weekendsOnly = false;
+    var venueFilter = section.querySelector('.venue-filter');
+    var venueBoxes = all('.venue-filter input[type="checkbox"]');
+    var SKIP_KEY = 'screenings-skip-venues';
+    var skipped = {};
+    function venueOn(row) { return !skipped[row.getAttribute('data-venue')]; }
+    function anySkipped() { return Object.keys(skipped).length > 0; }
     function isWeekend(iso) { var g = dateObj(iso).getDay(); return g === 5 || g === 6 || g === 0; }
-    var today;
-    try {
-      today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
-    } catch (e) { today = new Date().toISOString().slice(0, 10); }
-
     // Drop what has already happened (only matters if a daily rebuild is late).
     all('.strip-day').forEach(function (t) { if (t.getAttribute('data-date') < today) t.hidden = true; });
     var stripWeeks = all('.strip-week').filter(function (w) {
@@ -521,8 +592,6 @@ _SCREENINGS_SCRIPT = """  <script>
     if (!stripWeeks.length) return;
     var lastDay = stripWeeks[stripWeeks.length - 1].getAttribute('data-end');
 
-    function dateObj(iso) { return new Date(iso + 'T12:00:00'); }
-    function fmt(iso, opts) { return dateObj(iso).toLocaleDateString('en-US', opts); }
     function rangeLabel(from, to) {
       if (from === to) return fmt(from, { weekday: 'long', month: 'long', day: 'numeric' });
       var a = dateObj(from), b = dateObj(to);
@@ -547,13 +616,23 @@ _SCREENINGS_SCRIPT = """  <script>
         var d = el.getAttribute('data-date');
         return d >= today && d >= from && d <= to && (!weekendsOnly || isWeekend(d));
       }
-      all('.day-group').forEach(function (g) { g.hidden = !inRange(g); });
+      all('.day-group').forEach(function (g) {
+        var any = false;
+        all('.screening-card', g).forEach(function (c) {
+          var shown = 0;
+          all('.screening-venue', c).forEach(function (r) { r.hidden = !venueOn(r); if (!r.hidden) shown++; });
+          c.hidden = !shown;
+          if (shown) any = true;
+        });
+        g.setAttribute('data-has-films', any ? '1' : '0');
+        g.hidden = !inRange(g) || !any;
+      });
       var films = 0;
       all('.screenings-view[data-view="movie"] .screening-card').forEach(function (card) {
         var rows = all('.screening-venue', card);
         var shown = 0, times = 0, dates = {};
         rows.forEach(function (r) {
-          r.hidden = !inRange(r);
+          r.hidden = !inRange(r) || !venueOn(r);
           if (!r.hidden) {
             shown++;
             times += r.querySelectorAll('.showtime').length;
@@ -570,7 +649,7 @@ _SCREENINGS_SCRIPT = """  <script>
         }
       });
       var showtimes = 0, venues = {};
-      all('.day-group:not([hidden]) .screening-venue').forEach(function (r) {
+      all('.day-group:not([hidden]) .screening-card:not([hidden]) .screening-venue:not([hidden])').forEach(function (r) {
         showtimes += r.querySelectorAll('.showtime').length;
         var v = r.querySelector('.venue-name');
         if (v) venues[v.textContent.replace(' (map)', '').trim()] = true;
@@ -585,6 +664,10 @@ _SCREENINGS_SCRIPT = """  <script>
       } else if (weekendsOnly && state.kind === 'day' && !isWeekend(from)) {
         empty.textContent = fmt(from, { weekday: 'long' }) + ' isn\u2019t a weekend day. ' +
           'Turn off \u201cWeekends only\u201d to see ' + label + '.';
+        summary.hidden = true; empty.hidden = false;
+      } else if (anySkipped()) {
+        empty.textContent = 'No screenings from my watchlist at the theaters you picked for ' + label +
+          '. Choose more theaters to see others.';
         summary.hidden = true; empty.hidden = false;
       } else {
         empty.textContent = 'No screenings from my watchlist are listed for ' + label +
@@ -603,9 +686,45 @@ _SCREENINGS_SCRIPT = """  <script>
         t.classList.toggle('filtered-out', weekendsOnly && !isWeekend(d));
       });
       if (weekendButton) weekendButton.setAttribute('aria-pressed', weekendsOnly ? 'true' : 'false');
-      all('.strip-week-label .strip-count').forEach(function (c) {
-        c.textContent = c.getAttribute(weekendsOnly ? 'data-weekend' : 'data-all');
+
+      // Strip counts: distinct films per day at the chosen theaters; each
+      // week tile counts its days (weekend days only, with that filter on).
+      var filmsByDate = {};
+      all('.day-group').forEach(function (g) {
+        var set = {};
+        all('.screening-card', g).forEach(function (c) { if (!c.hidden) set[c.getAttribute('data-film')] = true; });
+        filmsByDate[g.getAttribute('data-date')] = set;
       });
+      all('.strip-day').forEach(function (t) {
+        var d = t.getAttribute('data-date');
+        var n = Object.keys(filmsByDate[d] || {}).length;
+        t.querySelector('.strip-count').textContent = n ? plural(n, 'film') : '\u2013';
+        t.classList.toggle('is-empty', !n);
+        t.setAttribute('aria-label', fmt(d, { weekday: 'long', month: 'long', day: 'numeric' }) + ': ' +
+          (n ? plural(n, 'film') : 'none'));
+      });
+      all('.strip-week').forEach(function (w) {
+        var set = {}, a = w.getAttribute('data-week'), b = w.getAttribute('data-end');
+        Object.keys(filmsByDate).forEach(function (d) {
+          if (d >= a && d <= b && d >= today && (!weekendsOnly || isWeekend(d)))
+            Object.keys(filmsByDate[d]).forEach(function (f) { set[f] = true; });
+        });
+        var n = Object.keys(set).length;
+        var c = w.querySelector('.strip-week-label .strip-count');
+        if (c) c.textContent = n ? plural(n, 'film') : 'none';
+      });
+
+      // Theater filter: checkboxes and the dropdown's label.
+      venueBoxes.forEach(function (b) { b.checked = !skipped[b.value]; });
+      if (venueFilter) {
+        var on = venueBoxes.filter(function (b) { return b.checked; });
+        var text = on.length === venueBoxes.length ? 'All theaters'
+                 : on.length === 0 ? 'No theaters'
+                 : on.length === 1 ? on[0].parentNode.textContent.trim()
+                 : on.length + ' of ' + venueBoxes.length + ' theaters';
+        venueFilter.querySelector('.venue-filter-label').textContent = text;
+        venueFilter.classList.toggle('is-filtered', on.length !== venueBoxes.length);
+      }
 
       var isDefault = state.kind === 'week' && state.week === defaultState.week;
       if (heading && /^This Week/.test(headingText)) {
@@ -633,8 +752,9 @@ _SCREENINGS_SCRIPT = """  <script>
       if (remember) {
         try {
           var url = new URL(window.location.href);
-          ['week', 'date', 'from', 'to', 'weekends'].forEach(function (k) { url.searchParams.delete(k); });
+          ['week', 'date', 'from', 'to', 'weekends', 'skip'].forEach(function (k) { url.searchParams.delete(k); });
           if (weekendsOnly) url.searchParams.set('weekends', '1');
+          if (anySkipped()) url.searchParams.set('skip', Object.keys(skipped).sort().join(','));
           if (state.kind === 'day') url.searchParams.set('date', from);
           else if (state.kind === 'range') { url.searchParams.set('from', from); url.searchParams.set('to', to); }
           else if (!isDefault) url.searchParams.set('week', state.week);
@@ -662,6 +782,12 @@ _SCREENINGS_SCRIPT = """  <script>
     var w0 = params && params.get('weekends');
     if (w0 === null || w0 === undefined) { try { w0 = localStorage.getItem(WEEKEND_KEY); } catch (e) {} }
     weekendsOnly = w0 === '1';
+    var s0 = params && params.get('skip');
+    var s0list = null;
+    if (s0 !== null && s0 !== undefined) s0list = s0 ? s0.split(',') : [];
+    else { try { s0list = JSON.parse(localStorage.getItem(SKIP_KEY) || '[]'); } catch (e) { s0list = []; } }
+    var known = {}; venueBoxes.forEach(function (b) { known[b.value] = true; });
+    (s0list || []).forEach(function (v) { if (known[v]) skipped[v] = true; });
     apply(false);
     showView(startView, false);
     if (weekendButton) weekendButton.addEventListener('click', function () {
@@ -669,6 +795,36 @@ _SCREENINGS_SCRIPT = """  <script>
       try { localStorage.setItem(WEEKEND_KEY, weekendsOnly ? '1' : '0'); } catch (e) {}
       apply(true);
     });
+
+    function saveSkipped() {
+      try { localStorage.setItem(SKIP_KEY, JSON.stringify(Object.keys(skipped))); } catch (e) {}
+      apply(true);
+    }
+    venueBoxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        if (b.checked) delete skipped[b.value]; else skipped[b.value] = true;
+        saveSkipped();
+      });
+    });
+    all('.venue-shortcuts button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var area = btn.getAttribute('data-only');
+        skipped = {};
+        if (area !== 'all') all('.venue-group').forEach(function (g) {
+          if (g.getAttribute('data-area') !== area)
+            all('input[type="checkbox"]', g).forEach(function (b) { skipped[b.value] = true; });
+        });
+        saveSkipped();
+      });
+    });
+    if (venueFilter) {
+      document.addEventListener('click', function (e) {
+        if (venueFilter.open && !venueFilter.contains(e.target)) venueFilter.open = false;
+      });
+      venueFilter.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { venueFilter.open = false; venueFilter.querySelector('summary').focus(); }
+      });
+    }
 
     all('.strip-week-label').forEach(function (b) {
       b.addEventListener('click', function () { state = weekState(weekOf(b.getAttribute('data-week'))); apply(true); });
@@ -711,7 +867,7 @@ def _film_header_lines(group: list[MatchedScreening], extra_meta: str | None = N
     klass = "screening-card"
     if len(first.screening.films) > 1:
         klass += " double-feature"
-    lines = [f'    <div class="{klass}">']
+    lines = [f'    <div class="{klass}" data-film="{html.escape(_film_id(first))}">']
     lines.append(f'      <div class="screening-title">{_canonical_title_html(first)}</div>')
     meta = []
     if directors:
@@ -776,7 +932,7 @@ def _render_site_film(group: list[MatchedScreening], map_query=None) -> str:
     lines = _film_header_lines(group)
     lines.append('      <ul class="screening-venues">')
     for ms in group:
-        lines.append('        <li class="screening-venue">')
+        lines.append(f'        <li class="screening-venue" data-venue="{_venue_id(ms.screening.theater)}">')
         lines.append(f'          {_venue_html(ms.screening.theater, map_query)}')
         lines.extend(_showings_lines(ms, '          '))
         lines.append('        </li>')
@@ -823,7 +979,8 @@ def _render_site_film_week(group: list[MatchedScreening], map_query=None) -> str
         prev_day = day
         klass = "screening-venue" + (" new-day" if new_day else "")
         label = day.strftime("%a, %b %-d")
-        lines.append(f'        <li class="{klass}" data-date="{day.isoformat()}">')
+        lines.append(f'        <li class="{klass}" data-date="{day.isoformat()}" '
+                     f'data-venue="{_venue_id(ms.screening.theater)}">')
         # Repeat rows of the same day keep the date for screen readers but hide
         # it visually, so each day's rows read as one block.
         if new_day:
@@ -885,11 +1042,12 @@ def write_site_page(matches: list[MatchedScreening],
                     week_label: str | None = None,
                     updated_iso: str | None = None,
                     weeks: list[SiteWeek] | None = None,
-                    map_query=None) -> Path:
+                    map_query=None,
+                    venue_area=None) -> Path:
     """Render the site fragment and splice it into the given page file."""
     fragment = render_site_fragment(matches, week_label=week_label,
                                     updated_iso=updated_iso, weeks=weeks,
-                                    map_query=map_query)
+                                    map_query=map_query, venue_area=venue_area)
     return splice_into_site_page(page_path, fragment)
 
 

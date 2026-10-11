@@ -36,6 +36,11 @@ DEFAULT_STORE = str(ROOT / "data" / "nyc-screenings")
 _BROOKLYN = {"bam rose cinemas", "nitehawk cinema williamsburg", "nitehawk cinema prospect park"}
 
 
+def venue_area(venue: str) -> str:
+    """Borough, for grouping the page's theater filter."""
+    return "Brooklyn" if venue.strip().lower() in _BROOKLYN else "Manhattan"
+
+
 def map_query(venue: str) -> str:
     borough = "Brooklyn, NY" if venue.strip().lower() in _BROOKLYN else "New York, NY"
     return f"{venue}, {borough}"
@@ -74,7 +79,7 @@ def run(site_page: str, watchlist_path: str = DEFAULT_WATCHLIST, store: str = DE
     weeks = build_weeks(matches, sorted({s.day for s in screenings}), today)
 
     write_site_page(matches, site_page, updated_iso=updated_iso,
-                    weeks=weeks, map_query=map_query)
+                    weeks=weeks, map_query=map_query, venue_area=venue_area)
     if report_path:
         write_report(weeks[0].matches, report_path)
     return {

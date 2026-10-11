@@ -12,7 +12,7 @@
   --text-light: #777777;
   --white: #FFFFFF;
   --light-bg: #F5FFFA; /* Mint Cream - very light sea green tint */
-  --page-bg: #FFFFFF; /
+  --page-bg: #FFFFFF;
   /* --page-bg: #f8ffee; */
 
   --card-bg: #FFFFFF; /* Background color for content cards/boxes */
@@ -1337,6 +1337,163 @@ p {
 .strip-day[aria-pressed="true"] .strip-month,
 .strip-day[aria-pressed="true"] .strip-count {
     color: var(--white);
+}
+
+/* Notice shown when the daily rebuild hasn't run for a while */
+.screenings-stale {
+    background: #fff4e5;
+    border: 1px solid #f0c27a;
+    color: #6b4a12;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    margin: 0 0 16px;
+}
+
+.screenings-stale[hidden] {
+    display: none;
+}
+
+/* "Theaters" dropdown */
+.venue-filter {
+    position: relative;
+}
+
+.venue-filter summary {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.92rem;
+    color: var(--primary-dark);
+    background: var(--card-bg);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.venue-filter summary::-webkit-details-marker {
+    display: none;
+}
+
+.venue-filter summary::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border: solid var(--primary-dark);
+    border-width: 0 1.5px 1.5px 0;
+    transform: translateY(-2px) rotate(45deg);
+    margin-left: 2px;
+}
+
+.venue-filter[open] summary::after {
+    transform: translateY(1px) rotate(-135deg);
+}
+
+.venue-filter.is-filtered summary {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.venue-filter.is-filtered summary::after {
+    border-color: var(--white);
+}
+
+.venue-filter summary:focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+}
+
+.venue-panel {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    width: max-content;
+    max-width: min(560px, calc(100vw - 32px));
+    background: var(--card-bg);
+    border: 1px solid #dfe8e7;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: 12px 16px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 28px;
+}
+
+.venue-shortcuts {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eeeeee;
+    margin-bottom: 4px;
+}
+
+.venue-shortcuts button {
+    font: inherit;
+    font-size: 0.82rem;
+    color: var(--primary-dark);
+    background: var(--light-bg);
+    border: 1px solid var(--primary-light);
+    border-radius: 999px;
+    padding: 2px 10px;
+    cursor: pointer;
+}
+
+.venue-shortcuts button:hover {
+    border-color: var(--primary-color);
+}
+
+.venue-group {
+    border: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.venue-group legend {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-light);
+    padding: 0;
+    margin-bottom: 4px;
+}
+
+.venue-group label {
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.venue-group input {
+    accent-color: var(--primary-color);
+    width: 15px;
+    height: 15px;
+}
+
+@media (max-width: 640px) {
+    .venue-panel {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        top: auto;
+        bottom: 16px;
+        width: auto;
+        max-width: none;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
 }
 
 /* With "Weekends only" on, Monday to Thursday recede. */
