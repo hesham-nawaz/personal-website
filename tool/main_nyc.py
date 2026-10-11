@@ -35,7 +35,9 @@ DEFAULT_STORE = str(ROOT / "data" / "nyc-screenings")
 
 # Google Maps searches by venue name find the venue's own listing. The borough
 # keeps a search from landing on a same-named place elsewhere.
-_BROOKLYN = {"bam rose cinemas", "nitehawk cinema williamsburg", "nitehawk cinema prospect park"}
+_BROOKLYN = {"bam rose cinemas", "nitehawk cinema williamsburg", "nitehawk cinema prospect park",
+             # Screen Slate venues whose pages give no address
+             "light industry", "millennium film workshop"}
 _QUEENS = {"museum of the moving image"}
 # Addresses of venues found through Screen Slate (data/nyc-venues.json),
 # loaded by run().
