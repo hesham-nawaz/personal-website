@@ -9,7 +9,11 @@ from unittest import mock
 
 from tests.helpers import WATCHLIST, FakeFeed, make_feed  # noqa: F401  (sets sys.path)
 
+import json
+
 import letterboxd_watchlist as lb
+import nyc_momi
+from tests.helpers import MOMI_EVENTS
 import nyc_repertory as nr
 from watchlist import load_watchlist, title_variants
 
@@ -50,6 +54,30 @@ class FeedParsing(unittest.TestCase):
         self.assertEqual(s.times, ["10:45a", "7:40p"])
         self.assertEqual(s.ticket_urls, ["https://t/1", "https://t/2"])
         self.assertIsNone(s.notes)
+
+
+class MoMICalendar(unittest.TestCase):
+    def test_parses_screenings_only(self):
+        events = json.loads(MOMI_EVENTS.read_text())["events"]
+        rows = [r for r in (nyc_momi.parse_event(e) for e in events) if r]
+        self.assertEqual([r["id"] for r in rows], ["momi-101", "momi-102"])   # no exhibition, no talk
+        a, b = rows
+        self.assertEqual((a["film_title"], a["film_year"], a["film_director"], a["date"], a["time"], a["format"]),
+                         ("In the Mouth of Madness", 1994, "John Carpenter", "2026-10-12", "15:30", "35mm"))
+        self.assertIsNone(a["special_event"])
+        self.assertEqual((b["film_year"], b["film_director"], b["format"], b["special_event"]),
+                         (1987, "Wim Wenders", "4K restoration", "Q&A"))
+        self.assertEqual(b["ticket_url"], "https://movingimage.org/event/wings-of-desire/")
+
+    def test_follows_pages(self):
+        pages = {"p1": {"events": [{"id": 1}], "next_rest_url": "p2"}, "p2": {"events": [{"id": 2}], "next_rest_url": None}}
+        calls = []
+
+        def get(url):
+            calls.append(url)
+            return pages["p1"] if len(calls) == 1 else pages[url]
+
+        self.assertEqual([e["id"] for e in nyc_momi.fetch_events(date(2026, 10, 10), date(2026, 12, 1), get)], [1, 2])
 
 
 class Matching(unittest.TestCase):

@@ -532,7 +532,7 @@ _SCREENINGS_SCRIPT = """  <script>
     // more than two days old means the daily job has been failing.
     var updatedEl = section.querySelector('.screenings-updated');
     var staleEl = section.querySelector('.screenings-stale');
-    if (updatedEl && staleEl && /^\d{4}-\d{2}-\d{2}$/.test(updatedEl.getAttribute('data-updated') || '')) {
+    if (updatedEl && staleEl && /^\\d{4}-\\d{2}-\\d{2}$/.test(updatedEl.getAttribute('data-updated') || '')) {
       var upd = updatedEl.getAttribute('data-updated');
       var age = Math.round((dateObj(today) - dateObj(upd)) / 864e5);
       if (age > 2) {

@@ -11,9 +11,10 @@ from datetime import date
 from pathlib import Path
 from unittest import mock
 
-from tests.helpers import WATCHLIST, FakeFeed, make_feed, scratch_site
+from tests.helpers import WATCHLIST, FakeFeed, fake_momi, make_feed, scratch_site
 
 import main_nyc
+import nyc_momi
 import nyc_store
 
 try:
@@ -49,7 +50,8 @@ class PageScript(unittest.TestCase):
     def setUpClass(cls):
         cls.site = scratch_site()
         store = Path(tempfile.mkdtemp()) / "store"
-        with mock.patch.object(nyc_store, "fetch_day", FakeFeed(make_feed(BUILT))):
+        with mock.patch.object(nyc_store, "fetch_day", FakeFeed(make_feed(BUILT))), \
+             mock.patch.object(nyc_momi, "fetch_screenings", fake_momi()):
             main_nyc.run(str(cls.site / "screenings-nyc.html"), str(WATCHLIST), str(store), BUILT.isoformat(), BUILT)
         cls.pw = sync_playwright().start()
         cls.browser = cls.pw.chromium.launch()
@@ -116,7 +118,7 @@ class PageScript(unittest.TestCase):
         s = self.state(page)
         self.assertEqual(s["venues"], ["BAM Rose Cinemas", "Nitehawk Cinema Williamsburg"])
         self.assertIn("skip=", s["q"])
-        self.assertEqual(page.text_content(".venue-filter-label"), "2 of 5 theaters")
+        self.assertEqual(page.text_content(".venue-filter-label"), "2 of 6 theaters")
         self.assertEqual(page.text_content('.strip-day[data-date="2026-10-14"] .strip-count'), "2 films")
         # remembered on the next visit
         page.goto((self.site / "screenings-nyc.html").as_uri())

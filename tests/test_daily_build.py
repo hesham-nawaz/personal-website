@@ -9,9 +9,10 @@ from datetime import date
 from pathlib import Path
 from unittest import mock
 
-from tests.helpers import WATCHLIST, FakeFeed, make_feed, scratch_site
+from tests.helpers import WATCHLIST, FakeFeed, fake_momi, make_feed, momi_rows, scratch_site
 
 import main_nyc
+import nyc_momi
 import nyc_store
 import render
 
@@ -25,8 +26,9 @@ class DailyBuild(unittest.TestCase):
         self.store = Path(tempfile.mkdtemp()) / "store"
         self.feed = make_feed(TODAY)
 
-    def run_day(self, today, feed=None):
-        with mock.patch.object(nyc_store, "fetch_day", feed or FakeFeed(self.feed)):
+    def run_day(self, today, feed=None, momi=None):
+        with mock.patch.object(nyc_store, "fetch_day", feed or FakeFeed(self.feed)), \
+             mock.patch.object(nyc_momi, "fetch_screenings", momi or fake_momi()):
             return main_nyc.run(str(self.page), str(WATCHLIST), str(self.store), today.isoformat(), today)
 
     def records(self):
@@ -102,6 +104,32 @@ class DailyBuild(unittest.TestCase):
         movie = p.split('data-view="movie" hidden>', 1)[1]
         titles = re.findall(r'<div class="screening-title">(.*?)</div>', movie)
         self.assertEqual(len(titles), len(set(titles)))
+
+    def test_momi_screenings_join_the_page(self):
+        s = self.run_day(TODAY)
+        self.assertEqual(s["momi"], 2)
+        p = self.page.read_text()
+        self.assertIn("google.com/maps/search/?api=1&amp;query=Museum+of+the+Moving+Image%2C+Queens%2C+NY", p)
+        self.assertIn('href="https://movingimage.org/event/wings-of-desire/"', p)
+        self.assertIn('Listed as “Wings of Desire (with J. Hoberman)”', p)
+        self.assertIn('data-only="Queens"', p)
+        self.assertNotIn("In the Mouth of Madness", p)          # not on the fixture watchlist
+
+    def test_sources_only_remove_their_own_screenings(self):
+        self.run_day(TODAY)
+        momi_ids = [r["id"] for r in self.records().values() if r["source"] == "momi"]
+        # MoMI down: its screenings stay listed; repertory.nyc still refreshes
+        s = self.run_day(date(2026, 10, 11), momi=fake_momi(fail=True))
+        self.assertEqual(s["momi"], "unavailable")
+        self.assertTrue(all(self.records()[i]["removed"] is None for i in momi_ids))
+        # MoMI drops one screening: only that one is marked removed
+        rows = [r for r in momi_rows() if r["id"] != "momi-102"]
+        self.run_day(date(2026, 10, 11), momi=fake_momi(rows))
+        recs = self.records()
+        self.assertEqual(recs["momi-102"]["removed"], "2026-10-11")
+        self.assertIsNone(recs["momi-101"]["removed"])
+        self.assertTrue(all(r["removed"] is None for r in recs.values()
+                            if r["source"] == "repertory.nyc" and r["date"] >= "2026-10-11"))
 
     def test_la_page_still_renders(self):
         from match import MatchedScreening

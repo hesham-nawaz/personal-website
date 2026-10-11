@@ -1,0 +1,19 @@
+{
+  "events": [
+    {"id": 101, "title": "In the Mouth of Madness", "start_date": "2026-10-12 15:30:00", "all_day": false,
+     "timezone": "America/New_York", "url": "https://movingimage.org/event/in-the-mouth-of-madness/",
+     "categories": [{"name": "Screening"}],
+     "description": "<p>Dir. John Carpenter. 1994, 95 mins. 35mm. Sam Neill is an insurance investigator&#8230;</p>"},
+    {"id": 102, "title": "Wings of Desire (with J. Hoberman)", "start_date": "2026-10-13 19:00:00", "all_day": false,
+     "timezone": "America/New_York", "url": "https://movingimage.org/event/wings-of-desire/",
+     "categories": [{"name": "Screening"}, {"name": "Screening + Q&amp;A"}],
+     "description": "<p>Introduced by J. Hoberman</p><p>Dir. Wim Wenders. 1987, 128 mins. West Germany. 4K restoration.</p>"},
+    {"id": 103, "title": "Seeing the Cinema: Photographic Visions of Movie Theaters", "start_date": "2026-10-10 00:00:00",
+     "all_day": true, "timezone": "America/New_York", "url": "https://movingimage.org/event/seeing-the-cinema/",
+     "categories": [{"name": "Exhibition"}], "description": "<p>An exhibition.</p>"},
+    {"id": 104, "title": "Artist Talk: Someone", "start_date": "2026-10-14 18:00:00", "all_day": false,
+     "timezone": "America/New_York", "url": "https://movingimage.org/event/talk/",
+     "categories": [{"name": "Artist Talk"}], "description": "<p>A talk.</p>"}
+  ],
+  "next_rest_url": null
+}

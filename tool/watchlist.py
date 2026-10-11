@@ -71,6 +71,8 @@ _DECORATION_PATTERNS = [
     r"\d+(st|nd|rd|th) anniversary[^)]*|\d+mm)\)\s*$",
     # ": 30th Anniversary Remaster", ": 4K Restoration"
     r"\s*:\s*(\d+(st|nd|rd|th) anniversary.*|4k restoration.*|new restoration.*)$",
+    # trailing guest credits: "Southland Tales (with J. Hoberman)"
+    r"\s*\((with|featuring|introduced by|presented by|in conversation with)\b[^)]*\)\s*$",
 ]
 _PREFIX_PATTERNS = [
     # "The Downtown Festival: Title", "Downtown Fest: Title"

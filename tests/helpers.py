@@ -15,6 +15,7 @@ if str(TOOL) not in sys.path:
     sys.path.insert(0, str(TOOL))
 
 WATCHLIST = FIXTURES / "watchlist.csv"
+MOMI_EVENTS = FIXTURES / "momi_events.json"
 
 # (title, year, director, theater, HH:MM, format, special_event)
 BASE_DAY = [
@@ -69,3 +70,20 @@ def scratch_site() -> Path:
     shutil.copy(ROOT / "screenings-nyc.html", d / "screenings-nyc.html")
     shutil.copy(ROOT / "styles.css", d / "styles.css")
     return d
+
+
+def momi_rows(events_file: Path = None) -> list[dict]:
+    """The fixture MoMI calendar, parsed as the daily job would."""
+    import json
+    import nyc_momi
+    data = json.loads((events_file or MOMI_EVENTS).read_text())
+    return [r for r in (nyc_momi.parse_event(e) for e in data["events"]) if r]
+
+
+def fake_momi(rows=None, fail=False):
+    """Stands in for nyc_momi.fetch_screenings."""
+    def fetch(start, end, **kw):
+        if fail:
+            raise OSError("simulated MoMI outage")
+        return [dict(r) for r in (momi_rows() if rows is None else rows) if start.isoformat() <= r["date"] <= end.isoformat()]
+    return fetch

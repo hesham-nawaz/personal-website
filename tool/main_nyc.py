@@ -2,8 +2,8 @@
 
 Each (daily) run:
   1. refreshes the screenings store, data/nyc-screenings/, from
-     https://repertory.nyc/api/screenings for today through the feed's horizon
-     (see nyc_store.py);
+     https://repertory.nyc/api/screenings and the Museum of the Moving Image's
+     calendar for today through the feeds' horizon (see nyc_store.py);
   2. matches every screening still listed from today on against Hesham's
      Letterboxd watchlist;
   3. renders "This Week in NYC" (today through Sunday) plus each later week
@@ -34,16 +34,18 @@ DEFAULT_STORE = str(ROOT / "data" / "nyc-screenings")
 # Google Maps searches by venue name find the venue's own listing. The borough
 # keeps a search from landing on a same-named place elsewhere.
 _BROOKLYN = {"bam rose cinemas", "nitehawk cinema williamsburg", "nitehawk cinema prospect park"}
+_QUEENS = {"museum of the moving image"}
 
 
 def venue_area(venue: str) -> str:
     """Borough, for grouping the page's theater filter."""
-    return "Brooklyn" if venue.strip().lower() in _BROOKLYN else "Manhattan"
+    v = venue.strip().lower()
+    return "Brooklyn" if v in _BROOKLYN else "Queens" if v in _QUEENS else "Manhattan"
 
 
 def map_query(venue: str) -> str:
-    borough = "Brooklyn, NY" if venue.strip().lower() in _BROOKLYN else "New York, NY"
-    return f"{venue}, {borough}"
+    area = venue_area(venue)
+    return f"{venue}, {'New York' if area == 'Manhattan' else area}, NY"
 
 
 def build_weeks(matches, listed_days: list[date], today: date) -> list[SiteWeek]:
@@ -113,7 +115,9 @@ def main() -> int:
     if "days_checked" in s:
         print(f"Store: checked {s['days_checked']} days through {s['through']} "
               f"({s['days_failed']} failed); {s['added']} new, {s['updated']} changed, "
-              f"{s['removed']} removed, {s['restored']} back.")
+              f"{s['removed']} removed, {s['restored']} back. "
+              f"Museum of the Moving Image: {s['momi']}"
+              f"{' screenings listed' if s['momi'] != 'unavailable' else ''}.")
     print(f"Listed from today: {s['screenings_listed']} showtimes; matched {s['matched_total']} "
           f"({s['matched_this_week']} this week) against {s['watchlist_entries']}-entry watchlist; "
           f"{s['weeks']} weeks on the page.")
