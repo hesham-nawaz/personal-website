@@ -9,11 +9,13 @@ small line diff in git.
 Stored are all screenings, not just watchlist matches, so a film added to the
 watchlist later still matches screenings that were posted earlier.
 
-Sources: repertory.nyc (11 venues) and the Museum of the Moving Image's own
-calendar (nyc_momi.py). Each record names its source, and a source's run
+Sources: repertory.nyc (11 venues), the Museum of the Moving Image's own
+calendar (nyc_momi.py), and Screen Slate for the venues neither covers
+(nyc_screenslate.py). Each record names its source, and a source's run
 only ever marks its own screenings as removed, so one source being down or
-missing a day never touches the other's listings. If MoMI's calendar can't
-be reached, its stored screenings are left as they were.
+missing a day never touches the other's listings. If MoMI's calendar or
+Screen Slate can't be reached, their stored screenings are left as they were;
+only repertory.nyc being down stops the run.
 
 Bookkeeping per screening:
   first_seen  the run date it first appeared in the feed
@@ -36,17 +38,19 @@ from datetime import date, timedelta
 from pathlib import Path
 
 import nyc_momi
+import nyc_screenslate
 from nyc_repertory import API_URL, fetch_day, event_label, format_tag
 
 HORIZON_DAYS = 120         # never look further ahead than this
 STOP_AFTER_EMPTY_DAYS = 30  # the feed thins out; stop after a month of nothing
 STOP_AFTER_FAILED_DAYS = 5  # the feed is down; don't spend the run retrying
 
-FIELDS = ["id", "source", "date", "time", "title", "year", "director", "theater",
+FIELDS = ["id", "source", "date", "time", "title", "year", "director", "films", "theater",
           "theater_slug", "format", "event", "ticket_url",
           "first_seen", "removed"]
 REPERTORY = "repertory.nyc"
 MOMI = "momi"
+SCREENSLATE = "screenslate"
 
 
 def _source(r: dict) -> str:
@@ -74,6 +78,8 @@ def _record(entry: dict, run_day: str, source: str = REPERTORY) -> dict | None:
         "title": title,
         "year": year,
         "director": (entry.get("film_director") or "").strip() or None,
+        # multi-film programs: [{title, year, director, format}, ...]
+        "films": entry.get("films") or None,
         "theater": (entry.get("theater_name") or "").strip(),
         "theater_slug": entry.get("theater_slug"),
         # raw format as posted; display filtering (hiding DCP etc.) happens later
@@ -162,15 +168,10 @@ def _merge(records: dict[str, dict], fetched: dict[str, list[dict]], source: str
         # A screening can move to another day under the same id; listed wins.
 
 
-def refresh(store: Path, today: date | None = None, url: str = API_URL,
-            fetch=None, momi_get_json=None) -> dict:
-    """Fetch today..horizon from every source and merge into the store.
-    Returns a summary. Raises RuntimeError, leaving the store untouched, if
-    repertory.nyc (the main source) is down."""
-    fetch = fetch or fetch_day
-    today = today or date.today()
-    run_day = today.isoformat()
-
+def _fetch_days(fetch, today: date, url, label: str):
+    """Fetch day by day from today until a month of empty days or the
+    horizon. Returns (rows by iso day for the days that worked, failed days,
+    whether the source looks down)."""
     fetched: dict[str, list[dict]] = {}   # iso day -> rows (only successful days)
     failed: list[str] = []
     empty_streak = fail_streak = 0
@@ -179,7 +180,7 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
         try:
             rows = fetch(day, url)
         except Exception as e:  # one bad day shouldn't sink the run
-            print(f"[nyc_store] WARNING: fetch failed for {day}: {e}", file=sys.stderr)
+            print(f"[nyc_store] WARNING: {label} fetch failed for {day}: {e}", file=sys.stderr)
             failed.append(day.isoformat())
             empty_streak = 0
             fail_streak += 1
@@ -192,9 +193,21 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
         empty_streak = 0 if rows else empty_streak + 1
         if empty_streak >= STOP_AFTER_EMPTY_DAYS:
             break
-    last_checked = max(fetched) if fetched else run_day
+    return fetched, failed, (not fetched or fail_streak >= STOP_AFTER_FAILED_DAYS)
 
-    if not fetched or fail_streak >= STOP_AFTER_FAILED_DAYS:
+
+def refresh(store: Path, today: date | None = None, url: str = API_URL,
+            fetch=None, momi_get_json=None, screenslate=None) -> dict:
+    """Fetch today..horizon from every source and merge into the store.
+    Returns a summary. Raises RuntimeError, leaving the store untouched, if
+    repertory.nyc (the main source) is down."""
+    fetch = fetch or fetch_day
+    today = today or date.today()
+    run_day = today.isoformat()
+
+    fetched, failed, down = _fetch_days(fetch, today, url, "repertory.nyc")
+    last_checked = max(fetched) if fetched else run_day
+    if down:
         raise RuntimeError(f"feed unavailable ({len(failed)} failed requests, "
                            f"{len(fetched)} days fetched); store left unchanged")
 
@@ -212,6 +225,18 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
         print(f"[nyc_store] WARNING: Museum of the Moving Image calendar unavailable ({e}); "
               f"keeping its stored screenings", file=sys.stderr)
 
+    # Screen Slate, for the venues the other two don't cover.
+    seen = {r.get("theater_name") for rows in fetched.values() for r in rows}
+    ss = screenslate or nyc_screenslate.ScreenSlate(seen)
+    ss_fetched, _, ss_down = _fetch_days(ss.fetch_day, today, None, "Screen Slate")
+    if ss_down:
+        print("[nyc_store] WARNING: Screen Slate unavailable; keeping its stored screenings", file=sys.stderr)
+        ss_fetched = None
+    else:
+        nyc_screenslate.update_venues(store.parent / "nyc-venues.json",
+                                      [r for rows in ss_fetched.values() for r in rows],
+                                      **({"get": ss.get_page} if hasattr(ss, "get_page") else {}))
+
     # Every month the checked window touches.
     months = set()
     d = today
@@ -225,6 +250,8 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
     _merge(records, fetched, REPERTORY, run_day, counts)
     if momi_fetched is not None:
         _merge(records, momi_fetched, MOMI, run_day, counts)
+    if ss_fetched is not None:
+        _merge(records, ss_fetched, SCREENSLATE, run_day, counts)
 
     _write_months(store, records, months)
     listed_now = sum(1 for r in records.values()
@@ -233,7 +260,10 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
                       if _source(r) == MOMI and r["date"] >= run_day and not r.get("removed"))
     return {"days_checked": len(fetched), "days_failed": len(failed),
             "through": last_checked, **counts, "listed_from_today": listed_now,
-            "momi": "unavailable" if momi_fetched is None else momi_listed}
+            "momi": "unavailable" if momi_fetched is None else momi_listed,
+            "screenslate": "unavailable" if ss_fetched is None else sum(
+                1 for r in records.values()
+                if _source(r) == SCREENSLATE and r["date"] >= run_day and not r.get("removed"))}
 
 
 def listed_records(store: Path, today: date) -> list[dict]:

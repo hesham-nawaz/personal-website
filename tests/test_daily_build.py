@@ -9,10 +9,11 @@ from datetime import date
 from pathlib import Path
 from unittest import mock
 
-from tests.helpers import WATCHLIST, FakeFeed, fake_momi, make_feed, momi_rows, scratch_site
+from tests.helpers import WATCHLIST, FakeFeed, FakeScreenSlate, fake_momi, make_feed, momi_rows, scratch_site
 
 import main_nyc
 import nyc_momi
+import nyc_screenslate
 import nyc_store
 import render
 
@@ -21,14 +22,19 @@ TODAY = date(2026, 10, 10)          # a Saturday
 
 class DailyBuild(unittest.TestCase):
     def setUp(self):
+        patcher = mock.patch.dict("os.environ", {"TMDB_TOKEN": ""})   # no posters, no network
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.site = scratch_site()
         self.page = self.site / "screenings-nyc.html"
         self.store = Path(tempfile.mkdtemp()) / "store"
         self.feed = make_feed(TODAY)
 
-    def run_day(self, today, feed=None, momi=None):
+    def run_day(self, today, feed=None, momi=None, screenslate=None):
+        ss = screenslate or FakeScreenSlate()
         with mock.patch.object(nyc_store, "fetch_day", feed or FakeFeed(self.feed)), \
-             mock.patch.object(nyc_momi, "fetch_screenings", momi or fake_momi()):
+             mock.patch.object(nyc_momi, "fetch_screenings", momi or fake_momi()), \
+             mock.patch.object(nyc_screenslate, "ScreenSlate", lambda skip: ss):
             return main_nyc.run(str(self.page), str(WATCHLIST), str(self.store), today.isoformat(), today)
 
     def records(self):
@@ -130,6 +136,26 @@ class DailyBuild(unittest.TestCase):
         self.assertIsNone(recs["momi-101"]["removed"])
         self.assertTrue(all(r["removed"] is None for r in recs.values()
                             if r["source"] == "repertory.nyc" and r["date"] >= "2026-10-11"))
+
+    def test_screenslate_venues(self):
+        s = self.run_day(TODAY)
+        self.assertGreater(s["screenslate"], 0)
+        p = self.page.read_text()
+        self.assertIn('data-venue="spectacle"', p)              # the double feature has a watchlist film
+        self.assertIn('data-venue="museum-of-modern-art"', p)   # High and Low
+        self.assertNotIn('data-venue="paris-theater"', p)       # Sebastiane isn't on the watchlist
+        self.assertIn("query=Museum+of+Modern+Art%2C+11+West+53rd+Street", p)
+        self.assertIn('Introduced by Dave Kehr', p)
+        venues = json.loads((self.store.parent / "nyc-venues.json").read_text())
+        self.assertEqual(venues["Spectacle"]["borough"], "Brooklyn")
+        self.assertEqual(sorted(json.loads(l)["theater"] for p_ in self.store.glob("*.jsonl")
+                                for l in p_.read_text().splitlines()
+                                if json.loads(l)["source"] == "screenslate" and json.loads(l)["date"] == "2026-10-10"),
+                         ["Museum of Modern Art", "Paris Theater", "Spectacle"])
+        # Screen Slate down: its screenings stay; the run still succeeds
+        s2 = self.run_day(date(2026, 10, 11), screenslate=FakeScreenSlate(fail=True))
+        self.assertEqual(s2["screenslate"], "unavailable")
+        self.assertTrue(all(r["removed"] is None for r in self.records().values() if r["source"] == "screenslate"))
 
     def test_la_page_still_renders(self):
         from match import MatchedScreening

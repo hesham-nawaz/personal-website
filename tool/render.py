@@ -370,6 +370,13 @@ def render_site_fragment(matches: list[MatchedScreening],
         parts.append(_render_site_film_week(group, map_query))
     parts.append('  </div>')
 
+    if any(getattr(m, "poster_url", None) for m in all_matches):
+        # Required by TMDB's API terms wherever its posters are used.
+        parts.append('  <p class="tmdb-credit"><a href="https://www.themoviedb.org/" target="_blank" rel="noopener">'
+                     '<img src="images/tmdb-logo.svg" alt="TMDB" width="56" height="12" onerror="this.remove()">'
+                     '</a> Film posters from TMDB. This website uses TMDB and the TMDB APIs but is not endorsed, '
+                     'certified, or otherwise approved by TMDB.</p>')
+
     parts.append(_SCREENINGS_SCRIPT)
     parts.append('</section>')
     return "\n".join(parts)
@@ -867,7 +874,14 @@ def _film_header_lines(group: list[MatchedScreening], extra_meta: str | None = N
     klass = "screening-card"
     if len(first.screening.films) > 1:
         klass += " double-feature"
+    poster = next((getattr(m, "poster_url", None) for m in group if getattr(m, "poster_url", None)), None)
+    if poster:
+        klass += " has-poster"
     lines = [f'    <div class="{klass}" data-film="{html.escape(_film_id(first))}">']
+    if poster:
+        # decorative: the title is right beside it
+        lines.append(f'      <img class="card-poster" src="{html.escape(poster)}" alt="" loading="lazy" '
+                     f'decoding="async" width="54" height="81">')
     lines.append(f'      <div class="screening-title">{_canonical_title_html(first)}</div>')
     meta = []
     if directors:

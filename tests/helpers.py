@@ -87,3 +87,40 @@ def fake_momi(rows=None, fail=False):
             raise OSError("simulated MoMI outage")
         return [dict(r) for r in (momi_rows() if rows is None else rows) if start.isoformat() <= r["date"] <= end.isoformat()]
     return fetch
+
+
+SS_DETAILS = FIXTURES / "screenslate_details.json"
+SS_VENUE_PAGES = {
+    "paris-theater": "<div>Address 4 West 58th Street, New York, NY 10019</div>",
+    "museum-modern-art": "<div>Address 11 West 53rd Street, New York, NY 10019</div>",
+    "spectacle": "<div>Address 124 S. 3rd Street, Brooklyn, NY 11249</div>",
+}
+
+
+class FakeScreenSlate:
+    """Stands in for nyc_screenslate.ScreenSlate: the fixture's screenings
+    every day (Paris, MoMA, a Spectacle double feature, and a Film Forum
+    listing that must be skipped as already covered)."""
+
+    def __init__(self, fail=False):
+        import json
+        self.fail = fail
+        self.details = {d["nid"]: d for d in json.loads(SS_DETAILS.read_text())}
+        self.pages = []
+
+    def fetch_day(self, day, url=None):
+        import nyc_screenslate
+        if self.fail:
+            raise OSError("simulated Screen Slate outage")
+        if day > date(2026, 10, 25):              # two weeks of listings, like make_feed
+            return []
+        ts = day.isoformat()
+        showtimes = [{"nid": "201", "field_timestamp": f"{ts}T19:00:00", "field_note": ""},
+                     {"nid": "202", "field_timestamp": f"{ts}T16:00:00", "field_note": "Introduced by Dave Kehr"},
+                     {"nid": "203", "field_timestamp": f"{ts}T21:30:00", "field_note": "Q&amp;A"},
+                     {"nid": "204", "field_timestamp": f"{ts}T20:15:00", "field_note": ""}]
+        return nyc_screenslate.to_rows(showtimes, self.details, set(nyc_screenslate.COVERED))
+
+    def get_page(self, path):
+        self.pages.append(path)
+        return SS_VENUE_PAGES[path.rsplit("/", 1)[1]].encode()

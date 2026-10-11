@@ -13,7 +13,8 @@ import json
 
 import letterboxd_watchlist as lb
 import nyc_momi
-from tests.helpers import MOMI_EVENTS
+import nyc_screenslate
+from tests.helpers import MOMI_EVENTS, SS_DETAILS
 import nyc_repertory as nr
 from watchlist import load_watchlist, title_variants
 
@@ -78,6 +79,46 @@ class MoMICalendar(unittest.TestCase):
             return pages["p1"] if len(calls) == 1 else pages[url]
 
         self.assertEqual([e["id"] for e in nyc_momi.fetch_events(date(2026, 10, 10), date(2026, 12, 1), get)], [1, 2])
+
+
+class ScreenSlateListings(unittest.TestCase):
+    def setUp(self):
+        self.details = {d["nid"]: d for d in json.loads(SS_DETAILS.read_text())}
+
+    def test_parses_single_and_multi_film_screenings(self):
+        self.assertEqual(nyc_screenslate.parse_films(self.details["201"]),
+                         [{"title": "Sebastiane", "year": 1976, "director": "Derek Jarman, Paul Humfress", "format": "DCP"}])
+        multi = nyc_screenslate.parse_films(self.details["203"])
+        self.assertEqual([(f["title"], f["year"], f["director"]) for f in multi],
+                         [("Sylph", 2021, "slimebubble, Almeda Morgan"), ("Wings of Desire", 1987, "Wim Wenders")])
+
+    def test_rows_skip_covered_venues(self):
+        showtimes = [{"nid": n, "field_timestamp": "2026-10-12T19:00:00", "field_note": "Q&amp;A" if n == "203" else ""}
+                     for n in ("201", "202", "203", "204")]
+        rows = nyc_screenslate.to_rows(showtimes, self.details, set(nyc_screenslate.COVERED))
+        self.assertEqual([r["theater_name"] for r in rows], ["Paris Theater", "Museum of Modern Art", "Spectacle"])
+        double = rows[2]
+        self.assertEqual(double["film_title"], "Sylph / Wings of Desire")
+        self.assertEqual(len(double["films"]), 2)
+        self.assertEqual(double["special_event"], "Q&A")
+        self.assertEqual(rows[0]["id"], "ss-201-20261012T1900")
+
+    def test_venue_addresses_and_boroughs(self):
+        info = nyc_screenslate.parse_venue_page("<p>Address 36-01 35th Avenue, Astoria, NY 11106</p>")
+        self.assertEqual(info, {"address": "36-01 35th Avenue, Astoria, NY 11106", "borough": "Queens"})
+        self.assertEqual(nyc_screenslate.borough_for_zip("11249"), "Brooklyn")
+        self.assertEqual(nyc_screenslate.borough_for_zip("10019"), "Manhattan")
+        self.assertIsNone(nyc_screenslate.parse_venue_page("<p>no address</p>")["borough"])
+
+    def test_multi_film_record_matches_each_film(self):
+        import nyc_repertory
+        from watchlist import load_watchlist
+        rec = {"id": "x", "title": "Sylph / Wings of Desire", "date": "2026-10-12", "time": "21:30",
+               "theater": "Spectacle", "films": [{"title": "Sylph", "year": 2021, "director": "slimebubble"},
+                                                 {"title": "Wings of Desire", "year": 1987, "director": "Wim Wenders"}]}
+        [s] = nyc_repertory.screenings_from_records([rec])
+        wl = load_watchlist(WATCHLIST)
+        self.assertEqual([wl.match(f.title, f.year) is not None for f in s.films], [False, True])
 
 
 class Matching(unittest.TestCase):

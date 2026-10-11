@@ -1,7 +1,8 @@
 name: Daily Screenings (NYC)
 
-# Every morning: stores every screening repertory.nyc lists from today on in
-# data/nyc-screenings/ (one JSON Lines file per month), matches them against
+# Every morning: stores every screening repertory.nyc, the Museum of the
+# Moving Image and Screen Slate list from today on in data/nyc-screenings/
+# (one JSON Lines file per month), matches them against
 # Hesham's Letterboxd watchlist, and rebuilds screenings-nyc.html with this
 # week (today through Sunday) plus a picker for later weeks. Commits to main
 # so Cloudflare Pages re-deploys.
@@ -66,6 +67,10 @@ jobs:
       # then rebuilds the page. If the feed is down, the store and page are
       # left as they were and this step fails.
       - name: Store screenings and rebuild screenings-nyc.html
+        env:
+          # TMDB API Read Access Token for film posters (repository secret).
+          # Without it the page is built without posters.
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
         run: |
           TODAY=$(TZ=America/New_York date +%F)
           cd tool && python main_nyc.py \
@@ -80,6 +85,9 @@ jobs:
           git config user.name  "screenings-bot"
           git config user.email "screenings-bot@users.noreply.github.com"
           git add screenings-nyc.html data/watchlist.csv data/nyc-screenings
+          for f in data/nyc-venues.json data/tmdb-posters.json images/tmdb-logo.svg; do
+            if [ -e "$f" ]; then git add "$f"; fi
+          done
           if git diff --cached --quiet; then
             echo "Nothing changed — nothing to commit."
             exit 0

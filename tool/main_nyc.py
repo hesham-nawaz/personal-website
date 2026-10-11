@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -25,6 +26,7 @@ from match import match_screenings
 from nyc_repertory import screenings_from_records
 from nyc_store import listed_records, refresh
 from render import SiteWeek, write_report, write_site_page
+from tmdb_posters import attach_posters, ensure_logo
 from watchlist import load_watchlist
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -35,15 +37,24 @@ DEFAULT_STORE = str(ROOT / "data" / "nyc-screenings")
 # keeps a search from landing on a same-named place elsewhere.
 _BROOKLYN = {"bam rose cinemas", "nitehawk cinema williamsburg", "nitehawk cinema prospect park"}
 _QUEENS = {"museum of the moving image"}
+# Addresses of venues found through Screen Slate (data/nyc-venues.json),
+# loaded by run().
+_VENUES: dict[str, dict] = {}
 
 
 def venue_area(venue: str) -> str:
     """Borough, for grouping the page's theater filter."""
+    known = (_VENUES.get(venue) or {}).get("borough")
+    if known:
+        return known
     v = venue.strip().lower()
     return "Brooklyn" if v in _BROOKLYN else "Queens" if v in _QUEENS else "Manhattan"
 
 
 def map_query(venue: str) -> str:
+    address = (_VENUES.get(venue) or {}).get("address")
+    if address:
+        return f"{venue}, {address}"
     area = venue_area(venue)
     return f"{venue}, {'New York' if area == 'Manhattan' else area}, NY"
 
@@ -73,12 +84,20 @@ def run(site_page: str, watchlist_path: str = DEFAULT_WATCHLIST, store: str = DE
     today = today or date.today()
     store_dir = Path(store)
     summary = refresh(store_dir, today=today) if fetch else {}
+    global _VENUES
+    try:
+        _VENUES = json.loads((store_dir.parent / "nyc-venues.json").read_text())
+    except (OSError, ValueError):
+        _VENUES = {}
 
     records = listed_records(store_dir, today)
     screenings = screenings_from_records(records)
     wl = load_watchlist(watchlist_path)
     matches = match_screenings(screenings, wl)
     weeks = build_weeks(matches, sorted({s.day for s in screenings}), today)
+    posters = attach_posters(matches, store_dir.parent / "tmdb-posters.json", today)
+    if any(getattr(m, "poster_url", None) for m in matches):
+        ensure_logo(Path(site_page).parent / "images" / "tmdb-logo.svg")
 
     write_site_page(matches, site_page, updated_iso=updated_iso,
                     weeks=weeks, map_query=map_query, venue_area=venue_area)
@@ -91,6 +110,7 @@ def run(site_page: str, watchlist_path: str = DEFAULT_WATCHLIST, store: str = DE
         "matched_total": sum(len(m.screening.times) for m in matches),
         "weeks": len(weeks),
         "watchlist_entries": len(wl.entries),
+        **posters,
     }
 
 
@@ -116,11 +136,10 @@ def main() -> int:
         print(f"Store: checked {s['days_checked']} days through {s['through']} "
               f"({s['days_failed']} failed); {s['added']} new, {s['updated']} changed, "
               f"{s['removed']} removed, {s['restored']} back. "
-              f"Museum of the Moving Image: {s['momi']}"
-              f"{' screenings listed' if s['momi'] != 'unavailable' else ''}.")
+              f"Museum of the Moving Image: {s['momi']}; Screen Slate venues: {s['screenslate']}.")
     print(f"Listed from today: {s['screenings_listed']} showtimes; matched {s['matched_total']} "
           f"({s['matched_this_week']} this week) against {s['watchlist_entries']}-entry watchlist; "
-          f"{s['weeks']} weeks on the page.")
+          f"{s['weeks']} weeks on the page. Posters: {s['posters']}.")
     return 0
 
 

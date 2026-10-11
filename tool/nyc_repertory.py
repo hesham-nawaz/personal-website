@@ -227,7 +227,19 @@ def _entry_to_screening(entry: dict) -> Screening | None:
 
 
 def screening_from_record(rec: dict) -> Screening | None:
-    """Screening from a stored record (see nyc_store.py)."""
+    """Screening from a stored record (see nyc_store.py). Multi-film
+    programs (a "films" list) become one screening with several films, each
+    matched against the watchlist on its own."""
+    if rec.get("films"):
+        base = screening_from_record({k: v for k, v in rec.items() if k != "films"})
+        if base is None:
+            return None
+        films = [f for f in rec["films"] if f.get("title")]
+        base.films = [Film(title=f["title"], year=f.get("year")) for f in films]
+        base.directors = []
+        for f in films:
+            base.directors += [d.strip() for d in (f.get("director") or "").split(",") if d.strip()]
+        return base
     entry = {
         "film_title": rec.get("title"), "film_year": rec.get("year"),
         "film_director": rec.get("director"), "theater_name": rec.get("theater"),

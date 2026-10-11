@@ -1715,6 +1715,57 @@ p {
     border-radius: 4px;
 }
 
+/* Poster thumbnail (from TMDB) beside the card's text */
+.screening-card.has-poster {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: start;
+}
+
+.screening-card.has-poster > :not(.card-poster) {
+    grid-column: 2;
+}
+
+.card-poster {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: 54px;
+    height: 81px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #eef3f2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.tmdb-credit {
+    margin-top: 28px;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.tmdb-credit img {
+    height: 12px;
+    width: auto;
+    display: block;
+}
+
+@media (max-width: 640px) {
+    .screening-card.has-poster {
+        grid-template-columns: 40px minmax(0, 1fr);
+        column-gap: 12px;
+    }
+
+    .card-poster {
+        width: 40px;
+        height: 60px;
+    }
+}
+
 /* One card per film per day; each venue showing it is a row inside. */
 .screening-venues {
     list-style: none;

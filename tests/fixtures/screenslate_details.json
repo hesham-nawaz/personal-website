@@ -1,0 +1,22 @@
+[
+ {"nid": "201", "title": "Sebastiane at Paris", "field_display_title": "",
+  "media_title_labels": " <span class=\"field field--name-title field--type-string field--label-hidden\">Sebastiane</span> ",
+  "media_title_info": " <span> Derek Jarman, Paul Humfress</span><span>1976</span><span>86M</span> <span>DCP</span>",
+  "media_title_format": "DCP", "venue_title": "<a href=\"/venues/paris-theater\" hreflang=\"en\">Paris Theater</a>",
+  "field_url": "https://www.paristheaternyc.com/film/sebastiane-paris"},
+ {"nid": "202", "title": "High and Low at MoMA", "field_display_title": "",
+  "media_title_labels": " <span class=\"field field--name-title field--type-string field--label-hidden\">High and Low</span> ",
+  "media_title_info": " <span> Akira Kurosawa</span><span>1963</span><span>143M</span> <span>35mm</span>",
+  "media_title_format": "35mm", "venue_title": "<a href=\"/venues/museum-modern-art\" hreflang=\"en\">Museum of Modern Art</a>",
+  "field_url": "https://www.moma.org/calendar/events/1"},
+ {"nid": "203", "title": "Shorts", "field_display_title": "An Audiovisual Double Feature",
+  "media_title_labels": " <span class=\"field field--name-title field--type-string field--label-hidden\">Sylph</span> | <span class=\"field field--name-title field--type-string field--label-hidden\">Wings of Desire</span> ",
+  "media_title_info": " <span> slimebubble, Almeda Morgan</span><span>2021</span><span>35M</span> | <span> Wim Wenders</span><span>1987</span><span>128M</span> ",
+  "media_title_format": "|", "venue_title": "<a href=\"/venues/spectacle\" hreflang=\"en\">Spectacle</a>",
+  "field_url": "https://www.spectacletheater.com/x"},
+ {"nid": "204", "title": "Wings of Desire at Film Forum", "field_display_title": "",
+  "media_title_labels": " <span class=\"field field--name-title field--type-string field--label-hidden\">Wings of Desire</span> ",
+  "media_title_info": " <span> Wim Wenders</span><span>1987</span><span>128M</span> <span>35mm</span>",
+  "media_title_format": "35mm", "venue_title": "<a href=\"/venues/film-forum\" hreflang=\"en\">Film Forum</a>",
+  "field_url": "https://filmforum.org/x"}
+]
