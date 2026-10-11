@@ -45,6 +45,12 @@ jobs:
 
       # Stdlib only — no install step needed.
 
+      # The Python tests (the browser tests skip without Playwright; the Tests
+      # workflow runs those). A failure stops the run, leaving the page as it
+      # was; the page itself says so once it is more than two days old.
+      - name: Run tests
+        run: python -m unittest discover -s tests -t .
+
       # Refresh the watchlist so films added on Letterboxd since the last run
       # can match. If Letterboxd is unreachable or returns a suspiciously short
       # list, the script leaves data/watchlist.csv as it was and this step is
