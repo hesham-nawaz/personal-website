@@ -114,6 +114,11 @@
   "borough": "Manhattan",
   "slug": "scandinavia-house"
  },
+ "Singers": {
+  "address": "30 Kosciuszko St, Brooklyn, NY 11205",
+  "borough": "Brooklyn",
+  "slug": "singers"
+ },
  "Soho House": {
   "address": null,
   "borough": null,
@@ -133,6 +138,11 @@
   "address": "17 West 17th Street, 8th Floor New York, NY 10011",
   "borough": "Manhattan",
   "slug": "8th-floor"
+ },
+ "The LGBT Community Center": {
+  "address": null,
+  "borough": null,
+  "slug": "lgbt-community-center"
  },
  "UnionDocs": {
   "address": "352 Onderdonk Ave. Ridgewood, NY 11385",

@@ -20,6 +20,13 @@
   "tmdb_id": 37247,
   "year": 1967
  },
+ "https://boxd.it/1Efw": {
+  "checked": "2026-10-14",
+  "poster_path": "/wrkjsGcFJxcQqR56kJUYAEKKg2T.jpg",
+  "title": "Jennifer's Body",
+  "tmdb_id": 19994,
+  "year": 2009
+ },
  "https://boxd.it/1INM": {
   "checked": "2026-10-11",
   "poster_path": "/jb6o66HE1duy0L7MJzEZXvrrsux.jpg",
@@ -40,6 +47,13 @@
   "title": "Labyrinth",
   "tmdb_id": 13597,
   "year": 1986
+ },
+ "https://boxd.it/1RSc": {
+  "checked": "2026-10-14",
+  "poster_path": "/tgNjemQPG96uIezpiUiXFcer5ga.jpg",
+  "title": "High and Low",
+  "tmdb_id": 12493,
+  "year": 1963
  },
  "https://boxd.it/1RxS": {
   "checked": "2026-10-11",
@@ -125,6 +139,13 @@
   "tmdb_id": 10436,
   "year": 1993
  },
+ "https://boxd.it/1WvC": {
+  "checked": "2026-10-14",
+  "poster_path": "/hSGncpMByW8zx2aOSXdZB0e70yA.jpg",
+  "title": "Bugsy",
+  "tmdb_id": 10337,
+  "year": 1991
+ },
  "https://boxd.it/1YYc": {
   "checked": "2026-10-11",
   "poster_path": "/9gC88zYUBARRSThcG93MvW14sqx.jpg",
@@ -160,12 +181,33 @@
   "tmdb_id": 26371,
   "year": 1987
  },
+ "https://boxd.it/21em": {
+  "checked": "2026-10-14",
+  "poster_path": "/gI2Qs1yTTj3NcESJyttCkbmJ4k9.jpg",
+  "title": "Big Trouble in Little China",
+  "tmdb_id": 6978,
+  "year": 1986
+ },
  "https://boxd.it/223a": {
   "checked": "2026-10-11",
   "poster_path": "/wpRrdm6g8zWtJnzVqME5QwSKkn7.jpg",
   "title": "Bram Stoker's Dracula",
   "tmdb_id": 6114,
   "year": 1992
+ },
+ "https://boxd.it/226e": {
+  "checked": "2026-10-14",
+  "poster_path": "/g6D7mjQtndu768cusGmoEQY9fTB.jpg",
+  "title": "Carlito's Way",
+  "tmdb_id": 6075,
+  "year": 1993
+ },
+ "https://boxd.it/22Wu": {
+  "checked": "2026-10-14",
+  "poster_path": "/hHtOgGb3NihlyRATHlKPaFApbrd.jpg",
+  "title": "RoboCop",
+  "tmdb_id": 5548,
+  "year": 1987
  },
  "https://boxd.it/23Uu": {
   "checked": "2026-10-11",
@@ -230,6 +272,13 @@
   "tmdb_id": 1887,
   "year": 2006
  },
+ "https://boxd.it/28Ew": {
+  "checked": "2026-10-14",
+  "poster_path": "/vbRAGLzbC75QfiKD1lKjmnQGuph.jpg",
+  "title": "Thelma & Louise",
+  "tmdb_id": 1541,
+  "year": 1991
+ },
  "https://boxd.it/28fQ": {
   "checked": "2026-10-11",
   "poster_path": "/h5RRYPVVuHzd7QOJyP5Dsi8J9XZ.jpg",
@@ -272,6 +321,13 @@
   "tmdb_id": 670,
   "year": 2003
  },
+ "https://boxd.it/29Ug": {
+  "checked": "2026-10-14",
+  "poster_path": "/kaS8BkTZESnkoB5i1zRQ02FIRGk.jpg",
+  "title": "Boyz n the Hood",
+  "tmdb_id": 650,
+  "year": 1991
+ },
  "https://boxd.it/29lU": {
   "checked": "2026-10-11",
   "poster_path": "/pCe6lfLxt1B58zPD4lgQrlnDS2j.jpg",
@@ -293,12 +349,26 @@
   "tmdb_id": 845,
   "year": 1951
  },
+ "https://boxd.it/2aHW": {
+  "checked": "2026-10-14",
+  "poster_path": "/uS9m8OBk1A8eM9I042bx8XXpqAq.jpg",
+  "title": "The Silence of the Lambs",
+  "tmdb_id": 274,
+  "year": 1991
+ },
  "https://boxd.it/2as8": {
   "checked": "2026-10-11",
   "poster_path": "/hY4exng4s29RzDbtQInjx9MA3PZ.jpg",
   "title": "La Haine",
   "tmdb_id": 406,
   "year": 1995
+ },
+ "https://boxd.it/2asM": {
+  "checked": "2026-10-14",
+  "poster_path": "/76Ts0yoHk8kVQj9MMnoMixhRWoh.jpg",
+  "title": "Basic Instinct",
+  "tmdb_id": 402,
+  "year": 1992
  },
  "https://boxd.it/2ayq": {
   "checked": "2026-10-11",
@@ -307,12 +377,33 @@
   "tmdb_id": 339,
   "year": 1991
  },
+ "https://boxd.it/2b3I": {
+  "checked": "2026-10-14",
+  "poster_path": "/2YztYilviFCYcEtDAnrOstUWGie.jpg",
+  "title": "O Brother, Where Art Thou?",
+  "tmdb_id": 134,
+  "year": 2000
+ },
  "https://boxd.it/2be2": {
   "checked": "2026-10-11",
   "poster_path": "/2w09J0KUnVtJvqPYu8N63XjAyCR.jpg",
   "title": "Brazil",
   "tmdb_id": 68,
   "year": 1985
+ },
+ "https://boxd.it/2pQ0": {
+  "checked": "2026-10-14",
+  "poster_path": "/yUkH0y9OsY7J08Dvfzi1P0di559.jpg",
+  "title": "Redline",
+  "tmdb_id": 71883,
+  "year": 2009
+ },
+ "https://boxd.it/34Q6": {
+  "checked": "2026-10-14",
+  "poster_path": "/19hyCudualHxCD0GrEngqsi0wBF.jpg",
+  "title": "Amour",
+  "tmdb_id": 86837,
+  "year": 2012
  },
  "https://boxd.it/4DLW": {
   "checked": "2026-10-11",
@@ -327,6 +418,13 @@
   "title": "An Autumn's Tale",
   "tmdb_id": 64015,
   "year": 1987
+ },
+ "https://boxd.it/70sM": {
+  "checked": "2026-10-14",
+  "poster_path": "/xDSH9Pxmj0MtXPYd0f8SiXdGJ88.jpg",
+  "title": "Nostos: The Return",
+  "tmdb_id": 237957,
+  "year": 1989
  },
  "https://boxd.it/7DPK": {
   "checked": "2026-10-11",
@@ -447,6 +545,13 @@
   "tmdb_id": 1596296,
   "year": 2026
  },
+ "https://boxd.it/ZzT2": {
+  "checked": "2026-10-14",
+  "poster_path": "/kohUtEueIVyDXC30MaOdi36aAwn.jpg",
+  "title": "Elsinore",
+  "tmdb_id": 1599230,
+  "year": 2026
+ },
  "https://boxd.it/dvXe": {
   "checked": "2026-10-11",
   "poster_path": "/pHlRr2MfjK77VIIAO7p0R4jhsJI.jpg",
@@ -488,6 +593,13 @@
   "title": "Arco",
   "tmdb_id": 804370,
   "year": 2025
+ },
+ "https://boxd.it/xG0M": {
+  "checked": "2026-10-14",
+  "poster_path": "/dNJFRtVg3xLQ7dbNIQ55cmmIniD.jpg",
+  "title": "Wild Horse Nine",
+  "tmdb_id": 891621,
+  "year": 2026
  },
  "https://boxd.it/yXaQ": {
   "checked": "2026-10-11",
