@@ -34,6 +34,13 @@
   "tmdb_id": 17346,
   "year": 1975
  },
+ "https://boxd.it/1O9S": {
+  "checked": "2026-10-15",
+  "poster_path": "/5LipPcaW1J9IjAP7TOTesw8OcMS.jpg",
+  "title": "Body Heat",
+  "tmdb_id": 14412,
+  "year": 1981
+ },
  "https://boxd.it/1PGe": {
   "checked": "2026-10-11",
   "poster_path": "/m8yOFRDVZPxtsr4D2hVdzls6q6t.jpg",
@@ -356,6 +363,13 @@
   "tmdb_id": 274,
   "year": 1991
  },
+ "https://boxd.it/2aSU": {
+  "checked": "2026-10-15",
+  "poster_path": "/9msfwOeGc9uL1iRRTBdEf15XonC.jpg",
+  "title": "Mean Streets",
+  "tmdb_id": 203,
+  "year": 1973
+ },
  "https://boxd.it/2as8": {
   "checked": "2026-10-11",
   "poster_path": "/hY4exng4s29RzDbtQInjx9MA3PZ.jpg",
@@ -404,6 +418,13 @@
   "title": "Amour",
   "tmdb_id": 86837,
   "year": 2012
+ },
+ "https://boxd.it/3dBE": {
+  "checked": "2026-10-15",
+  "poster_path": null,
+  "title": "My Brother's Wedding",
+  "tmdb_id": null,
+  "year": 1983
  },
  "https://boxd.it/4DLW": {
   "checked": "2026-10-11",
