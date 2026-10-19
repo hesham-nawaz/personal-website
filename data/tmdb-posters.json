@@ -244,6 +244,13 @@
   "tmdb_id": 4011,
   "year": 1988
  },
+ "https://boxd.it/25A2": {
+  "checked": "2026-10-19",
+  "poster_path": "/A0byHUHMwZ7dtBQtfZ44QIgDbjo.jpg",
+  "title": "Barry Lyndon",
+  "tmdb_id": 3175,
+  "year": 1975
+ },
  "https://boxd.it/25ds": {
   "checked": "2026-10-11",
   "poster_path": "/dOBdatHIVppvmRFw2z7bf9VKJr9.jpg",
@@ -342,6 +349,13 @@
   "tmdb_id": 638,
   "year": 1997
  },
+ "https://boxd.it/29b6": {
+  "checked": "2026-10-19",
+  "poster_path": "/hGg1UCQSHlXfv2HI9bDHT2OQBam.jpg",
+  "title": "Paths of Glory",
+  "tmdb_id": 975,
+  "year": 1957
+ },
  "https://boxd.it/29lU": {
   "checked": "2026-10-11",
   "poster_path": "/pCe6lfLxt1B58zPD4lgQrlnDS2j.jpg",
@@ -363,6 +377,13 @@
   "tmdb_id": 845,
   "year": 1951
  },
+ "https://boxd.it/2a1Q": {
+  "checked": "2026-10-19",
+  "poster_path": "/kMKyx1k8hWWscYFnPbnxxN4Eqo4.jpg",
+  "title": "Full Metal Jacket",
+  "tmdb_id": 600,
+  "year": 1987
+ },
  "https://boxd.it/2aHW": {
   "checked": "2026-10-14",
   "poster_path": "/uS9m8OBk1A8eM9I042bx8XXpqAq.jpg",
@@ -370,12 +391,26 @@
   "tmdb_id": 274,
   "year": 1991
  },
+ "https://boxd.it/2aMi": {
+  "checked": "2026-10-19",
+  "poster_path": "/A6VzUPcADZGYdGHlVdWvpMNDF5d.jpg",
+  "title": "The Killing",
+  "tmdb_id": 247,
+  "year": 1956
+ },
  "https://boxd.it/2aSU": {
   "checked": "2026-10-15",
   "poster_path": "/9msfwOeGc9uL1iRRTBdEf15XonC.jpg",
   "title": "Mean Streets",
   "tmdb_id": 203,
   "year": 1973
+ },
+ "https://boxd.it/2aVE": {
+  "checked": "2026-10-19",
+  "poster_path": "/4sHeTAp65WrSSuc05nRBKddhBxO.jpg",
+  "title": "A Clockwork Orange",
+  "tmdb_id": 185,
+  "year": 1971
  },
  "https://boxd.it/2as8": {
   "checked": "2026-10-11",
@@ -411,6 +446,13 @@
   "title": "Brazil",
   "tmdb_id": 68,
   "year": 1985
+ },
+ "https://boxd.it/2bf0": {
+  "checked": "2026-10-19",
+  "poster_path": "/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg",
+  "title": "2001: A Space Odyssey",
+  "tmdb_id": 62,
+  "year": 1968
  },
  "https://boxd.it/2pQ0": {
   "checked": "2026-10-14",
