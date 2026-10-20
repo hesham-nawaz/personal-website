@@ -244,6 +244,13 @@
   "tmdb_id": 4011,
   "year": 1988
  },
+ "https://boxd.it/24WQ": {
+  "checked": "2026-10-20",
+  "poster_path": "/3RAoVTxUk1OzZClscAsynuu670p.jpg",
+  "title": "Corpse Bride",
+  "tmdb_id": 3933,
+  "year": 2005
+ },
  "https://boxd.it/25A2": {
   "checked": "2026-10-19",
   "poster_path": "/A0byHUHMwZ7dtBQtfZ44QIgDbjo.jpg",
@@ -580,6 +587,13 @@
   "tmdb_id": 1452168,
   "year": 2026
  },
+ "https://boxd.it/TbK4": {
+  "checked": "2026-10-20",
+  "poster_path": "/oNejN1l69nBF8LdQwy5FkAQZT44.jpg",
+  "title": "Fatherland",
+  "tmdb_id": 1437696,
+  "year": 2026
+ },
  "https://boxd.it/UNi": {
   "checked": "2026-10-11",
   "poster_path": "/wlSmIk6iQ8yQhBG795UOOBUs4gF.jpg",
@@ -656,6 +670,13 @@
   "title": "Midnight in Paris",
   "tmdb_id": 59436,
   "year": 2011
+ },
+ "https://boxd.it/iL4": {
+  "checked": "2026-10-20",
+  "poster_path": "/fnHC1OJ1EbdOX97nmXVYrXFgiQT.jpg",
+  "title": "Mikey and Nicky",
+  "tmdb_id": 59143,
+  "year": 1976
  },
  "https://boxd.it/jkPq": {
   "checked": "2026-10-11",
