@@ -146,12 +146,26 @@
   "tmdb_id": 10436,
   "year": 1993
  },
+ "https://boxd.it/1WlM": {
+  "checked": "2026-10-23",
+  "poster_path": "/tZ3kDut2dhFVGkWNEn9xoCHCNAx.jpg",
+  "title": "The Player",
+  "tmdb_id": 10403,
+  "year": 1992
+ },
  "https://boxd.it/1WvC": {
   "checked": "2026-10-14",
   "poster_path": "/hSGncpMByW8zx2aOSXdZB0e70yA.jpg",
   "title": "Bugsy",
   "tmdb_id": 10337,
   "year": 1991
+ },
+ "https://boxd.it/1XFo": {
+  "checked": "2026-10-23",
+  "poster_path": "/2iW3pSihBIhXjnBQmUJ0mAiZbB5.jpg",
+  "title": "To Live and Die in L.A.",
+  "tmdb_id": 9846,
+  "year": 1985
  },
  "https://boxd.it/1YYc": {
   "checked": "2026-10-11",
@@ -327,6 +341,13 @@
   "title": "Rope",
   "tmdb_id": 1580,
   "year": 1948
+ },
+ "https://boxd.it/29BI": {
+  "checked": "2026-10-23",
+  "poster_path": "/6v1zYh2FKOYVddY5pCQhd4PO9uX.jpg",
+  "title": "Blue Velvet",
+  "tmdb_id": 793,
+  "year": 1986
  },
  "https://boxd.it/29CQ": {
   "checked": "2026-10-11",
