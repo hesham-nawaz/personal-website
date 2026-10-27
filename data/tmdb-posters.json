@@ -48,6 +48,13 @@
   "tmdb_id": 14412,
   "year": 1981
  },
+ "https://boxd.it/1P1U": {
+  "checked": "2026-10-27",
+  "poster_path": "/2K7CFH0AIHnGrA4yQjPCoIB5CmQ.jpg",
+  "title": "The Last Waltz",
+  "tmdb_id": 13963,
+  "year": 1978
+ },
  "https://boxd.it/1PGe": {
   "checked": "2026-10-11",
   "poster_path": "/m8yOFRDVZPxtsr4D2hVdzls6q6t.jpg",
@@ -286,6 +293,13 @@
   "tmdb_id": 3175,
   "year": 1975
  },
+ "https://boxd.it/25Hi": {
+  "checked": "2026-10-27",
+  "poster_path": "/ckklq45UxUkwgHve9xItXqXr06r.jpg",
+  "title": "Midnight Cowboy",
+  "tmdb_id": 3116,
+  "year": 1969
+ },
  "https://boxd.it/25ds": {
   "checked": "2026-10-11",
   "poster_path": "/dOBdatHIVppvmRFw2z7bf9VKJr9.jpg",
@@ -335,6 +349,13 @@
   "tmdb_id": 1541,
   "year": 1991
  },
+ "https://boxd.it/28Ka": {
+  "checked": "2026-10-27",
+  "poster_path": "/l2wTSP0Ifo9vY03nJEfkFBbT2S9.jpg",
+  "title": "Little Children",
+  "tmdb_id": 1440,
+  "year": 2006
+ },
  "https://boxd.it/28fQ": {
   "checked": "2026-10-11",
   "poster_path": "/h5RRYPVVuHzd7QOJyP5Dsi8J9XZ.jpg",
@@ -356,12 +377,26 @@
   "tmdb_id": 1607,
   "year": 1993
  },
+ "https://boxd.it/28yI": {
+  "checked": "2026-10-27",
+  "poster_path": "/1WV7WlTS8LI1L5NkCgjWT9GSW3O.jpg",
+  "title": "Raging Bull",
+  "tmdb_id": 1578,
+  "year": 1980
+ },
  "https://boxd.it/28yo": {
   "checked": "2026-10-11",
   "poster_path": "/9ar6rxLDB8kagAnXZKn6h9smscr.jpg",
   "title": "Rope",
   "tmdb_id": 1580,
   "year": 1948
+ },
+ "https://boxd.it/296g": {
+  "checked": "2026-10-27",
+  "poster_path": "/pH4saPwMjhnVGwmSH6RkMaHrt3s.jpg",
+  "title": "The French Connection",
+  "tmdb_id": 1051,
+  "year": 1971
  },
  "https://boxd.it/29BI": {
   "checked": "2026-10-23",
@@ -383,6 +418,13 @@
   "title": "Fantasia",
   "tmdb_id": 756,
   "year": 1940
+ },
+ "https://boxd.it/29Kq": {
+  "checked": "2026-10-27",
+  "poster_path": "/rx8RKXn8OtuS6lqloYsjyrGOUp4.jpg",
+  "title": "The Piano",
+  "tmdb_id": 713,
+  "year": 1993
  },
  "https://boxd.it/29R2": {
   "checked": "2026-10-11",
@@ -586,6 +628,13 @@
   "title": "Drive",
   "tmdb_id": 64690,
   "year": 2011
+ },
+ "https://boxd.it/IWJq": {
+  "checked": "2026-10-27",
+  "poster_path": "/4hfMbVbYc2gsMnSE1K8Oc9LQH4j.jpg",
+  "title": "Blue Heron",
+  "tmdb_id": 1184941,
+  "year": 2025
  },
  "https://boxd.it/JAs": {
   "checked": "2026-10-11",
