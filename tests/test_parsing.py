@@ -57,6 +57,39 @@ class FeedParsing(unittest.TestCase):
         self.assertIsNone(s.notes)
 
 
+class SameScreeningTwice(unittest.TestCase):
+    def rec(self, **kw):
+        base = {"id": "x", "source": "repertory.nyc", "date": "2026-12-05", "time": "18:00",
+                "title": "Full Metal Jacket", "year": None, "director": None, "films": None,
+                "theater": "Museum of the Moving Image", "theater_slug": "momi", "format": None,
+                "event": None, "ticket_url": None, "first_seen": "2026-10-20", "removed": None}
+        return {**base, **kw}
+
+    def test_venue_source_wins_and_borrows_missing_details(self):
+        import nyc_store
+        recs = [self.rec(id="sparse", first_seen="2026-10-23"),
+                self.rec(id="full", year=1987, director="Stanley Kubrick", ticket_url="https://tix/fmj"),
+                self.rec(id="momi-63613", source="momi", year=1987, format="35mm",
+                         ticket_url="https://movingimage.org/event/full-metal-jacket-2026/"),
+                self.rec(id="other-time", time="21:00")]
+        out = {r["id"]: r for r in nyc_store.dedupe_records(recs)}
+        self.assertEqual(sorted(out), ["momi-63613", "other-time"])
+        fmj = out["momi-63613"]
+        self.assertEqual((fmj["year"], fmj["director"], fmj["format"]), (1987, "Stanley Kubrick", "35mm"))
+        self.assertEqual(fmj["ticket_url"], "https://movingimage.org/event/full-metal-jacket-2026/")
+        [s] = [s for s in nr.screenings_from_records(list(out.values())) if s.times == ["6:00p"]]
+        self.assertEqual(s.ticket_urls, ["https://movingimage.org/event/full-metal-jacket-2026/"])
+
+    def test_titles_compare_normalized_and_newer_listing_wins(self):
+        import nyc_store
+        recs = [self.rec(id="old", title="Je t'aime, je t'aime", theater="Metrograph", year=1968,
+                         director="François Truffaut", first_seen="2026-10-18"),
+                self.rec(id="new", title="Je t’aime, je t’aime", theater="Metrograph", year=1968,
+                         director="Alain Resnais", first_seen="2026-10-20")]
+        [r] = nyc_store.dedupe_records(recs)
+        self.assertEqual(r["director"], "Alain Resnais")
+
+
 class MoMICalendar(unittest.TestCase):
     def test_parses_screenings_only(self):
         events = json.loads(MOMI_EVENTS.read_text())["events"]

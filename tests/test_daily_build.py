@@ -121,6 +121,29 @@ class DailyBuild(unittest.TestCase):
         self.assertIn('data-only="Queens"', p)
         self.assertNotIn("In the Mouth of Madness", p)          # not on the fixture watchlist
 
+    def test_screening_listed_by_two_sources_shows_once(self):
+        # repertory.nyc also covers MoMI now, sometimes twice over (a sparse
+        # stale row next to a full one): the page shows MoMI's own listing.
+        day = date(2026, 10, 13)
+        for i, (year, director, ticket) in enumerate([(None, None, None),
+                                                      (1987, "Wim Wenders", "https://tix.example/w")]):
+            self.feed[day].append({
+                "id": f"rep-momi-{i}", "film_title": "Wings of Desire (with J. Hoberman)",
+                "film_year": year, "film_director": director, "theater_name": "Museum of the Moving Image",
+                "theater_slug": "momi", "date": day.isoformat(), "time": "19:00", "format": None,
+                "ticket_url": ticket, "special_event": None})
+        self.run_day(TODAY)
+        self.assertEqual(len([r for r in self.records().values() if r["date"] == day.isoformat()
+                              and r["theater"] == "Museum of the Moving Image"]), 3,
+                         "the store keeps every source's rows")
+        p = self.page.read_text()
+        dayhtml = p.split(f'<div class="day-group" data-date="{day.isoformat()}"', 1)[1].split('<div class="day-group"', 1)[0]
+        momi = render._venue_id("Museum of the Moving Image")
+        self.assertEqual(dayhtml.count(f'data-venue="{momi}"'), 1)
+        self.assertEqual(dayhtml.count('>7:00p<'), 1)
+        self.assertIn('href="https://movingimage.org/event/wings-of-desire/"', dayhtml)
+        self.assertIn('>4K restoration<', dayhtml)
+
     def test_sources_only_remove_their_own_screenings(self):
         self.run_day(TODAY)
         momi_ids = [r["id"] for r in self.records().values() if r["source"] == "momi"]

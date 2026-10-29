@@ -266,9 +266,65 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
                 if _source(r) == SCREENSLATE and r["date"] >= run_day and not r.get("removed"))}
 
 
+# When two records describe the same screening, the venue's own calendar
+# wins over an aggregator (it has the format, and its links are canonical).
+_SOURCE_RANK = {MOMI: 0, REPERTORY: 1, SCREENSLATE: 2}
+# Fields a winning record may be missing and borrow from the duplicates.
+_FILLABLE = ("year", "director", "films", "format", "event", "ticket_url", "theater_slug")
+_DETAIL = ("year", "director", "format", "event", "ticket_url")
+
+
+def _posted(r: dict) -> int:
+    try:
+        return date.fromisoformat(r.get("first_seen") or "").toordinal()
+    except ValueError:
+        return 0
+
+
+def dedupe_records(records: list[dict]) -> list[dict]:
+    """Collapse records that are the same screening: same day, same time,
+    same venue, same title once normalized ("The\\xa0Vourdalak" and "The
+    Vourdalak" are one film). This happens two ways: repertory.nyc started
+    covering the Museum of the Moving Image (2026-10-19) on top of our own
+    MoMI source, and repertory.nyc sometimes posts one screening twice under
+    different ids (a stale row next to a corrected one).
+
+    The store keeps every source's rows as posted (so each source can still
+    mark only its own screenings removed); this runs when the page is built.
+    One record per screening is kept: the venue's own source first, then the
+    record with the most details, then the most recently posted. Details it
+    lacks (year, director, format, ticket link...) are taken from the rest.
+    """
+    from watchlist import normalize_title
+
+    groups: dict[tuple, list[dict]] = {}
+    for r in records:
+        key = (r["date"], r["time"], (r.get("theater") or "").strip().casefold(),
+               normalize_title(r.get("title") or ""))
+        groups.setdefault(key, []).append(r)
+
+    out = []
+    for rows in groups.values():
+        if len(rows) == 1:
+            out.append(rows[0])
+            continue
+        rows = sorted(rows, key=lambda r: (
+            _SOURCE_RANK.get(_source(r), 1),
+            -sum(r.get(k) is not None for k in _DETAIL),
+            -_posted(r),
+            r["id"]))
+        best = dict(rows[0])
+        for k in _FILLABLE:
+            if best.get(k) is None:
+                best[k] = next((r[k] for r in rows[1:] if r.get(k) is not None), None)
+        out.append(best)
+    return out
+
+
 def listed_records(store: Path, today: date) -> list[dict]:
-    """Screenings from today on that the feed still lists."""
-    return [r for r in load_from(store, today) if not r.get("removed")]
+    """Screenings from today on that the feed still lists, one record per
+    screening (see dedupe_records)."""
+    return dedupe_records([r for r in load_from(store, today) if not r.get("removed")])
 
 
 def show_format(raw: str | None) -> str | None:
