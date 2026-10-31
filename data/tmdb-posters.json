@@ -104,6 +104,13 @@
   "tmdb_id": 11541,
   "year": 1982
  },
+ "https://boxd.it/1Tzw": {
+  "checked": "2026-10-31",
+  "poster_path": "/wSc6tOp1yoAFbZqxG5XVGHcFvRN.jpg",
+  "title": "Millennium Mambo",
+  "tmdb_id": 11553,
+  "year": 2001
+ },
  "https://boxd.it/1U4Y": {
   "checked": "2026-10-11",
   "poster_path": "/iqUGAIQqHMMscatykpR6hVBxezA.jpg",
@@ -194,6 +201,20 @@
   "title": "To Live and Die in L.A.",
   "tmdb_id": 9846,
   "year": 1985
+ },
+ "https://boxd.it/1YPY": {
+  "checked": "2026-10-31",
+  "poster_path": "/9LTQNCvoLsKXP0LtaKAaYVtRaQL.jpg",
+  "title": "Ferris Bueller's Day Off",
+  "tmdb_id": 9377,
+  "year": 1986
+ },
+ "https://boxd.it/1YUE": {
+  "checked": "2026-10-31",
+  "poster_path": "/82KOHShH9raGhkcAN3TztVjqjj3.jpg",
+  "title": "Risky Business",
+  "tmdb_id": 9346,
+  "year": 1983
  },
  "https://boxd.it/1YYc": {
   "checked": "2026-10-11",
@@ -328,6 +349,13 @@
   "tmdb_id": 2640,
   "year": 1989
  },
+ "https://boxd.it/27B2": {
+  "checked": "2026-10-31",
+  "poster_path": "/nkucKciFGSRalw6dJtsglWqOXMC.jpg",
+  "title": "Say Anything...",
+  "tmdb_id": 2028,
+  "year": 1989
+ },
  "https://boxd.it/27CY": {
   "checked": "2026-10-11",
   "poster_path": "/vee1jyUrqUEmi5ZStWI1JJzLQJH.jpg",
@@ -411,6 +439,13 @@
   "title": "The French Connection",
   "tmdb_id": 1051,
   "year": 1971
+ },
+ "https://boxd.it/299Y": {
+  "checked": "2026-10-31",
+  "poster_path": "/fE0Yjnxnv9JPs11elXha4BEwKTR.jpg",
+  "title": "The Manchurian Candidate",
+  "tmdb_id": 982,
+  "year": 1962
  },
  "https://boxd.it/29BI": {
   "checked": "2026-10-23",
@@ -496,6 +531,13 @@
   "tmdb_id": 600,
   "year": 1987
  },
+ "https://boxd.it/2a9K": {
+  "checked": "2026-10-31",
+  "poster_path": "/ijWibsAU1iBcCD8tuIZfTmDzMVE.jpg",
+  "title": "Rashomon",
+  "tmdb_id": 548,
+  "year": 1950
+ },
  "https://boxd.it/2aCM": {
   "checked": "2026-10-25",
   "poster_path": "/2LRzNq41yrY8EjCnD1S8sCCPvKk.jpg",
@@ -559,12 +601,26 @@
   "tmdb_id": 339,
   "year": 1991
  },
+ "https://boxd.it/2az4": {
+  "checked": "2026-10-31",
+  "poster_path": "/qbYgqOczabWNn2XKwgMtVrntD6P.jpg",
+  "title": "Once Upon a Time in the West",
+  "tmdb_id": 335,
+  "year": 1968
+ },
  "https://boxd.it/2b3I": {
   "checked": "2026-10-14",
   "poster_path": "/2YztYilviFCYcEtDAnrOstUWGie.jpg",
   "title": "O Brother, Where Art Thou?",
   "tmdb_id": 134,
   "year": 2000
+ },
+ "https://boxd.it/2b8y": {
+  "checked": "2026-10-31",
+  "poster_path": "/ekstpH614fwDX8DUln1a2Opz0N8.jpg",
+  "title": "Taxi Driver",
+  "tmdb_id": 103,
+  "year": 1976
  },
  "https://boxd.it/2be2": {
   "checked": "2026-10-11",
