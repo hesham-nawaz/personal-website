@@ -181,6 +181,13 @@
   "tmdb_id": 10436,
   "year": 1993
  },
+ "https://boxd.it/1WlC": {
+  "checked": "2026-11-04",
+  "poster_path": "/j6MGZpg55cTqlHHwahBtzI2qQg1.jpg",
+  "title": "Raise the Red Lantern",
+  "tmdb_id": 10404,
+  "year": 1991
+ },
  "https://boxd.it/1WlM": {
   "checked": "2026-10-23",
   "poster_path": "/tZ3kDut2dhFVGkWNEn9xoCHCNAx.jpg",
@@ -712,6 +719,13 @@
   "title": "Blue Heron",
   "tmdb_id": 1184941,
   "year": 2025
+ },
+ "https://boxd.it/ImWe": {
+  "checked": "2026-11-04",
+  "poster_path": "/glt0v4I89rMWstDNCaFXc5SNyO1.jpg",
+  "title": "Dune: Part Three",
+  "tmdb_id": 1170608,
+  "year": 2026
  },
  "https://boxd.it/JAs": {
   "checked": "2026-10-11",
