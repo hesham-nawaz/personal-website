@@ -636,6 +636,13 @@
   "tmdb_id": 68,
   "year": 1985
  },
+ "https://boxd.it/2beG": {
+  "checked": "2026-11-05",
+  "poster_path": "/fWDbQlOWOqjR5jZm98KjGyYmUOw.jpg",
+  "title": "Talk to Her",
+  "tmdb_id": 64,
+  "year": 2002
+ },
  "https://boxd.it/2bf0": {
   "checked": "2026-10-19",
   "poster_path": "/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg",
@@ -922,6 +929,13 @@
   "title": "Pig",
   "tmdb_id": 635731,
   "year": 2021
+ },
+ "https://boxd.it/s2S": {
+  "checked": "2026-11-05",
+  "poster_path": "/mAquHAmoBgZ1omUNdNsnGVNX74c.jpg",
+  "title": "Beginners",
+  "tmdb_id": 55347,
+  "year": 2010
  },
  "https://boxd.it/uh7C": {
   "checked": "2026-10-11",
