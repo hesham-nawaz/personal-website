@@ -244,6 +244,13 @@
   "tmdb_id": 9008,
   "year": 1999
  },
+ "https://boxd.it/1ZxQ": {
+  "checked": "2026-11-07",
+  "poster_path": "/6Y0ZRyh5eH7WLY4fcF92swhtgUz.jpg",
+  "title": "Tokyo Sonata",
+  "tmdb_id": 8937,
+  "year": 2008
+ },
  "https://boxd.it/1efg": {
   "checked": "2026-10-11",
   "poster_path": "/iFqe07F78SO0SIBzWcK4I5MwNvP.jpg",
@@ -404,6 +411,13 @@
   "title": "Little Children",
   "tmdb_id": 1440,
   "year": 2006
+ },
+ "https://boxd.it/28PO": {
+  "checked": "2026-11-07",
+  "poster_path": "/1qhOyf5C4s9ZdvY8d5JDx9DFMeT.jpg",
+  "title": "Stalker",
+  "tmdb_id": 1398,
+  "year": 1979
  },
  "https://boxd.it/28fQ": {
   "checked": "2026-10-11",
@@ -880,6 +894,13 @@
   "title": "Elsinore",
   "tmdb_id": 1599230,
   "year": 2026
+ },
+ "https://boxd.it/cksW": {
+  "checked": "2026-11-07",
+  "poster_path": "/qLalOYSO378lfnBLTKydoCREtdb.jpg",
+  "title": "Kaili Blues",
+  "tmdb_id": 362178,
+  "year": 2015
  },
  "https://boxd.it/dvXe": {
   "checked": "2026-10-11",
