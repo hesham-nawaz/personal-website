@@ -580,6 +580,13 @@
   "tmdb_id": 845,
   "year": 1951
  },
+ "https://boxd.it/2a12": {
+  "checked": "2026-11-14",
+  "poster_path": "/qEWiBXJGXK28jGBAm8oFKKTB0WD.jpg",
+  "title": "The Matrix Revolutions",
+  "tmdb_id": 605,
+  "year": 2003
+ },
  "https://boxd.it/2a1Q": {
   "checked": "2026-10-19",
   "poster_path": "/kMKyx1k8hWWscYFnPbnxxN4Eqo4.jpg",
@@ -677,6 +684,13 @@
   "title": "O Brother, Where Art Thou?",
   "tmdb_id": 134,
   "year": 2000
+ },
+ "https://boxd.it/2b7g": {
+  "checked": "2026-11-14",
+  "poster_path": "/iQ5ztdjvteGeboxtmRdXEChJOHh.jpg",
+  "title": "Scarface",
+  "tmdb_id": 111,
+  "year": 1983
  },
  "https://boxd.it/2b8y": {
   "checked": "2026-10-31",
