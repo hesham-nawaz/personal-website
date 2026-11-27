@@ -104,6 +104,13 @@
   "tmdb_id": 12626,
   "year": 1987
  },
+ "https://boxd.it/1SJA": {
+  "checked": "2026-11-27",
+  "poster_path": "/bp5Kg9iT9oSXsECgDkNJVqvIrxX.jpg",
+  "title": "The Hudsucker Proxy",
+  "tmdb_id": 11934,
+  "year": 1994
+ },
  "https://boxd.it/1SXW": {
   "checked": "2026-11-11",
   "poster_path": "/pPCOAipDP0sm8SLChpTMBPdCiqB.jpg",
@@ -124,6 +131,13 @@
   "title": "The Year of Living Dangerously",
   "tmdb_id": 11541,
   "year": 1982
+ },
+ "https://boxd.it/1TEc": {
+  "checked": "2026-11-27",
+  "poster_path": "/bpjRGwfYJ71bU0hNhLIz7g3t6Oy.jpg",
+  "title": "Thief",
+  "tmdb_id": 11524,
+  "year": 1981
  },
  "https://boxd.it/1Tzw": {
   "checked": "2026-10-31",
@@ -439,6 +453,13 @@
   "title": "Girl, Interrupted",
   "tmdb_id": 3558,
   "year": 1999
+ },
+ "https://boxd.it/25gw": {
+  "checked": "2026-11-27",
+  "poster_path": "/6cL89ok9t8xEKboOjOVga2W66jj.jpg",
+  "title": "The Thin Man",
+  "tmdb_id": 3529,
+  "year": 1934
  },
  "https://boxd.it/26iI": {
   "checked": "2026-10-11",
@@ -1089,6 +1110,13 @@
   "poster_path": "/pHlRr2MfjK77VIIAO7p0R4jhsJI.jpg",
   "title": "Okja",
   "tmdb_id": 387426,
+  "year": 2017
+ },
+ "https://boxd.it/e4uc": {
+  "checked": "2026-11-27",
+  "poster_path": "/hgoWjp9Sh0MI97eAMZCnIoVfgvq.jpg",
+  "title": "Phantom Thread",
+  "tmdb_id": 400617,
   "year": 2017
  },
  "https://boxd.it/eCuA": {
