@@ -206,8 +206,11 @@ def infer_years(sources: dict[str, dict | None], known: list[dict], today: date)
     Regal's opening dates, BAM, Nitehawk, repertory.nyc. Only years from the
     last two years count, and only when they agree, so "The Mummy" (2026) at
     a multiplex never takes the 1999 film's year or the other way round.
-    Rows flagged as repertory ("_first_run": False) are left alone. Returns
-    how many rows got a year."""
+    Rows flagged as repertory ("_first_run": False) are left alone. A row
+    its source calls a current release ("_first_run": True) that no other
+    listing dates gets this year: an approximation (matching allows a year
+    either side), but it stops a new film called "Game" (Alamo, 2026) from
+    matching "The Game" (1997). Returns how many rows got a year."""
     from watchlist import normalize_title
 
     years: dict[str, set[int]] = {}
@@ -228,8 +231,11 @@ def infer_years(sources: dict[str, dict | None], known: list[dict], today: date)
             for r in rows:
                 if r.get("film_year") is None and r.get("_first_run") is not False and not r.get("films"):
                     ys = years.get(normalize_title(r.get("film_title") or ""))
-                    if ys and len(ys) == 1 or (ys and max(ys) - min(ys) <= 1):
+                    if ys and max(ys) - min(ys) <= 1:
                         r["film_year"] = max(ys)
+                        filled += 1
+                    elif r.get("_first_run") is True:
+                        r["film_year"] = today.year
                         filled += 1
     return filled
 

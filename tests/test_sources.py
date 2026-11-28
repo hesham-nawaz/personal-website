@@ -145,6 +145,8 @@ class Parsers(unittest.TestCase):
             loc = "williamsburg" if "/williamsburg/" in url else "prospectpark"
             if "/movies/" in url:
                 return NITEHAWK_PAGE.replace("williamsburg", loc).encode()
+            if url.endswith("/prospectpark/coming-soon/"):
+                raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
             if url.endswith(f"/{loc}/") or "coming-soon" in url:
                 return home.format(loc=loc).encode()
             raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
@@ -227,13 +229,15 @@ class YearInference(unittest.TestCase):
             {"film_title": "The Mummy", "film_year": None, "_first_run": None},
             {"film_title": "Wings of Desire", "film_year": None, "_first_run": None},
             {"film_title": "Club Kid", "film_year": None, "_first_run": False},
+            {"film_title": "Game", "film_year": None, "_first_run": True},
+            {"film_title": "Game", "film_year": None, "_first_run": None},
         ]}
         regal = {"2026-11-28": [{"film_title": "The Mummy", "film_year": 2026}]}
         known = [{"title": "Club Kid", "year": 2026}, {"title": "Wings of Desire", "year": 1987},
                  {"title": "The Mummy", "year": 1999}]
         filled = nyc_store.infer_years({"amc": amc, "regal": regal, "alamo": None}, known, TODAY)
-        self.assertEqual([r["film_year"] for r in amc["2026-11-28"]], [2026, 2026, None, None])
-        self.assertEqual(filled, 2)
+        self.assertEqual([r["film_year"] for r in amc["2026-11-28"]], [2026, 2026, None, None, 2026, None])
+        self.assertEqual(filled, 3)
 
 
 class TheaterSites(unittest.TestCase):

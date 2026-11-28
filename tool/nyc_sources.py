@@ -284,6 +284,8 @@ def fetch_nitehawk(today: date, end: date, get=http_get) -> dict[str, list[dict]
             try:
                 html_text = get(NITEHAWK_BASE + p).decode("utf-8", "replace")
             except urllib.error.HTTPError as e:
+                if e.code == 404 and i == 1:
+                    continue          # not every location has a coming-soon page
                 if e.code == 404 and i >= 2:
                     break             # no more dated pages
                 raise
