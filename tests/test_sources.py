@@ -240,6 +240,44 @@ class YearInference(unittest.TestCase):
         self.assertEqual(filled, 3)
 
 
+class MacSnapshots(unittest.TestCase):
+    """Sources fetched on Hesham's Mac (tool/fetch_local.py) and read back by the store."""
+
+    def test_round_trip_and_freshness(self):
+        from datetime import datetime, timedelta, timezone
+        import fetch_local
+        d = Path(tempfile.mkdtemp())
+        now = datetime(2026, 11, 28, 11, 0, tzinfo=timezone.utc)
+        rows = src.parse_regal(REGAL_PAYLOAD)
+        n = fetch_local.write_snapshot(d, "regal", {"2026-11-27": [], "2026-11-28": rows}, now)
+        self.assertEqual(n, 3)
+        got = nyc_store.load_snapshot(d, "regal", date(2026, 11, 28), now + timedelta(hours=30))
+        self.assertEqual(sorted(got), ["2026-11-28"])            # days before today dropped
+        self.assertEqual([r["id"] for r in got["2026-11-28"]], [r["id"] for r in rows])
+        self.assertIsNone(nyc_store.load_snapshot(d, "regal", date(2026, 11, 28), now + timedelta(hours=40)))
+        self.assertIsNone(nyc_store.load_snapshot(d, "amc", date(2026, 11, 28), now))
+
+    def test_store_uses_fresh_snapshot_instead_of_fetching(self):
+        from datetime import datetime, timezone
+        import fetch_local
+        store = Path(tempfile.mkdtemp()) / "store"
+        snaps = store.parent / "local-sources"
+        today = date(2026, 10, 10)
+        row = {"id": "regal-1412-1", "film_title": "Naza", "film_year": 2026, "film_director": None,
+               "films": None, "theater_name": "Regal Essex Crossing", "theater_slug": "regal-essex-crossing-1412",
+               "date": "2026-10-10", "time": "19:00", "format": None, "ticket_url": None, "special_event": None}
+        fetch_local.write_snapshot(snaps, "regal", {"2026-10-10": [row]}, datetime.now(timezone.utc))
+
+        def never(today, end):
+            raise AssertionError("should use the snapshot")
+
+        with mock.patch.object(nyc_momi, "fetch_screenings", fake_momi()):
+            s = nyc_store.refresh(store, today, fetch=FakeFeed(make_feed(today)),
+                                  screenslate=FakeScreenSlate(), sources=[("regal", never)])
+        self.assertEqual(s["snapshots"], ["regal"])
+        self.assertEqual(s["sources"], {"regal": 1})
+
+
 class TheaterSites(unittest.TestCase):
     """End to end: a theater's own site adds screenings repertory.nyc lacks,
     duplicates of repertory.nyc's collapse, and an outage keeps what's stored."""

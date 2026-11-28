@@ -143,7 +143,8 @@ def main() -> int:
               f"{s['removed']} removed, {s['restored']} back. "
               f"Museum of the Moving Image: {s['momi']}; Screen Slate venues: {s['screenslate']}; "
               + "; ".join(f"{k}: {v}" for k, v in (s.get("sources") or {}).items())
-              + f". Years filled in: {s.get('years_filled', 0)}.")
+              + f". Years filled in: {s.get('years_filled', 0)}. "
+              + f"From Mac snapshots: {', '.join(s.get('snapshots') or []) or 'none'}.")
     print(f"Listed from today: {s['screenings_listed']} showtimes; matched {s['matched_total']} "
           f"({s['matched_this_week']} this week) against {s['watchlist_entries']}-entry watchlist; "
           f"{s['weeks']} weeks on the page. Posters: {s['posters']}.")

@@ -200,6 +200,34 @@ def _fetch_days(fetch, today: date, url, label: str):
     return fetched, failed, (not fetched or fail_streak >= STOP_AFTER_FAILED_DAYS)
 
 
+SNAPSHOT_MAX_AGE_HOURS = 36
+
+
+def load_snapshot(directory: Path, name: str, today: date, now=None) -> dict | None:
+    """{iso day: rows} from a source snapshot fetched on Hesham's Mac
+    (tool/fetch_local.py) if there is one from the last 36 hours, keeping
+    the checked days from today on. None if missing, stale or unreadable."""
+    from datetime import datetime, timezone
+
+    path = Path(directory) / f"{name}.jsonl"
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+        meta = json.loads(lines[0])["meta"]
+        fetched = datetime.fromisoformat(meta["fetched_at"])
+    except (OSError, ValueError, KeyError, IndexError, TypeError):
+        return None
+    now = now or datetime.now(timezone.utc)
+    if (now - fetched).total_seconds() > SNAPSHOT_MAX_AGE_HOURS * 3600:
+        return None
+    days = {d: [] for d in meta.get("checked_days") or [] if d >= today.isoformat()}
+    for line in lines[1:]:
+        if line.strip():
+            r = json.loads(line)
+            if r.get("date") in days:
+                days[r["date"]].append(r)
+    return days
+
+
 def infer_years(sources: dict[str, dict | None], known: list[dict], today: date) -> int:
     """Fill in the year of current releases listed without one (AMC and
     Alamo give none) from other listings of the same title that have one:
@@ -241,7 +269,8 @@ def infer_years(sources: dict[str, dict | None], known: list[dict], today: date)
 
 
 def refresh(store: Path, today: date | None = None, url: str = API_URL,
-            fetch=None, momi_get_json=None, screenslate=None, sources=None) -> dict:
+            fetch=None, momi_get_json=None, screenslate=None, sources=None,
+            snapshots: Path | None = None) -> dict:
     """Fetch today..horizon from every source and merge into the store.
     Returns a summary. Raises RuntimeError, leaving the store untouched, if
     repertory.nyc (the main source) is down."""
@@ -269,14 +298,28 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
         print(f"[nyc_store] WARNING: Museum of the Moving Image calendar unavailable ({e}); "
               f"keeping its stored screenings", file=sys.stderr)
 
+    # Sources that refuse GitHub's servers are fetched on Hesham's Mac and
+    # pushed as snapshots (tool/fetch_local.py); a fresh one stands in for
+    # fetching the source here.
+    snapshots = Path(snapshots) if snapshots is not None else store.parent / "local-sources"
+    used_snapshots = []
+
     # Screen Slate, for the venues the other two don't cover.
     seen = {r.get("theater_name") for rows in fetched.values() for r in rows}
     ss = screenslate or nyc_screenslate.ScreenSlate(seen)
-    ss_fetched, _, ss_down = _fetch_days(ss.fetch_day, today, None, "Screen Slate")
+    ss_snapshot = None if screenslate is not None else load_snapshot(snapshots, SCREENSLATE, today)
+    if ss_snapshot is not None:
+        skip = {nyc_screenslate.norm_venue(v) for v in seen if v} | nyc_screenslate.COVERED
+        ss_fetched = {d: [r for r in rows if nyc_screenslate.norm_venue(r.get("theater_name")) not in skip]
+                      for d, rows in ss_snapshot.items()}
+        ss_down = False
+        used_snapshots.append(SCREENSLATE)
+    else:
+        ss_fetched, _, ss_down = _fetch_days(ss.fetch_day, today, None, "Screen Slate")
     if ss_down:
         print("[nyc_store] WARNING: Screen Slate unavailable; keeping its stored screenings", file=sys.stderr)
         ss_fetched = None
-    else:
+    elif ss_snapshot is None:
         nyc_screenslate.update_venues(store.parent / "nyc-venues.json",
                                       [r for rows in ss_fetched.values() for r in rows],
                                       **({"get": ss.get_page} if hasattr(ss, "get_page") else {}))
@@ -284,6 +327,11 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
     # Theaters' own sites (BAM, Nitehawk, AMC, Regal, Alamo).
     extra: dict[str, dict | None] = {}
     for name, fetch_source in (nyc_sources.SOURCES if sources is None else sources):
+        snap = load_snapshot(snapshots, name, today)
+        if snap is not None:
+            extra[name] = snap
+            used_snapshots.append(name)
+            continue
         try:
             extra[name] = fetch_source(today, horizon_end)
         except Exception as e:  # one site down: keep what we have from it
@@ -331,7 +379,8 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
                 1 for r in records.values()
                 if _source(r) == name and r["date"] >= run_day and not r.get("removed"))
                 for name, days in extra.items()},
-            "years_filled": years_filled}
+            "years_filled": years_filled,
+            "snapshots": used_snapshots}
 
 
 # When two records describe the same screening, the venue's own calendar

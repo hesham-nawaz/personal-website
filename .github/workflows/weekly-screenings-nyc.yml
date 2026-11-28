@@ -16,6 +16,10 @@ name: Daily Screenings (NYC)
 #   - theaters' own sites (tool/nyc_sources.py): BAM's and the Nitehawks'
 #     film pages for their regular runs, and the NYC AMC, Regal and Alamo
 #     Drafthouse locations.
+# Screen Slate, Regal and AMC refuse GitHub's servers, so a launchd job on
+# Hesham's Mac (local-sync/) fetches them each morning with
+# tool/fetch_local.py and pushes data/local-sources/; snapshots up to 36
+# hours old are used in place of fetching those sources here.
 # Any source but repertory.nyc can be down without stopping the run; its
 # stored screenings are kept until it's back.
 #
@@ -29,6 +33,11 @@ on:
     # by breakfast. Off the hour to avoid the top-of-hour Actions backlog.
     - cron: "17 10 * * *"
   workflow_dispatch:
+  # Hesham's Mac pushes Screen Slate, Regal and AMC snapshots each morning
+  # (those sites refuse GitHub's servers); rebuild the page when they land.
+  push:
+    branches: [main]
+    paths: ["data/local-sources/**"]
 
 permissions:
   contents: write
