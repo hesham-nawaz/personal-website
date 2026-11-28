@@ -126,11 +126,15 @@ def event_label(special) -> str | None:
 # set a screening apart are shown; plain digital projection (DCP) is the norm
 # and is hidden.
 _FORMAT_NAMES = [
+    (r"^imax$", lambda m: "IMAX"),
     (r"^(\d{2})\s*mm\b", lambda m: f"{m.group(1)}mm"),
     (r"^4k\s+restoration$", lambda m: "4K restoration"),
     (r"^4k(\s+dcp)?$", lambda m: "4K"),
     (r"^3d(\s+dcp)?$", lambda m: "3D"),
     (r"^(imax.*|vhs|nitrate.*|.*restoration)$", lambda m: m.group(0)[:1].upper() + m.group(0)[1:]),
+    (r"^dolby cinema$", lambda m: "Dolby Cinema"),
+    (r"^4dx$", lambda m: "4DX"),
+    (r"^screenx$", lambda m: "ScreenX"),
 ]
 
 

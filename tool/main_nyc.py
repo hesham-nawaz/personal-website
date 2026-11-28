@@ -2,8 +2,10 @@
 
 Each (daily) run:
   1. refreshes the screenings store, data/nyc-screenings/, from
-     https://repertory.nyc/api/screenings and the Museum of the Moving Image's
-     calendar for today through the feeds' horizon (see nyc_store.py);
+     https://repertory.nyc/api/screenings, the Museum of the Moving Image's
+     calendar, Screen Slate, and theaters' own sites (BAM, Nitehawk, and the
+     NYC AMC, Regal and Alamo Drafthouse locations) for today through the
+     feeds' horizon (see nyc_store.py and nyc_sources.py);
   2. matches every screening still listed from today on against Hesham's
      Letterboxd watchlist;
   3. renders "This Week in NYC" (today through Sunday) plus each later week
@@ -24,6 +26,7 @@ from pathlib import Path
 
 from match import match_screenings
 from nyc_repertory import screenings_from_records
+from nyc_sources import VENUE_BOROUGHS
 from nyc_store import listed_records, refresh
 from render import SiteWeek, write_report, write_site_page
 from tmdb_posters import attach_posters, ensure_logo
@@ -46,7 +49,7 @@ _VENUES: dict[str, dict] = {}
 
 def venue_area(venue: str) -> str:
     """Borough, for grouping the page's theater filter."""
-    known = (_VENUES.get(venue) or {}).get("borough")
+    known = (_VENUES.get(venue) or {}).get("borough") or VENUE_BOROUGHS.get(venue)
     if known:
         return known
     v = venue.strip().lower()
@@ -138,7 +141,9 @@ def main() -> int:
         print(f"Store: checked {s['days_checked']} days through {s['through']} "
               f"({s['days_failed']} failed); {s['added']} new, {s['updated']} changed, "
               f"{s['removed']} removed, {s['restored']} back. "
-              f"Museum of the Moving Image: {s['momi']}; Screen Slate venues: {s['screenslate']}.")
+              f"Museum of the Moving Image: {s['momi']}; Screen Slate venues: {s['screenslate']}; "
+              + "; ".join(f"{k}: {v}" for k, v in (s.get("sources") or {}).items())
+              + f". Years filled in: {s.get('years_filled', 0)}.")
     print(f"Listed from today: {s['screenings_listed']} showtimes; matched {s['matched_total']} "
           f"({s['matched_this_week']} this week) against {s['watchlist_entries']}-entry watchlist; "
           f"{s['weeks']} weeks on the page. Posters: {s['posters']}.")

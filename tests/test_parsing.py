@@ -14,7 +14,7 @@ import json
 import letterboxd_watchlist as lb
 import nyc_momi
 import nyc_screenslate
-from tests.helpers import MOMI_EVENTS, SS_DETAILS
+from tests.helpers import MOMI_EVENTS, SS_LISTINGS
 import nyc_repertory as nr
 from watchlist import load_watchlist, title_variants
 
@@ -115,26 +115,44 @@ class MoMICalendar(unittest.TestCase):
 
 
 class ScreenSlateListings(unittest.TestCase):
-    def setUp(self):
-        self.details = {d["nid"]: d for d in json.loads(SS_DETAILS.read_text())}
+    def rows(self):
+        return nyc_screenslate.parse_listings(SS_LISTINGS.read_text(), date(2026, 10, 12),
+                                              set(nyc_screenslate.COVERED))
 
-    def test_parses_single_and_multi_film_screenings(self):
-        self.assertEqual(nyc_screenslate.parse_films(self.details["201"]),
-                         [{"title": "Sebastiane", "year": 1976, "director": "Derek Jarman, Paul Humfress", "format": "DCP"}])
-        multi = nyc_screenslate.parse_films(self.details["203"])
-        self.assertEqual([(f["title"], f["year"], f["director"]) for f in multi],
-                         [("Sylph", 2021, "slimebubble, Almeda Morgan"), ("Wings of Desire", 1987, "Wim Wenders")])
-
-    def test_rows_skip_covered_venues(self):
-        showtimes = [{"nid": n, "field_timestamp": "2026-10-12T19:00:00", "field_note": "Q&amp;A" if n == "203" else ""}
-                     for n in ("201", "202", "203", "204")]
-        rows = nyc_screenslate.to_rows(showtimes, self.details, set(nyc_screenslate.COVERED))
-        self.assertEqual([r["theater_name"] for r in rows], ["Paris Theater", "Museum of Modern Art", "Spectacle"])
-        double = rows[2]
+    def test_rows_skip_covered_venues_and_exhibitions(self):
+        rows = self.rows()
+        self.assertEqual([r["theater_name"] for r in rows], ["Museum of Modern Art", "Paris Theater", "Spectacle"])
+        moma, paris, double = rows
+        self.assertEqual((paris["film_title"], paris["film_year"], paris["film_director"], paris["format"]),
+                         ("Sebastiane", 1976, "Derek Jarman, Paul Humfress", "DCP"))
+        self.assertEqual((paris["date"], paris["time"], paris["theater_slug"]), ("2026-10-12", "19:00", "paris-theater"))
+        self.assertEqual(paris["ticket_url"], "https://www.paristheaternyc.com/film/sebastiane-paris")
+        self.assertEqual((moma["time"], moma["special_event"], moma["format"]), ("16:00", "Introduced by Dave Kehr", "35mm"))
         self.assertEqual(double["film_title"], "Sylph / Wings of Desire")
-        self.assertEqual(len(double["films"]), 2)
-        self.assertEqual(double["special_event"], "Q&A")
-        self.assertEqual(rows[0]["id"], "ss-201-20261012T1900")
+        self.assertEqual([(f["title"], f["year"], f["director"]) for f in double["films"]],
+                         [("Sylph", 2021, "slimebubble, Almeda Morgan"), ("Wings of Desire", 1987, "Wim Wenders")])
+        self.assertEqual((double["time"], double["special_event"]), ("21:30", "Q&A"))
+        self.assertEqual(len({r["id"] for r in rows}), 3)
+
+    def test_program_with_display_title_and_times(self):
+        page = ('<div class="venue"><h3><a href="/venues/anthology-film-archives">Anthology Film Archives</a></h3>'
+                '<div class="listing"><div class="listing-content"><div class="series"><a>Faces</a></div>'
+                '<a class="display-title" href="https://anthology.example/62314">Self-Portraits</a>'
+                '<div class="media-titles"><div class="media-title"><div class="media-title-label">'
+                '<span class="field--name-title">Cinématon</span></div><div class="media-title-info">'
+                '<span> Gérard Courant</span><span>1987</span><span>4M</span><span>Digital Video</span></div></div>'
+                '<div class="media-title"><div class="media-title-label"><span class="field--name-title">Self-Portrait</span>'
+                '</div><div class="media-title-info"><span> Shigeko Kubota</span><span>1970-71</span><span>5M</span></div></div></div>'
+                '<div class="showtimes"><span>12:15am</span> <span>6:30pm**</span></div>'
+                '<div class="screening-notes"><div>** Filmmaker in person!</div></div></div></div></div>')
+        rows = nyc_screenslate.parse_listings(page, date(2026, 11, 29), set())
+        self.assertEqual([(r["film_title"], r["time"], r["special_event"]) for r in rows],
+                         [("Self-Portraits", "00:15", None), ("Self-Portraits", "18:30", "Filmmaker in person!")])
+        self.assertEqual([f["year"] for f in rows[0]["films"]], [1987, 1970])
+        self.assertEqual(rows[0]["films"][0]["format"], "Digital Video")
+        self.assertEqual(rows[0]["ticket_url"], "https://anthology.example/62314")
+        self.assertEqual(nyc_screenslate.to_24h("12:00pm"), "12:00")
+        self.assertIsNone(nyc_screenslate.to_24h("TBA"))
 
     def test_venue_addresses_and_boroughs(self):
         info = nyc_screenslate.parse_venue_page("<p>Address 36-01 35th Avenue, Astoria, NY 11106</p>")

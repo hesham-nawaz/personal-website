@@ -1,20 +1,27 @@
 name: Daily Screenings (NYC)
 
-# Every morning: stores every screening repertory.nyc, the Museum of the
-# Moving Image and Screen Slate list from today on in data/nyc-screenings/
-# (one JSON Lines file per month), matches them against
+# Every morning: stores every screening listed from today on in
+# data/nyc-screenings/ (one JSON Lines file per month), matches them against
 # Hesham's Letterboxd watchlist, and rebuilds screenings-nyc.html with this
 # week (today through Sunday) plus a picker for later weeks. Commits to main
 # so Cloudflare Pages re-deploys.
 #
-# As of Oct 2026 the feed covers 11 venues: Film Forum, Film at Lincoln
-# Center, IFC Center, Metrograph, Quad, BAM Rose Cinemas, Anthology Film
-# Archives, Roxy, New Plaza, and both Nitehawks. It does NOT include MoMA,
-# Museum of the Moving Image, Japan Society, the Paris Theater or Alamo.
+# Sources (Nov 2026):
+#   - repertory.nyc's public JSON feed: Film Forum, Film at Lincoln Center,
+#     IFC Center, Metrograph, Quad, BAM, Anthology, Roxy, New Plaza, both
+#     Nitehawks, MoMI (for BAM and Nitehawk, only repertory and events);
+#   - the Museum of the Moving Image's own calendar;
+#   - Screen Slate's daily listing pages for ~30 other venues (MoMA, the
+#     Paris, Spectacle, ...);
+#   - theaters' own sites (tool/nyc_sources.py): BAM's and the Nitehawks'
+#     film pages for their regular runs, and the NYC AMC, Regal and Alamo
+#     Drafthouse locations.
+# Any source but repertory.nyc can be down without stopping the run; its
+# stored screenings are kept until it's back.
 #
-# No auth needed — repertory.nyc/api/screenings is a public JSON feed, and the
-# Letterboxd watchlist is public, so each run first refreshes
-# data/watchlist.csv from it (keeping the last good copy if that fails).
+# No auth needed, and the Letterboxd watchlist is public, so each run first
+# refreshes data/watchlist.csv from it (keeping the last good copy if that
+# fails).
 
 on:
   schedule:
@@ -33,7 +40,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
 
     steps:
       - name: Check out repo

@@ -10,11 +10,14 @@ Stored are all screenings, not just watchlist matches, so a film added to the
 watchlist later still matches screenings that were posted earlier.
 
 Sources: repertory.nyc (11 venues), the Museum of the Moving Image's own
-calendar (nyc_momi.py), and Screen Slate for the venues neither covers
-(nyc_screenslate.py). Each record names its source, and a source's run
+calendar (nyc_momi.py), Screen Slate for the venues neither covers
+(nyc_screenslate.py), and theaters' own sites (nyc_sources.py): BAM and the
+Nitehawks for their regular runs, and the NYC AMC, Regal and Alamo Drafthouse
+locations. Each record names its source, and a source's run
 only ever marks its own screenings as removed, so one source being down or
-missing a day never touches the other's listings. If MoMI's calendar or
-Screen Slate can't be reached, their stored screenings are left as they were;
+missing a day never touches the other's listings. If MoMI's calendar,
+Screen Slate or a theater's site can't be reached, their stored screenings are
+left as they were;
 only repertory.nyc being down stops the run.
 
 Bookkeeping per screening:
@@ -39,6 +42,7 @@ from pathlib import Path
 
 import nyc_momi
 import nyc_screenslate
+import nyc_sources
 from nyc_repertory import API_URL, fetch_day, event_label, format_tag
 
 HORIZON_DAYS = 120         # never look further ahead than this
@@ -196,8 +200,42 @@ def _fetch_days(fetch, today: date, url, label: str):
     return fetched, failed, (not fetched or fail_streak >= STOP_AFTER_FAILED_DAYS)
 
 
+def infer_years(sources: dict[str, dict | None], known: list[dict], today: date) -> int:
+    """Fill in the year of current releases listed without one (AMC and
+    Alamo give none) from other listings of the same title that have one:
+    Regal's opening dates, BAM, Nitehawk, repertory.nyc. Only years from the
+    last two years count, and only when they agree, so "The Mummy" (2026) at
+    a multiplex never takes the 1999 film's year or the other way round.
+    Rows flagged as repertory ("_first_run": False) are left alone. Returns
+    how many rows got a year."""
+    from watchlist import normalize_title
+
+    years: dict[str, set[int]] = {}
+
+    def note(title, year):
+        if title and isinstance(year, int) and year >= today.year - 2:
+            years.setdefault(normalize_title(title), set()).add(year)
+
+    for r in known:
+        note(r.get("title") or r.get("film_title"), r.get("year") or r.get("film_year"))
+    for days in sources.values():
+        for rows in (days or {}).values():
+            for r in rows:
+                note(r.get("film_title"), r.get("film_year"))
+    filled = 0
+    for days in sources.values():
+        for rows in (days or {}).values():
+            for r in rows:
+                if r.get("film_year") is None and r.get("_first_run") is not False and not r.get("films"):
+                    ys = years.get(normalize_title(r.get("film_title") or ""))
+                    if ys and len(ys) == 1 or (ys and max(ys) - min(ys) <= 1):
+                        r["film_year"] = max(ys)
+                        filled += 1
+    return filled
+
+
 def refresh(store: Path, today: date | None = None, url: str = API_URL,
-            fetch=None, momi_get_json=None, screenslate=None) -> dict:
+            fetch=None, momi_get_json=None, screenslate=None, sources=None) -> dict:
     """Fetch today..horizon from every source and merge into the store.
     Returns a summary. Raises RuntimeError, leaving the store untouched, if
     repertory.nyc (the main source) is down."""
@@ -237,6 +275,16 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
                                       [r for rows in ss_fetched.values() for r in rows],
                                       **({"get": ss.get_page} if hasattr(ss, "get_page") else {}))
 
+    # Theaters' own sites (BAM, Nitehawk, AMC, Regal, Alamo).
+    extra: dict[str, dict | None] = {}
+    for name, fetch_source in (nyc_sources.SOURCES if sources is None else sources):
+        try:
+            extra[name] = fetch_source(today, horizon_end)
+        except Exception as e:  # one site down: keep what we have from it
+            print(f"[nyc_store] WARNING: {name} unavailable ({e}); keeping its stored screenings",
+                  file=sys.stderr)
+            extra[name] = None
+
     # Every month the checked window touches.
     months = set()
     d = today
@@ -246,12 +294,21 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
     months.add(horizon_end.isoformat()[:7])
     records = load_months(store, months)
 
+    known = [r for rows in fetched.values() for r in rows] + [
+        r for r in records.values() if r["date"] >= (today - timedelta(days=90)).isoformat()]
+    if momi_fetched:
+        known += [r for rows in momi_fetched.values() for r in rows]
+    years_filled = infer_years(extra, known, today)
+
     counts = {"added": 0, "updated": 0, "removed": 0, "restored": 0}
     _merge(records, fetched, REPERTORY, run_day, counts)
     if momi_fetched is not None:
         _merge(records, momi_fetched, MOMI, run_day, counts)
     if ss_fetched is not None:
         _merge(records, ss_fetched, SCREENSLATE, run_day, counts)
+    for name, days in extra.items():
+        if days is not None:
+            _merge(records, days, name, run_day, counts)
 
     _write_months(store, records, months)
     listed_now = sum(1 for r in records.values()
@@ -263,12 +320,18 @@ def refresh(store: Path, today: date | None = None, url: str = API_URL,
             "momi": "unavailable" if momi_fetched is None else momi_listed,
             "screenslate": "unavailable" if ss_fetched is None else sum(
                 1 for r in records.values()
-                if _source(r) == SCREENSLATE and r["date"] >= run_day and not r.get("removed"))}
+                if _source(r) == SCREENSLATE and r["date"] >= run_day and not r.get("removed")),
+            "sources": {name: "unavailable" if days is None else sum(
+                1 for r in records.values()
+                if _source(r) == name and r["date"] >= run_day and not r.get("removed"))
+                for name, days in extra.items()},
+            "years_filled": years_filled}
 
 
 # When two records describe the same screening, the venue's own calendar
 # wins over an aggregator (it has the format, and its links are canonical).
-_SOURCE_RANK = {MOMI: 0, REPERTORY: 1, SCREENSLATE: 2}
+_SOURCE_RANK = {MOMI: 0, "bam": 0, "nitehawk": 0, "regal": 0, "amc": 0, "alamo": 0,
+                REPERTORY: 1, SCREENSLATE: 2}
 # Fields a winning record may be missing and borrow from the duplicates.
 _FILLABLE = ("year", "director", "films", "format", "event", "ticket_url", "theater_slug")
 _DETAIL = ("year", "director", "format", "event", "ticket_url")

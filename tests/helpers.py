@@ -14,6 +14,11 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 if str(TOOL) not in sys.path:
     sys.path.insert(0, str(TOOL))
 
+# Tests never reach the theaters' own sites: no such sources unless a test
+# passes fakes (see test_daily_build.TheaterSites).
+import nyc_sources  # noqa: E402
+nyc_sources.SOURCES = []
+
 WATCHLIST = FIXTURES / "watchlist.csv"
 MOMI_EVENTS = FIXTURES / "momi_events.json"
 
@@ -89,7 +94,7 @@ def fake_momi(rows=None, fail=False):
     return fetch
 
 
-SS_DETAILS = FIXTURES / "screenslate_details.json"
+SS_LISTINGS = FIXTURES / "screenslate_listings.html"
 SS_VENUE_PAGES = {
     "paris-theater": "<div>Address 4 West 58th Street, New York, NY 10019</div>",
     "museum-modern-art": "<div>Address 11 West 53rd Street, New York, NY 10019</div>",
@@ -98,14 +103,14 @@ SS_VENUE_PAGES = {
 
 
 class FakeScreenSlate:
-    """Stands in for nyc_screenslate.ScreenSlate: the fixture's screenings
-    every day (Paris, MoMA, a Spectacle double feature, and a Film Forum
-    listing that must be skipped as already covered)."""
+    """Stands in for nyc_screenslate.ScreenSlate: the fixture's listing page
+    every day (Paris, MoMA, a Spectacle double feature, a Film Forum listing
+    that must be skipped as already covered, and an exhibition with no
+    showtimes)."""
 
     def __init__(self, fail=False):
-        import json
         self.fail = fail
-        self.details = {d["nid"]: d for d in json.loads(SS_DETAILS.read_text())}
+        self.page = SS_LISTINGS.read_text()
         self.pages = []
 
     def fetch_day(self, day, url=None):
@@ -114,12 +119,7 @@ class FakeScreenSlate:
             raise OSError("simulated Screen Slate outage")
         if day > date(2026, 10, 25):              # two weeks of listings, like make_feed
             return []
-        ts = day.isoformat()
-        showtimes = [{"nid": "201", "field_timestamp": f"{ts}T19:00:00", "field_note": ""},
-                     {"nid": "202", "field_timestamp": f"{ts}T16:00:00", "field_note": "Introduced by Dave Kehr"},
-                     {"nid": "203", "field_timestamp": f"{ts}T21:30:00", "field_note": "Q&amp;A"},
-                     {"nid": "204", "field_timestamp": f"{ts}T20:15:00", "field_note": ""}]
-        return nyc_screenslate.to_rows(showtimes, self.details, set(nyc_screenslate.COVERED))
+        return nyc_screenslate.parse_listings(self.page, day, set(nyc_screenslate.COVERED))
 
     def get_page(self, path):
         self.pages.append(path)
